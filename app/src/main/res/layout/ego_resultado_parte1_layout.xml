@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/txtvExamenFQEGO"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="20dp"
+        android:text="@string/label_examen_fisico_qumico"
+        android:textStyle="bold"
+        />
+
+    <TextView
+        android:id="@+id/txtvResultadoEGO"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="80dp"
+        android:layout_toRightOf="@+id/txtvExamenFQEGO"
+        android:text="@string/label_resultado_malaria"
+        android:textStyle="bold"
+        />
+
+    <TextView
+        android:id="@+id/txtvColorEGO"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvExamenFQEGO"
+        android:text="@string/label_color"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtColorEGO"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:layout_below="@+id/txtvResultadoEGO"
+        android:layout_marginLeft="109dp"
+        android:layout_toRightOf="@+id/txtvColorEGO"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvAspecto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvColorEGO"
+        android:text="@string/label_aspecto"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtAspecto"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/edtxtColorEGO"
+        android:layout_marginLeft="91dp"
+        android:layout_toRightOf="@+id/txtvAspecto"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvSedimento"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvAspecto"
+        android:text="@string/label_sedimento"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtSedimento"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/edtxtAspecto"
+        android:layout_marginLeft="75dp"
+        android:layout_toRightOf="@+id/txtvSedimento"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvExamenQuimico"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvSedimento"
+        android:text="@string/label_examen_qumico"
+        android:textStyle="bold"
+        />
+
+    <TextView
+        android:id="@+id/txtvDensidad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvExamenQuimico"
+        android:text="@string/label_densidad"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtDensidad"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/txtvExamenQuimico"
+        android:layout_marginLeft="84dp"
+        android:layout_toRightOf="@+id/txtvDensidad"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvProteinas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvDensidad"
+        android:text="@string/label_proteinas"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtProteinas"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_below="@+id/edtxtDensidad"
+        android:layout_marginLeft="82dp"
+        android:layout_toRightOf="@+id/txtvProteinas"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvHemoglobinas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvProteinas"
+        android:text="@string/label_hemoglobinas"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtHemoglobinas"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="23dp"
+        android:layout_below="@+id/edtxtProteinas"
+        android:layout_marginLeft="48dp"
+        android:layout_toRightOf="@+id/txtvHemoglobinas"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvCuerpoCetonico"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvHemoglobinas"
+        android:text="@string/label_cuerpo_cetonico"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtCuerpoCetonico"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="23dp"
+        android:layout_below="@+id/edtxtHemoglobinas"
+        android:layout_marginLeft="32dp"
+        android:layout_toRightOf="@+id/txtvCuerpoCetonico"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvPHego"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvCuerpoCetonico"
+        android:text="@string/label_ph"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtPHego"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="23dp"
+        android:layout_below="@+id/edtxtCuerpoCetonico"
+        android:layout_marginLeft="129dp"
+        android:layout_toRightOf="@+id/txtvPHego"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvUrobilinogeno"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvPHego"
+        android:text="@string/label_urobilinogeno"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtUrobilinogeno"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="27dp"
+        android:layout_below="@+id/edtxtPHego"
+        android:layout_marginLeft="49dp"
+        android:layout_toRightOf="@+id/txtvUrobilinogeno"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvGlucosa"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvUrobilinogeno"
+        android:text="@string/label_glucosa"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtGlucosa"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_below="@+id/edtxtUrobilinogeno"
+        android:layout_marginLeft="90dp"
+        android:layout_toRightOf="@+id/txtvGlucosa"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvBilirrubinasEGO"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvGlucosa"
+        android:text="@string/label_bilirrubinas"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtBilirrubinasEGO"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="23dp"
+        android:layout_below="@+id/edtxtGlucosa"
+        android:layout_marginLeft="67dp"
+        android:layout_toRightOf="@+id/txtvBilirrubinasEGO"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvNitritos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvBilirrubinasEGO"
+        android:text="@string/label_nitritos"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtNitritos"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="22dp"
+        android:layout_below="@+id/edtxtBilirrubinasEGO"
+        android:layout_marginLeft="95dp"
+        android:layout_toRightOf="@+id/txtvNitritos"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+</RelativeLayout>

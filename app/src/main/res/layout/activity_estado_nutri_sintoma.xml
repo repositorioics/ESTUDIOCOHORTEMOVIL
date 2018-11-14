@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    tools:context=".sintomasactivities.EstadoNutriSintomasAcitvity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent">
+
+        <Button
+            android:id="@+id/btnEstadoNutriGSintomas"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:layout_marginTop="7dp"
+            android:text="@string/boton_estado_nutri_sintomas"
+            android:layout_alignParentTop="true"
+            android:drawableRight="@drawable/reducir"
+            android:onClick="onClick_btnRegresar"
+            />
+
+        <TextView
+            android:id="@+id/txtvIMCENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btnEstadoNutriGSintomas"
+            android:layout_toRightOf="@+id/txtvSimbPorc"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="24dp"
+            android:text="@string/label_imc"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            />
+
+        <EditText
+            android:id="@+id/edtxtimc"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:inputType="numberDecimal"
+            android:layout_below="@+id/btnEstadoNutriGSintomas"
+            android:layout_toRightOf="@+id/txtvIMCENSintoma"
+            android:layout_marginTop="14dp"
+            android:layout_marginLeft="14dp"
+            android:layout_marginRight="10dp"
+            android:ems="10"
+            android:textCursorDrawable="@null"
+            style="@style/EditTextEstilo" />
+
+        <TextView
+            android:id="@+id/txtvEstdoNutri"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="45dp"
+            android:layout_marginLeft="24dp"
+            android:layout_below="@id/txtvIMCENSintoma"
+            android:text="@string/label_estado_nturicional"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            />
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/spnEstadoNutri"
+            android:layout_marginTop="28dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_below="@+id/txtvIMCENSintoma"
+            android:layout_toRightOf="@+id/txtvEstdoNutri" />
+
+        <!--<TextView
+            android:id="@+id/txtvPrinciplaENSintoma"
+            android:layout_width="420dp"
+            android:layout_height="30dp"
+            android:layout_below="@+id/btnEstadoNutriGSintomas"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="14dp"
+            android:gravity="center"
+            android:background="@drawable/bg_textview_rectangulo"
+            android:text="@string/label_sintoma"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/txtvSENSintoma"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_toRightOf="@+id/txtvPrinciplaENSintoma"
+            android:layout_below="@+id/btnEstadoNutriGSintomas"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="2dp"
+            android:gravity="center"
+            android:background="@drawable/bg_textview_rectangulo"
+            android:text="@string/label_s"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/txtvNENSintoma"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_toRightOf="@+id/txtvSENSintoma"
+            android:layout_below="@+id/btnEstadoNutriGSintomas"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="5dp"
+            android:gravity="center"
+            android:background="@drawable/bg_textview_rectangulo"
+            android:text="@string/label_n"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/txtvDENintoma"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_toRightOf="@+id/txtvNENSintoma"
+            android:layout_below="@+id/btnEstadoNutriGSintomas"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="5dp"
+            android:gravity="center"
+            android:background="@drawable/bg_textview_rectangulo"
+            android:text="@string/label_d"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/txtvIMCENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvPrinciplaENSintoma"
+            android:layout_toRightOf="@+id/txtvSimbPorc"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="24dp"
+            android:text="@string/label_imc"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            />
+
+        <EditText
+            android:id="@+id/edtxtimc"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:inputType="numberDecimal"
+            android:layout_below="@+id/txtvPrinciplaENSintoma"
+            android:layout_toRightOf="@+id/txtvIMCENSintoma"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="14dp"
+            android:ems="10"
+            android:textCursorDrawable="@null"
+            style="@style/EditTextEstilo" />
+
+        <TextView
+            android:id="@+id/txtvOBSENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvIMCENSintoma"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="24dp"
+            android:text="@string/label_obeso"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbOBSSENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvPrinciplaENSintoma"
+            android:layout_below="@+id/txtvIMCENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedOBSEN"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbOBSNENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvSENSintoma"
+            android:layout_below="@+id/txtvIMCENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedOBSEN"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbOBSDENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvNENSintoma"
+            android:layout_below="@+id/txtvIMCENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedOBSEN"
+            />
+
+        <TextView
+            android:id="@+id/txtvSBPENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvOBSENSintoma"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="24dp"
+            android:text="@string/label_sobrepeso"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbSBPSENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvPrinciplaENSintoma"
+            android:layout_below="@+id/txtvOBSENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedSBPEN"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbSBPNENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvSENSintoma"
+            android:layout_below="@+id/txtvOBSENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedSBPEN"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbSBPDENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvNENSintoma"
+            android:layout_below="@+id/txtvOBSENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedSBPEN"
+            />
+
+        <TextView
+            android:id="@+id/txtvSDPENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvSBPENSintoma"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="24dp"
+            android:text="@string/label_sospecha_problema"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbSDPSENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvPrinciplaENSintoma"
+            android:layout_below="@+id/txtvSBPENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedSDPEN"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbSDPNENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvSENSintoma"
+            android:layout_below="@+id/txtvSBPENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedSDPEN"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbSDPDENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvNENSintoma"
+            android:layout_below="@+id/txtvSBPENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedSDPEN"
+            />
+
+        <TextView
+            android:id="@+id/txtvNRMENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvSDPENSintoma"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="24dp"
+            android:text="@string/label_normal"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbNRMSENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvPrinciplaENSintoma"
+            android:layout_below="@+id/txtvSDPENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedNRMEN"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbNRMNENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvSENSintoma"
+            android:layout_below="@+id/txtvSDPENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedNRMEN"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbNRMDENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvNENSintoma"
+            android:layout_below="@+id/txtvSDPENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedNRMEN"
+            />
+
+        <TextView
+            android:id="@+id/txtvBJPENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvNRMENSintoma"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="24dp"
+            android:text="@string/label_bajo_peso"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbBJPSENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvPrinciplaENSintoma"
+            android:layout_below="@+id/txtvNRMENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedBJPEN"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbBJPNENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvSENSintoma"
+            android:layout_below="@+id/txtvNRMENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedBJPEN"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbBJPDENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvNENSintoma"
+            android:layout_below="@+id/txtvNRMENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedBJPEN"
+            />
+
+        <TextView
+            android:id="@+id/txtvBPSENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvBJPENSintoma"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="24dp"
+            android:text="@string/label_bajo_peso_severo"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbBPSSENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvPrinciplaENSintoma"
+            android:layout_below="@+id/txtvBJPENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedBPSEN"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbBPSNENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvSENSintoma"
+            android:layout_below="@+id/txtvBJPENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedBPSEN"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbBPSDENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvNENSintoma"
+            android:layout_below="@+id/txtvBJPENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedBPSEN"
+            />-->
+
+
+    </RelativeLayout>
+
+</ScrollView>

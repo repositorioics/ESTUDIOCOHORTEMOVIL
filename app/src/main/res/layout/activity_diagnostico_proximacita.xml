@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:focusable="true" android:focusableInTouchMode="true"
+    tools:context=".diagnosticoactivities.DiagnosticoProximaCitaActivity">
+
+
+    <!-- Header aligned to top -->
+
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@color/color_border_edit_text_normal"
+        android:gravity="center" >
+
+        <Button
+            android:id="@+id/btnProximaCita"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:layout_marginTop="7dp"
+            android:text="@string/boton_diagnostico_proximacita"
+            android:layout_alignParentTop="true"
+            android:onClick="onClick_btnProximaCita"
+            android:drawableRight="@drawable/reducir"/>
+
+    </RelativeLayout>
+
+
+
+    <!-- Content below header and above footer -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="40dp"
+        android:text="@string/label_TelefonoEmergencia"
+        android:id="@+id/txtvTelEme"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/header"
+        android:textAppearance="@style/LabelDiagnosticocreensEstilo"
+        />
+
+    <EditText
+        android:id="@+id/edtxtTelEme"
+        android:layout_width="220dp"
+        android:layout_height="40dp"
+        android:inputType="number"
+        android:maxLength="10"
+        android:layout_below="@+id/header"
+        android:layout_marginTop="35dp"
+        android:layout_toRightOf="@+id/txtvTelEme"
+        android:layout_marginLeft="8dp"
+        android:ems="10"
+        android:textCursorDrawable="@null"
+        style="@style/EditTextEstilo" >
+    </EditText>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="40dp"
+        android:text="@string/label_proximacita"
+        android:id="@+id/txtvProximacita"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/txtvTelEme"
+        android:textAppearance="@style/LabelDiagnosticocreensEstilo"
+        />
+
+    <EditText
+        android:id="@+id/dpProximaCita"
+        android:layout_width="220dp"
+        android:layout_height="40dp"
+        android:inputType="date"
+        android:layout_toRightOf="@+id/txtvProximacita"
+        android:layout_below="@+id/txtvTelEme"
+        android:layout_marginTop="42dp"
+        android:layout_marginLeft="8dp"
+        android:ems="10"
+        style="@style/EditTextEstilo">
+
+        </EditText>
+
+        <!--android:textAppearance="@style/LabelSintomasScreensEstilo">-->
+    <ImageButton
+        android:id="@+id/ibtCalendar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:layout_marginTop="185dp"
+        android:layout_toRightOf="@+id/dpProximaCita"
+        android:background="@drawable/calendar48"
+
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="33dp"
+        android:text="@string/label_Colegio"
+        android:id="@+id/txtvColegio"
+
+        android:layout_below="@+id/txtvProximacita"
+        android:textAppearance="@style/LabelDiagnosticocreensEstilo"
+        />
+
+    <Spinner
+        android:id="@+id/spnColegio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="100dp"
+        android:layout_below="@+id/txtvProximacita"
+        android:layout_toRightOf="@+id/txtvColegio"
+        />
+
+    <ImageButton
+        android:id="@+id/imgBusquedaColegio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="15dp"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/lupa32"
+        android:background="@drawable/bg_button_lupa"
+        android:onClick="onClick_btnBuscarEscuelaPaciente"
+        android:layout_alignBottom="@+id/spnColegio" />
+
+    <!--<EditText
+        android:id="@+id/edtxColegio"
+        android:layout_width="270dp"
+        android:layout_marginTop="32dp"
+        android:layout_height="42dp"
+        android:layout_marginLeft="10dp"
+        android:inputType="text"
+        android:enabled="false"
+        android:layout_toRightOf="@+id/txtvColegio"
+        android:layout_below="@+id/txtvProximacita"
+
+
+        android:imeOptions="actionUnspecified"
+        android:maxLines="1" android:singleLine="true"
+
+        />-->
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="40dp"
+        android:text="@string/label_HorarioClase"
+        android:id="@+id/txtvHorarioClase"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/txtvColegio"
+        android:textAppearance="@style/LabelDiagnosticocreensEstilo"
+        />
+
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="AM"
+        android:height="20dp"
+        android:layout_marginTop="38dp"
+        android:id="@+id/chkAM"
+        android:layout_below="@+id/txtvColegio"
+        android:layout_toRightOf="@+id/txtvHorarioClase"
+        android:onClick="onChkboxClickedHorario"
+        android:textAppearance="@style/LabelDiagnosticocreensEstilo"
+        />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PM"
+        android:layout_marginTop="38dp"
+        android:id="@+id/chkPm"
+        android:layout_below="@+id/txtvColegio"
+        android:layout_toRightOf="@+id/chkAM"
+        android:onClick="onChkboxClickedHorario"
+        android:textAppearance="@style/LabelDiagnosticocreensEstilo"
+        />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NA"
+        android:layout_marginTop="38dp"
+        android:id="@+id/chkNA"
+        android:layout_below="@+id/txtvColegio"
+        android:layout_toRightOf="@+id/chkPm"
+        android:onClick="onChkboxClickedHorario"
+        android:textAppearance="@style/LabelDiagnosticocreensEstilo"
+        />
+
+</RelativeLayout>

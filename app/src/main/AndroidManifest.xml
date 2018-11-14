@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.sts_ni.estudiocohortecssfv" >
+
+    <uses-permission
+        android:name="android.permission.INTERNET" />
+    <uses-permission
+        android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission
+        android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:name=".CssfvApp"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/CustomActionBarTheme" >
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustResize|stateVisible" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".PantallaInicioActivity"
+            android:label="@string/title_pantalla_inicio" >
+            <intent-filter>
+                <action android:name="com.sts_ni.estudiocohortecssfv.inicio_action" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".InicioEnfermeriaActivity"
+            android:label="@string/title_titulopreclinicos">
+            <intent-filter>
+                <action android:name="com.sts_ni.estudiocohortecssfv.enfermeria_action" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".PreClinicosActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".EmergenciaCargaHojaConsultaActivity"
+            android:label="@string/title_titulopreclinicos" >
+        </activity>
+        <activity
+            android:name=".InicioConsultaActivity"
+            android:label="@string/title_activity_inicio_consulta" >
+            <intent-filter>
+                <action android:name="com.sts_ni.estudiocohortecssfv.consulta_action" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".ConsultaActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".sintomasactivities.GeneralesSintomasActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".sintomasactivities.EstadoGeneralSintomasActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".sintomasactivities.GastrointestinalSintomasActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".sintomasactivities.OsteomuscularSintomasActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".sintomasactivities.CabezaSintomaActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".sintomasactivities.DeshidratacionSintomasActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".sintomasactivities.CutaneoSintomaActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".sintomasactivities.GargantaSintomasActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".sintomasactivities.RenalSintomasActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".sintomasactivities.EstadoNutriSintomasAcitvity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".sintomasactivities.RespiratorioSintomasActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".sintomasactivities.ReferenciaSintomasActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".sintomasactivities.VacunasSintomasActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".sintomasactivities.CategoriaSintomaActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".diagnostiscoactivities.DiagnosticoExamenHistoriaActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".diagnostiscoactivities.DiagnosticoPlanesActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".diagnostiscoactivities.DiagnosticoActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".diagnostiscoactivities.DiagnosticoProximaCitaActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".diagnostiscoactivities.DiagnosticoTratamientoActivity"
+            android:label="@string/tilte_hoja_consulta">
+        </activity>
+        <activity android:name=".MalariaResultadoActivity"
+            android:label="@string/tilte_malaria_resultados">
+        </activity>
+        <activity android:name=".PerifericoResultadoActivity"
+            android:label="@string/title_periferico_resultado">
+        </activity>
+        <activity android:name=".EghResultadoActivity"
+            android:label="@string/title_egh_resultado">
+        </activity>
+        <activity android:name=".EgoResultadoActivity"
+            android:label="@string/title_ego_resultado">
+        </activity>
+        <activity android:name="com.sts_ni.estudiocohortecssfv.expedientesactivities.ExpedienteActivity"
+            android:label="@string/title_expedientes">
+            <intent-filter>
+                <action android:name="com.sts_ni.estudiocohortecssfv.expediente_action" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.sts_ni.estudiocohortecssfv.expedientesactivities.SeguimientoInfluenzaActivity"
+            android:label="@string/title_seguimiento_influenza">
+            <intent-filter>
+                <action android:name="com.sts_ni.estudiocohortecssfv.seguimiento_influenza_action" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.sts_ni.estudiocohortecssfv.expedientesactivities.SeguimientoZikaActivity"
+            android:label="@string/title_seguimiento_zika">
+            <intent-filter>
+                <action android:name="com.sts_ni.estudiocohortecssfv.seguimiento_zika_action" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+    </application>
+
+
+
+</manifest>

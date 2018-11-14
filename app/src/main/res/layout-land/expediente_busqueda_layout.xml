@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    tools:context=".expedientesactivities.ExpedienteActivity$PlaceholderFragment">
+
+
+
+    <!-- Header aligned to top -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent">
+
+        <TextView
+            android:id="@+id/txtvTituloExpediente"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="@style/TextoTituloEstilo"
+            android:text="@string/label_titulo_expediente"
+            android:layout_marginTop="50dp" />
+
+        <TextView
+            android:id="@+id/txtvBuscarExpediente"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/label_CodigoExp"
+            android:layout_below="@+id/txtvTituloExpediente"
+            android:textSize="15dp"
+            android:textColor="@android:color/black"
+            android:layout_marginTop="40dp"
+            android:layout_marginLeft="15dp"/>
+
+        <EditText
+            android:id="@+id/edtxBuscarExpediente"
+            android:layout_width="200dp"
+            android:layout_height="30dp"
+            android:layout_below="@+id/txtvTituloExpediente"
+            android:layout_toRightOf="@+id/txtvBuscarExpediente"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="35dp"
+            android:inputType="number"
+            android:maxLength="8"
+            android:ems="10"
+            android:textCursorDrawable="@null"
+            style="@style/EditTextEstilo"/>
+
+        <ImageButton
+            android:id="@+id/ibtBuscarExp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvTituloExpediente"
+            android:layout_toRightOf="@+id/edtxBuscarExpediente"
+            android:src="@drawable/lupa32"
+            android:background="@drawable/bg_button_lupa"
+            android:layout_marginTop="22dp"
+            android:layout_marginLeft="20dp" />
+
+
+        <LinearLayout android:id="@+id/lnyCabezeraExpediente"
+            android:orientation="horizontal" android:layout_width="match_parent"
+            android:layout_height="58dp" android:layout_weight="1"
+            android:layout_below="@+id/ibtBuscarExp"
+            android:layout_marginTop="40dp"
+            android:background="@android:color/transparent">
+
+            <TextView
+                style="@style/TextoTituloGridView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.20"
+                android:text="@string/label_titulo1_Grid"
+                android:id="@+id/txtvNoConsulta"
+                android:background="@drawable/bg_border_titulo_grid"
+                />
+
+            <TextView
+                style="@style/TextoTituloGridView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.15"
+                android:text="@string/label_titulo2_Grid"
+                android:id="@+id/txtvFecha"
+                android:background="@drawable/bg_border_titulo_grid"
+                />
+
+            <TextView
+                style="@style/TextoTituloGridView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.15"
+                android:text="@string/label_titulo3_Grid"
+                android:id="@+id/txtvHora"
+                android:background="@drawable/bg_border_titulo_grid"/>
+
+            <TextView
+                style="@style/TextoTituloGridView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.30"
+                android:text="@string/label_titulo4_Grid"
+                android:id="@+id/txtvMedico"
+                android:background="@drawable/bg_border_titulo_grid"
+                />
+
+            <TextView
+                style="@style/TextoTituloGridView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.20"
+                android:text="@string/label_titulo5_Grid"
+                android:id="@+id/txtvEstado"
+                android:background="@drawable/bg_border_titulo_grid"/>
+
+        </LinearLayout>
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            android:id="@+id/lstvHojaConsultaExp"
+            android:layout_below="@+id/lnyCabezeraExpediente"
+            />
+
+
+    </RelativeLayout>
+
+</ScrollView>

@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    tools:context=".sintomasactivities.RespiratorioSintomasActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:focusable="true" android:focusableInTouchMode="true">
+
+        <Button
+            android:id="@+id/btnVacunasGSintomas"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:layout_marginTop="7dp"
+            android:text="@string/boton_vacunas_sintomas"
+            android:layout_alignParentTop="true"
+            android:drawableRight="@drawable/reducir"
+            android:onClick="onClick_btnRegresar"
+            />
+
+        <TextView
+            android:id="@+id/txtvPrinciplaENSintoma"
+            android:layout_width="420dp"
+            android:layout_height="30dp"
+            android:layout_below="@+id/btnVacunasGSintomas"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="14dp"
+            android:gravity="center"
+            android:background="@drawable/bg_textview_rectangulo"
+            android:text="@string/label_sintoma"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            android:textStyle="bold"
+            >
+            <requestFocus />
+        </TextView>
+
+        <TextView
+            android:id="@+id/txtvSENSintoma"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_toRightOf="@+id/txtvPrinciplaENSintoma"
+            android:layout_below="@+id/btnVacunasGSintomas"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="2dp"
+            android:gravity="center"
+            android:background="@drawable/bg_textview_rectangulo"
+            android:text="@string/label_s"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/txtvNENSintoma"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_toRightOf="@+id/txtvSENSintoma"
+            android:layout_below="@+id/btnVacunasGSintomas"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="2dp"
+            android:gravity="center"
+            android:background="@drawable/bg_textview_rectangulo"
+            android:text="@string/label_n"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/txtvDENintoma"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_toRightOf="@+id/txtvNENSintoma"
+            android:layout_below="@+id/btnVacunasGSintomas"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="2dp"
+            android:gravity="center"
+            android:background="@drawable/bg_textview_rectangulo"
+            android:text="@string/label_d"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/txtvLTMENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvPrinciplaENSintoma"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="24dp"
+            android:text="@string/label_lactancia_materna"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbLTMSENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvPrinciplaENSintoma"
+            android:layout_below="@+id/txtvPrinciplaENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedLTMEN"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbLTMNENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvSENSintoma"
+            android:layout_below="@+id/txtvPrinciplaENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedLTMEN"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbLTMDENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvNENSintoma"
+            android:layout_below="@+id/txtvPrinciplaENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedLTMEN"
+            />
+
+        <TextView
+            android:id="@+id/txtvVCCENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvLTMENSintoma"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="24dp"
+            android:text="@string/label_vacunas_completas"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbVCCSENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvPrinciplaENSintoma"
+            android:layout_below="@+id/txtvLTMENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedVCCEN"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbVCCNENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvSENSintoma"
+            android:layout_below="@+id/txtvLTMENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedVCCEN"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbVCCDENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvNENSintoma"
+            android:layout_below="@+id/txtvLTMENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedVCCEN"
+            />
+
+        <TextView
+            android:id="@+id/txtvVCIENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvVCCENSintoma"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="24dp"
+            android:text="@string/label_vacuna_influenza"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbVCISENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvPrinciplaENSintoma"
+            android:layout_below="@+id/txtvVCCENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedVCIEN"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbVCINENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvSENSintoma"
+            android:layout_below="@+id/txtvVCCENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedVCIEN"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbVCIDENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvNENSintoma"
+            android:layout_below="@+id/txtvVCCENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkboxClickedVCIEN"
+            />
+
+        <TextView
+            android:id="@+id/txtvFCVENSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvVCIENSintoma"
+            android:layout_marginTop="25dp"
+            android:layout_marginLeft="24dp"
+            android:text="@string/label_fecha_vacuna"
+            android:textAppearance="@style/LabelSintomasScreensEstilo" />
+
+        <EditText
+            android:id="@+id/dpFCV"
+            android:layout_width="145dp"
+            android:layout_height="40dp"
+            android:inputType="date"
+            android:editable="false"
+            android:layout_toRightOf="@+id/txtvFCVENSintoma"
+            android:layout_below="@+id/txtvVCIENSintoma"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="13dp"
+            android:ems="10"
+            android:textCursorDrawable="@null"
+            android:drawableRight="@drawable/calendar"
+            style="@style/EditTextEstilo" />
+
+    </RelativeLayout>
+
+</ScrollView>

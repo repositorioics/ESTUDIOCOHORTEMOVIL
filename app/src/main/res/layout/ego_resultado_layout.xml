@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent">
+
+        <TextView
+            android:id="@+id/txtvEGOResultado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp"
+            android:layout_marginLeft="20dp"
+            android:textAppearance="@style/TextoTituloEstilo"
+            android:text="@string/title_ego_resultado"
+            />
+
+        <Button
+            android:id="@+id/btnSalirEGO"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_below="@+id/txtvEGOResultado"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginLeft="400dp"
+            android:background="@drawable/bg_button_cancel_selector"
+            android:text="@string/boton_salir"
+            android:onClick="onClick_btnRegreso"
+            />
+
+        <include
+            android:id="@+id/incExamenEGOParte1"
+            android:layout_width="500dp"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_below="@id/btnSalirEGO"
+            layout="@layout/ego_resultado_parte1_layout"/>
+        />
+
+        <include
+            android:id="@+id/incExamenEGOParte2"
+            android:layout_width="500dp"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_below="@id/incExamenEGOParte1"
+            layout="@layout/ego_resultado_parte2_layout"/>
+        />
+
+    </RelativeLayout>
+
+</ScrollView>

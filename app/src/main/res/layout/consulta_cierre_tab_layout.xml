@@ -1,0 +1,632 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:focusable="true" android:focusableInTouchMode="true">
+
+        <TextView
+            android:id="@+id/txtvTituloDiagnostico"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="@string/title_tab_diagnostico_consulta"
+            android:textAppearance="@style/TextoTituloEstilo" />
+
+        <ImageButton
+            android:id="@+id/imgBtnAgregarHoja"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/hoja_consulta" />
+
+        <TextView
+            android:id="@+id/txtvNombreApellido"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvTituloDiagnostico"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="54dp"
+            android:text="@string/label_nombre_apellido"
+            android:textColor="@android:color/black"
+            android:textSize="17sp" />
+
+        <EditText
+            android:id="@+id/edtxNombrePaciente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvTituloDiagnostico"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="7dp"
+            android:layout_marginTop="54dp"
+            android:layout_toRightOf="@+id/txtvNombreApellido"
+            android:ems="10"
+            android:enabled="false"
+            android:paddingLeft="14dp"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="15sp"
+            style="@style/EditTextEstilo"/>
+
+        <TextView
+            android:id="@+id/txtvEstudiosParticipante"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvNombreApellido"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="34dp"
+            android:text="@string/label_estudio_participante"
+            android:textColor="@android:color/black"
+            android:textSize="17sp" />
+
+        <EditText
+            android:id="@+id/edtxEstudioParticipanteC"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/edtxNombrePaciente"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="7dp"
+            android:layout_marginTop="34dp"
+            android:layout_toRightOf="@+id/txtvEstudiosParticipante"
+            style="@style/EditTextEstilo"
+            android:ems="10"
+            android:enabled="false"
+            android:paddingLeft="14dp"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtvCodigoSintomaC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvEstudiosParticipante"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="33dp"
+            android:text="@string/label_codigo"
+            android:textColor="@android:color/black"
+            android:textSize="17sp" />
+
+        <EditText
+            android:id="@+id/edtxCodigoSintomaC"
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvEstudiosParticipante"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="7dp"
+            android:layout_marginTop="36dp"
+            android:layout_toRightOf="@+id/txtvCodigoSintomaC"
+            style="@style/EditTextEstilo"
+            android:ems="10"
+            android:enabled="false"
+            android:paddingLeft="14dp"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="16sp"
+
+            />
+
+        <TextView
+            android:id="@+id/txtvFechaSintomaC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvEstudiosParticipante"
+            android:layout_marginLeft="17dp"
+            android:layout_marginTop="33dp"
+            android:layout_toRightOf="@+id/edtxCodigoSintomaC"
+            android:text="@string/label_fecha"
+            android:textColor="@android:color/black"
+            android:textSize="17sp" />
+
+        <EditText
+            android:id="@+id/edtxtFechaSintomaC"
+            android:layout_width="138dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvEstudiosParticipante"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="36dp"
+            android:layout_toRightOf="@+id/txtvFechaSintomaC"
+            style="@style/EditTextEstilo"
+            android:ems="10"
+            android:enabled="false"
+            android:inputType="date"
+            android:paddingLeft="14dp"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtvHoraSintomaC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvEstudiosParticipante"
+            android:layout_marginLeft="11dp"
+            android:layout_marginTop="33dp"
+            android:layout_toRightOf="@+id/edtxtFechaSintomaC"
+            android:text="@string/label_hora"
+            android:textColor="@android:color/black"
+            android:textSize="17sp" />
+
+        <EditText
+            android:id="@+id/edtxtHoraSintomaC"
+            android:layout_width="135dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvEstudiosParticipante"
+            android:layout_marginLeft="7dp"
+            android:layout_marginTop="36dp"
+            android:layout_toRightOf="@+id/txtvHoraSintomaC"
+            style="@style/EditTextEstilo"
+            android:ems="10"
+            android:enabled="false"
+            android:inputType="date"
+            android:paddingLeft="4dp"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtvExpendienteSintomaC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvCodigoSintomaC"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="33dp"
+            android:text="@string/label_expediente"
+            android:textColor="@android:color/black"
+            android:textSize="17sp" />
+
+        <EditText
+            android:id="@+id/edtxtExpedienteSintomaC"
+            android:layout_width="125dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvCodigoSintomaC"
+            android:layout_marginLeft="7dp"
+            android:layout_marginRight="7dp"
+            android:layout_marginTop="36dp"
+            android:layout_toRightOf="@+id/txtvExpendienteSintomaC"
+            style="@style/EditTextEstilo"
+            android:ems="10"
+            android:enabled="false"
+            android:inputType="date"
+            android:paddingLeft="12dp"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtvEdadSintomaC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvCodigoSintomaC"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="33dp"
+            android:layout_toRightOf="@+id/edtxtExpedienteSintomaC"
+            android:text="@string/label_edad"
+            android:textColor="@android:color/black"
+            android:textSize="17sp" />
+
+        <EditText
+            android:id="@+id/edtxtEdadSintomaC"
+            android:layout_width="98dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvCodigoSintomaC"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="36dp"
+            android:layout_toRightOf="@+id/txtvEdadSintomaC"
+            style="@style/EditTextEstilo"
+            android:ems="10"
+            android:enabled="false"
+            android:inputType="date"
+            android:paddingLeft="14dp"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtvSexoSintomaC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvCodigoSintomaC"
+            android:layout_marginLeft="23dp"
+            android:layout_marginTop="33dp"
+            android:layout_toRightOf="@+id/edtxtEdadSintomaC"
+            android:text="@string/label_sexo"
+            android:textColor="@android:color/black"
+            android:textSize="17sp" />
+
+        <EditText
+            android:id="@+id/edtxtSexoSintomaC"
+            android:layout_width="98dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvCodigoSintomaC"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="7dp"
+            android:layout_marginTop="36dp"
+            android:layout_toRightOf="@+id/txtvSexoSintomaC"
+            style="@style/EditTextEstilo"
+            android:ems="10"
+            android:enabled="false"
+            android:inputType="date"
+            android:paddingLeft="25dp"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtvPesoKgSintomaC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvEdadSintomaC"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="33dp"
+            android:text="@string/label_peso"
+            android:textColor="@android:color/black"
+            android:textSize="17sp" />
+
+        <EditText
+            android:id="@+id/edtxtPesoKgSintomaC"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvEdadSintomaC"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="7dp"
+            android:layout_marginTop="36dp"
+            android:layout_toRightOf="@+id/txtvPesoKgSintomaC"
+            style="@style/EditTextEstilo"
+            android:ems="10"
+            android:enabled="false"
+            android:inputType="date"
+            android:paddingLeft="14dp"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtvTallaCmSintomaC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvEdadSintomaC"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="33dp"
+            android:layout_toRightOf="@+id/edtxtPesoKgSintomaC"
+            android:text="@string/label_talla"
+            android:textColor="@android:color/black"
+            android:textSize="17sp" />
+
+        <EditText
+            android:id="@+id/edtxtTallaCmSintomaC"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvEdadSintomaC"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="7dp"
+            android:layout_marginTop="36dp"
+            android:layout_toRightOf="@+id/txtvTallaCmSintomaC"
+            style="@style/EditTextEstilo"
+            android:ems="10"
+            android:enabled="false"
+            android:inputType="date"
+            android:paddingLeft="14dp"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/txtvTempCSintomaC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvEdadSintomaC"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="33dp"
+            android:layout_toRightOf="@+id/edtxtTallaCmSintomaC"
+            android:text="@string/label_temp"
+            android:textColor="@android:color/black"
+            android:textSize="17sp" />
+
+        <EditText
+            android:id="@+id/edtxtTempCSintomaC"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvEdadSintomaC"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="7dp"
+            android:layout_marginTop="36dp"
+            android:layout_toRightOf="@+id/txtvTempCSintomaC"
+            style="@style/EditTextEstilo"
+            android:ems="10"
+            android:enabled="false"
+            android:paddingLeft="14dp"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:id="@+id/lnyCierre"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_below="@+id/txtvPesoKgSintomaC"
+            android:layout_marginTop="50dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginRight="7dp"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/txtvCBCargoCierre"
+                style="@style/TextoTituloGridView"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:background="@drawable/bg_border_titulo_grid"
+                android:text="@string/label_cargo"
+                android:layout_weight="0.18" />
+
+            <TextView
+                android:id="@+id/txtvCBNumeroCierre"
+                style="@style/TextoTituloGridView"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:background="@drawable/bg_border_titulo_grid"
+                android:text="@string/label_numero"
+                android:layout_weight="0.18" />
+
+            <TextView
+                android:id="@+id/txtvCBNombreCirre"
+                style="@style/TextoTituloGridView"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:background="@drawable/bg_border_titulo_grid"
+                android:text="@string/label_nombre"
+                android:layout_weight="0.45" />
+
+            <TextView
+                android:id="@+id/txtvCBFechaCierre"
+                style="@style/TextoTituloGridView"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:background="@drawable/bg_border_titulo_grid"
+                android:text="@string/label_fecha_cierre"
+                android:layout_weight="0.18" />
+
+            <TextView
+                android:id="@+id/txtvCBHoraCierre"
+                style="@style/TextoTituloGridView"
+                android:layout_width="0dp"
+                android:layout_height="45dp"
+                android:background="@drawable/bg_border_titulo_grid"
+                android:text="@string/label_hora_cierre"
+                android:layout_weight="0.17" />
+
+            <!--<TextView
+                android:id="@+id/txtvCierre"
+                style="@style/TextoTituloGridView"
+                android:layout_width="120dp"
+                android:layout_height="45dp"
+                android:layout_alignParentBottom="false"
+                android:layout_below="@+id/txtvPesoKgSintomaC"
+                android:layout_marginLeft="-2dp"
+                android:layout_marginTop="50dp"
+                android:layout_toRightOf="@+id/txtvCBHoraCierre"
+                android:background="@drawable/bg_border_titulo_grid"
+                android:text="@string/label_cierre" />
+
+            <TextView
+                android:id="@+id/txtvCambioTurno"
+                style="@style/TextoTituloGridView"
+                android:layout_width="180dp"
+                android:layout_height="45dp"
+                android:layout_alignParentBottom="false"
+                android:layout_below="@+id/txtvPesoKgSintomaC"
+                android:layout_marginLeft="-2dp"
+                android:layout_marginTop="50dp"
+                android:layout_toRightOf="@+id/txtvCierre"
+                android:background="@drawable/bg_border_titulo_grid"
+                android:text="@string/label_cambio_turno" />-->
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/lnyFila1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/lnyCierre"
+            android:layout_marginLeft="7dp"
+            android:layout_marginRight="7dp"
+            android:background="@drawable/bg_fila_primera_cierre"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtvCargoMedLog"
+                style="@style/TextoFilaGridView"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.20" />
+
+            <TextView
+                android:id="@+id/txtvNumeroMedLog"
+                style="@style/TextoFilaGridView"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.12" />
+
+            <TextView
+                android:id="@+id/txtvNombreMedLog"
+                style="@style/TextoFilaGridView"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.40" />
+
+            <TextView
+                android:id="@+id/txtvFechaMedLog"
+                style="@style/TextoFilaGridView"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.18" />
+
+            <TextView
+                android:id="@+id/txtvHoraMedLog"
+                style="@style/TextoFilaGridView"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.17" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lnyFila2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/lnyFila1"
+            android:layout_marginTop="3dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginRight="7dp"
+            android:background="@drawable/bg_fila_intermedia_cierre"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtvCargoMedTurno"
+                style="@style/TextoFilaGridView"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.20" />
+
+            <TextView
+                android:id="@+id/txtvNumeroMedTurno"
+                style="@style/TextoFilaGridView"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.12" />
+
+            <TextView
+                android:id="@+id/txtvNombreMedTurno"
+                style="@style/TextoFilaGridView"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.45" />
+
+            <TextView
+                android:id="@+id/txtvFechaMedTurno"
+                style="@style/TextoFilaGridView"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.18" />
+
+            <TextView
+                android:id="@+id/txtvHoraMedTurno"
+                style="@style/TextoFilaGridView"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.17" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/lnyFila3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/lnyFila2"
+            android:layout_marginTop="3dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginRight="7dp"
+            android:background="@drawable/bg_fila_primera_cierre"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtvCargoEnferm"
+                style="@style/TextoFilaGridView"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.20" />
+
+            <TextView
+                android:id="@+id/txtvNumeroEnferm"
+                style="@style/TextoFilaGridView"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.12" />
+
+            <TextView
+                android:id="@+id/txtvNombreEnferm"
+                style="@style/TextoFilaGridView"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.45" />
+
+            <TextView
+                android:id="@+id/txtvFechaEnferm"
+                style="@style/TextoFilaGridView"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.18" />
+
+            <TextView
+                android:id="@+id/txtvHoraEnferm"
+                style="@style/TextoFilaGridView"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="0.17" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/imgBtnCerrarHoja"
+            android:layout_width="160dp"
+            android:layout_height="55dp"
+            android:layout_below="@+id/lnyFila3"
+            android:layout_toLeftOf="@+id/imgBtnCambioTurno"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="10dp"
+            android:text="@string/boton_cerrar_hoja"
+            android:background="@drawable/bg_button_enviar_selector"
+            android:drawableLeft="@drawable/cerrar"
+            android:textColor="#ffffff" />
+
+        <Button
+            android:id="@+id/imgBtnCambioTurno"
+            android:layout_width="180dp"
+            android:layout_height="55dp"
+            android:layout_below="@+id/lnyFila3"
+            android:layout_toLeftOf="@+id/btnSalirCierre"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="10dp"
+            android:paddingLeft="10dp"
+            android:text="@string/boton_cambio_turno_hoja"
+            android:textColor="@android:color/white"
+            android:background="@drawable/bg_button_enviar_selector"
+            android:drawableLeft="@drawable/cambio_turno"
+            android:layout_alignParentRight="true" />
+
+        <Button
+            android:id="@+id/btnSalirCierre"
+            android:layout_width="100dp"
+            android:layout_height="55dp"
+            android:layout_below="@+id/imgBtnCerrarHoja"
+            android:layout_toLeftOf="@+id/btnCancelarCierre"
+            android:layout_marginTop="40dp"
+            android:text="@string/boton_salir"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:background="@drawable/bg_button_enviar_selector"/>
+
+        <Button
+            android:id="@+id/btnCancelarCierre"
+            android:layout_width="120dp"
+            android:layout_height="55dp"
+            android:layout_below="@+id/imgBtnCerrarHoja"
+            android:layout_toLeftOf="@+id/btnNoAtiendeLlamadoCierre"
+            android:layout_marginTop="40dp"
+            android:layout_marginLeft="10dp"
+            android:text="@string/boton_Cancel"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:background="@drawable/bg_button_cancel_selector"/>
+
+        <Button
+            android:id="@+id/btnNoAtiendeLlamadoCierre"
+            android:layout_width="210dp"
+            android:layout_height="55dp"
+            android:layout_below="@+id/imgBtnCerrarHoja"
+            android:layout_marginTop="40dp"
+            android:layout_marginLeft="10dp"
+            android:text="@string/boton_no_atiente_llamado"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:background="@drawable/bg_button_na_llamado_selector"
+            android:layout_marginRight="50dp"
+            android:layout_alignParentRight="true" />
+
+
+    </RelativeLayout>
+</ScrollView>

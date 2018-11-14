@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:focusable="true" android:focusableInTouchMode="true">
+
+        <TextView
+            android:id="@+id/txtvTituloDiagnostico"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="@style/TextoTituloEstilo"
+            android:text="@string/title_tab_diagnostico_consulta"
+            />
+
+        <ImageButton
+            android:id="@+id/ibtVisorDiagnostico"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="35dp"
+            android:background="@drawable/viewdoc"
+            />
+
+        <ImageButton
+            android:id="@+id/ibtEditPreclinicos"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_toLeftOf="@+id/ibtVisorDiagnostico"
+            android:layout_marginRight="25dp"
+            android:layout_marginTop="35dp"
+            android:background="@drawable/edit_preclinicos"
+            />
+
+        <ImageButton
+            android:id="@+id/ibtMensajeAlerta"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_toLeftOf="@+id/ibtEditPreclinicos"
+            android:layout_marginRight="25dp"
+            android:layout_marginTop="35dp"
+            android:background="@drawable/msnalerta32"
+            />
+
+        <TextView
+            android:id="@+id/txtvNombreApellido"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvTituloDiagnostico"
+            android:layout_marginTop="54dp"
+            android:layout_marginLeft="20dp"
+            android:text="@string/label_nombre_apellido"
+            android:textSize="17sp"
+            android:textColor="@android:color/black"
+            />
+
+        <EditText
+            android:id="@+id/edtxNombrePaciente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvNombreApellido"
+            android:layout_below="@+id/txtvTituloDiagnostico"
+            android:layout_marginTop="56dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="7dp"
+            android:paddingLeft="14dp"
+            style="@style/EditTextEstilo"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="15sp"
+            android:enabled="false"
+            android:ems="10"
+            />
+
+        <TextView
+            android:id="@+id/txtvEstudiosParticipante"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvNombreApellido"
+            android:layout_marginTop="34dp"
+            android:layout_marginLeft="20dp"
+            android:text="@string/label_estudio_participante"
+            android:textSize="17sp"
+            android:textColor="@android:color/black"
+            />
+
+        <EditText
+            android:id="@+id/edtxEstudioParticipante"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvEstudiosParticipante"
+            android:layout_below="@+id/edtxNombrePaciente"
+            android:layout_marginTop="28dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="7dp"
+            android:paddingLeft="14dp"
+            style="@style/EditTextEstilo"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="16sp"
+            android:enabled="false"
+            android:ems="10"
+            />
+
+        <TextView
+            android:id="@+id/txtvCodigoSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvEstudiosParticipante"
+            android:layout_marginTop="33dp"
+            android:layout_marginLeft="20dp"
+            android:text="@string/label_codigo"
+            android:textSize="17sp"
+            android:textColor="@android:color/black"
+            />
+
+        <EditText
+            android:id="@+id/edtxCodigoSintoma"
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvCodigoSintoma"
+            android:layout_below="@+id/txtvEstudiosParticipante"
+            android:layout_marginTop="36dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="7dp"
+            android:paddingLeft="14dp"
+            style="@style/EditTextEstilo"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="16sp"
+            android:enabled="false"
+            android:ems="10"
+
+            />
+
+        <TextView
+            android:id="@+id/txtvFechaSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvEstudiosParticipante"
+            android:layout_toRightOf="@+id/edtxCodigoSintoma"
+            android:layout_marginTop="33dp"
+            android:layout_marginLeft="17dp"
+            android:text="@string/label_fecha"
+            android:textSize="17sp"
+            android:textColor="@android:color/black"
+            />
+
+        <EditText
+            android:id="@+id/edtxtFechaSintoma"
+            android:layout_width="138dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvFechaSintoma"
+            android:layout_below="@+id/txtvEstudiosParticipante"
+            android:layout_marginTop="36dp"
+            android:layout_marginLeft="8dp"
+            android:paddingLeft="14dp"
+            style="@style/EditTextEstilo"
+            android:inputType="date"
+            android:enabled="false"
+            android:ems="10"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="16sp"
+            />
+
+        <TextView
+            android:id="@+id/txtvHoraSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvEstudiosParticipante"
+            android:layout_toRightOf="@+id/edtxtFechaSintoma"
+            android:layout_marginTop="33dp"
+            android:layout_marginLeft="11dp"
+            android:text="@string/label_hora"
+            android:textSize="17sp"
+            android:textColor="@android:color/black"
+            />
+
+        <EditText
+            android:id="@+id/edtxtHoraSintoma"
+            android:layout_width="135dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvHoraSintoma"
+            android:layout_below="@+id/txtvEstudiosParticipante"
+            android:layout_marginTop="36dp"
+            android:layout_marginLeft="7dp"
+            android:paddingLeft="4dp"
+            style="@style/EditTextEstilo"
+            android:inputType="date"
+            android:enabled="false"
+            android:ems="10"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="17sp"
+            />
+
+        <TextView
+            android:id="@+id/txtvExpendienteSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvCodigoSintoma"
+            android:layout_marginTop="33dp"
+            android:layout_marginLeft="20dp"
+            android:text="@string/label_expediente"
+            android:textSize="17sp"
+            android:textColor="@android:color/black"
+            />
+
+        <EditText
+            android:id="@+id/edtxtExpedienteSintoma"
+            android:layout_width="125dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvExpendienteSintoma"
+            android:layout_below="@+id/txtvCodigoSintoma"
+            android:layout_marginTop="36dp"
+            android:layout_marginLeft="7dp"
+            android:layout_marginRight="7dp"
+            android:paddingLeft="12dp"
+            style="@style/EditTextEstilo"
+            android:inputType="text"
+            android:nextFocusDown="@+id/edtxtPesoKgSintoma"
+            android:singleLine="true"
+            android:imeOptions="actionSend"
+            android:enabled="false"
+            android:ems="10"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="16sp"
+            />
+
+        <TextView
+            android:id="@+id/txtvEdadSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvCodigoSintoma"
+            android:layout_toRightOf="@+id/edtxtExpedienteSintoma"
+            android:layout_marginTop="33dp"
+            android:layout_marginLeft="24dp"
+            android:text="@string/label_edad"
+            android:textSize="17sp"
+            android:textColor="@android:color/black"
+            />
+
+        <EditText
+            android:id="@+id/edtxtEdadSintoma"
+            android:layout_width="98dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvEdadSintoma"
+            android:layout_below="@+id/txtvCodigoSintoma"
+            android:layout_marginTop="36dp"
+            android:layout_marginLeft="8dp"
+            android:paddingLeft="14dp"
+            style="@style/EditTextEstilo"
+            android:inputType="date"
+            android:enabled="false"
+            android:ems="10"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="16sp"
+            />
+
+        <TextView
+            android:id="@+id/txtvSexoSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/edtxtEdadSintoma"
+            android:layout_below="@+id/txtvCodigoSintoma"
+            android:layout_marginTop="33dp"
+            android:layout_marginLeft="23dp"
+            android:text="@string/label_sexo"
+            android:textSize="17sp"
+            android:textColor="@android:color/black"
+            />
+
+        <EditText
+            android:id="@+id/edtxtSexoSintoma"
+            android:layout_width="98dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvSexoSintoma"
+            android:layout_below="@+id/txtvCodigoSintoma"
+            android:layout_marginTop="36dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="7dp"
+            android:paddingLeft="25dp"
+            style="@style/EditTextEstilo"
+            android:inputType="date"
+            android:enabled="false"
+            android:ems="10"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="16sp"
+            />
+
+        <TextView
+            android:id="@+id/txtvPesoKgSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvEdadSintoma"
+            android:layout_marginTop="33dp"
+            android:layout_marginLeft="20dp"
+            android:text="@string/label_peso"
+            android:textSize="17sp"
+            android:textColor="@android:color/black"
+            />
+
+        <EditText
+            android:id="@+id/edtxtPesoKgSintoma"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvPesoKgSintoma"
+            android:layout_below="@+id/txtvEdadSintoma"
+            android:layout_marginTop="36dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="7dp"
+            android:paddingLeft="14dp"
+            style="@style/EditTextEstilo"
+            android:inputType="numberDecimal"
+            android:nextFocusRight="@+id/edtxtTallaCmSintoma"
+            android:singleLine="true"
+            android:imeOptions="actionSend"
+            android:enabled="false"
+            android:ems="10"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="16sp"
+            />
+
+        <TextView
+            android:id="@+id/txtvTallaCmSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvEdadSintoma"
+            android:layout_toRightOf="@+id/edtxtPesoKgSintoma"
+            android:layout_marginTop="33dp"
+            android:layout_marginLeft="8dp"
+            android:text="@string/label_talla"
+            android:textSize="17sp"
+            android:textColor="@android:color/black"
+            />
+
+        <EditText
+            android:id="@+id/edtxtTallaCmSintoma"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvTallaCmSintoma"
+            android:layout_below="@+id/txtvEdadSintoma"
+            android:layout_marginTop="36dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="7dp"
+            android:paddingLeft="14dp"
+            style="@style/EditTextEstilo"
+            android:inputType="numberDecimal"
+            android:nextFocusRight="@+id/edtxtTempCSintoma"
+            android:singleLine="true"
+            android:imeOptions="actionSend"
+            android:enabled="false"
+            android:ems="10"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="16sp"
+            />
+
+        <TextView
+            android:id="@+id/txtvTempCSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvEdadSintoma"
+            android:layout_toRightOf="@+id/edtxtTallaCmSintoma"
+            android:layout_marginTop="33dp"
+            android:layout_marginLeft="8dp"
+            android:text="@string/label_temp"
+            android:textSize="17sp"
+            android:textColor="@android:color/black"
+            />
+
+        <EditText
+            android:id="@+id/edtxtTempCSintoma"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvTempCSintoma"
+            android:layout_below="@+id/txtvEdadSintoma"
+            android:layout_marginTop="36dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="7dp"
+            android:paddingLeft="14dp"
+            style="@style/EditTextEstilo"
+            android:inputType="numberDecimal"
+            android:nextFocusUp="@+id/edtxtExpedienteSintoma"
+            android:singleLine="true"
+            android:imeOptions="actionSend"
+            android:enabled="false"
+            android:ems="10"
+            android:textColor="@color/color_texto_deshabilitado"
+            android:textSize="16sp"
+            />
+
+        <Button
+            android:id="@+id/btnGeneralesSintomas"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:layout_marginTop="48dp"
+            android:text="@string/boton_general_sintomas"
+            android:layout_alignTop="@+id/txtvTallaCmSintoma"
+            android:drawableRight="@drawable/expandir"/>
+
+        <Button
+            android:id="@+id/btnEstadoGeneralSintomas"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:layout_marginTop="78dp"
+            android:text="@string/boton_estado_general_sintomas"
+            android:layout_alignTop="@+id/btnGeneralesSintomas"
+            android:drawableRight="@drawable/expandir"/>
+
+        <Button
+            android:id="@+id/btnCabezaSintomas"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:layout_marginTop="78dp"
+            android:text="@string/boton_cabez_sintomas"
+            android:layout_alignTop="@+id/btnEstadoGeneralSintomas"
+            android:drawableRight="@drawable/expandir"/>
+
+        <Button
+            android:id="@+id/btnGargantaSintomas"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:layout_marginTop="78dp"
+            android:text="@string/boton_garganta_sintomas"
+            android:layout_alignTop="@+id/btnCabezaSintomas"
+            android:drawableRight="@drawable/expandir"/>
+
+        <Button
+            android:id="@+id/btnRespiratorioSintomas"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:layout_marginTop="78dp"
+            android:text="@string/boton_respiratorio_sintomas"
+            android:layout_alignTop="@+id/btnGargantaSintomas"
+            android:drawableRight="@drawable/expandir"/>
+
+        <Button
+            android:id="@+id/btnGastroInstesSintomas"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:layout_marginTop="78dp"
+            android:layout_alignTop="@+id/btnRespiratorioSintomas"
+            android:text="@string/boton_gastro_intestinal_sintomas"
+            android:drawableRight="@drawable/expandir"/>
+
+        <Button
+            android:id="@+id/btnDeshidartacionSintomas"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:layout_marginTop="78dp"
+            android:layout_alignTop="@+id/btnGastroInstesSintomas"
+            android:text="@string/boton_deshid_sintomas"
+            android:drawableRight="@drawable/expandir"/>
+
+        <Button
+            android:id="@+id/btnRenalSintomas"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:layout_marginTop="78dp"
+            android:layout_alignTop="@+id/btnDeshidartacionSintomas"
+            android:text="@string/boton_renal_sintomas"
+            android:drawableRight="@drawable/expandir"/>
+
+        <Button
+            android:id="@+id/btnReferenciaSintomas"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:layout_marginTop="78dp"
+            android:layout_alignTop="@+id/btnRenalSintomas"
+            android:text="@string/boton_referencia_sintomas"
+            android:drawableRight="@drawable/expandir"
+            />
+
+        <Button
+            android:id="@+id/btnOsteomuscularSintomas"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:layout_marginTop="78dp"
+            android:layout_alignTop="@+id/btnReferenciaSintomas"
+            android:text="@string/boton_osteomuscular_sintomas"
+            android:drawableRight="@drawable/expandir"/>
+
+        <Button
+            android:id="@+id/btnCutaneoSintomas"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:layout_marginTop="78dp"
+            android:layout_alignTop="@+id/btnOsteomuscularSintomas"
+            android:text="@string/boton_cutaneo_sintomas"
+            android:drawableRight="@drawable/expandir" />
+
+        <Button
+            android:id="@+id/btnEstadoNutriSintomas"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:layout_marginTop="78dp"
+            android:layout_alignTop="@+id/btnCutaneoSintomas"
+            android:text="@string/boton_estado_nutri_sintomas"
+            android:drawableRight="@drawable/expandir" />
+
+        <Button
+            android:id="@+id/btnVacunasSintomas"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:layout_marginTop="78dp"
+            android:layout_alignTop="@+id/btnEstadoNutriSintomas"
+            android:text="@string/boton_vacunas_sintomas"
+            android:drawableRight="@drawable/expandir" />
+
+        <Button
+            android:id="@+id/btnCategoriaSatImcSintomas"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:layout_marginTop="78dp"
+            android:text="@string/boton_catg_sat_imc_sintomas"
+            android:layout_alignTop="@+id/btnVacunasSintomas"
+            android:drawableRight="@drawable/expandir"/>
+
+    </RelativeLayout>
+
+</ScrollView>

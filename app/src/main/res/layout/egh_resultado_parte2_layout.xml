@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/txtvExamenMicroscopico"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="20dp"
+        android:text="@string/label_examen_microscopico"
+        android:textStyle="bold"
+        />
+
+    <TextView
+        android:id="@+id/txtvResultadoEGH"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="75dp"
+        android:layout_toRightOf="@+id/txtvExamenMicroscopico"
+        android:text="@string/label_resultado_malaria"
+        android:textStyle="bold"
+        />
+
+    <TextView
+        android:id="@+id/txtvEColi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvExamenMicroscopico"
+        android:text="@string/label_ecoli"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtEColi"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:layout_below="@+id/txtvResultadoEGH"
+        android:layout_marginLeft="123dp"
+        android:layout_toRightOf="@+id/txtvEColi"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvEndolimaxNana"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvEColi"
+        android:text="@string/label_endolimax_nana"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtEndolimaxNana"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:layout_below="@+id/edtxtEColi"
+        android:layout_marginLeft="56dp"
+        android:layout_toRightOf="@+id/txtvEndolimaxNana"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvEHistolytica"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvEndolimaxNana"
+        android:text="@string/label_ehistolytica"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtEHistolytica"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="23dp"
+        android:layout_below="@+id/edtxtEndolimaxNana"
+        android:layout_marginLeft="76dp"
+        android:layout_toRightOf="@+id/txtvEHistolytica"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvGardiaLambia"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvEHistolytica"
+        android:text="@string/label_gardia_lambia"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtGardiaLambia"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/edtxtEHistolytica"
+        android:layout_marginLeft="62dp"
+        android:layout_toRightOf="@+id/txtvGardiaLambia"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvTrichuris"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvGardiaLambia"
+        android:text="@string/label_trichuris_trichura"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtTrichuris"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="23dp"
+        android:layout_below="@+id/edtxtGardiaLambia"
+        android:layout_marginLeft="44dp"
+        android:layout_toRightOf="@+id/txtvTrichuris"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvHymenolepis"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvTrichuris"
+        android:text="@string/label_hymenolepis_nana"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtHymenolepis"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_below="@+id/edtxtTrichuris"
+        android:layout_marginLeft="40dp"
+        android:layout_toRightOf="@+id/txtvHymenolepis"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvStrongyloide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvHymenolepis"
+        android:text="@string/label_strongyloide_stercolaris"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtStrongyloide"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_below="@+id/edtxtHymenolepis"
+        android:layout_marginLeft="4dp"
+        android:layout_toRightOf="@+id/txtvStrongyloide"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvUnicinarias"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvStrongyloide"
+        android:text="@string/label_unicinarias"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtUnicinarias"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/edtxtStrongyloide"
+        android:layout_marginLeft="93dp"
+        android:layout_toRightOf="@+id/txtvUnicinarias"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvEnterovirus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvUnicinarias"
+        android:text="@string/label_enterovirus_vermiculares"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtEnterovirus"
+        android:layout_width="246dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/edtxtUnicinarias"
+        android:layout_marginLeft="3dp"
+        android:layout_toRightOf="@+id/txtvEnterovirus"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvObservacionesEgh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvEnterovirus"
+        android:text="@string/label_observaciones_examenes"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtObservacionesEGH"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="23dp"
+        android:layout_below="@+id/edtxtEnterovirus"
+        android:layout_marginLeft="68dp"
+        android:layout_toRightOf="@+id/txtvObservacionesEgh"
+        android:inputType="textMultiLine"
+        android:scrollbars="vertical"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+</RelativeLayout>

@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/txtvExamenFQEGH"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="20dp"
+        android:text="@string/label_examen_fisico_qumico"
+        android:textStyle="bold"
+        />
+
+    <TextView
+        android:id="@+id/txtvResultadoEGH"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="100dp"
+        android:layout_toRightOf="@+id/txtvExamenFQEGH"
+        android:text="@string/label_resultado_malaria"
+        android:textStyle="bold"
+        />
+
+    <TextView
+        android:id="@+id/txtvColorEGH"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvExamenFQEGH"
+        android:text="@string/label_color"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtColorEGH"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:layout_below="@+id/txtvResultadoEGH"
+        android:layout_marginLeft="132dp"
+        android:layout_toRightOf="@+id/txtvColorEGH"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvConsistencia"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvColorEGH"
+        android:text="@string/label_consistencia"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtConsistencia"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/edtxtColorEGH"
+        android:layout_marginLeft="80dp"
+        android:layout_toRightOf="@+id/txtvConsistencia"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvRestosAlimenticios"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvConsistencia"
+        android:text="@string/label_restos_alimenticios"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtRestosAlimenticios"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="23dp"
+        android:layout_below="@+id/edtxtConsistencia"
+        android:layout_marginLeft="32dp"
+        android:layout_toRightOf="@+id/txtvRestosAlimenticios"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvMucus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvRestosAlimenticios"
+        android:text="@string/label_mucus"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtMucus"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:layout_below="@+id/edtxtRestosAlimenticios"
+        android:layout_marginLeft="124dp"
+        android:layout_toRightOf="@+id/txtvMucus"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvPHegh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvMucus"
+        android:text="@string/label_ph"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtPHegh"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/edtxtMucus"
+        android:layout_marginLeft="150dp"
+        android:layout_toRightOf="@+id/txtvPHegh"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvSangreOculta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvPHegh"
+        android:text="@string/label_sangre_oculta"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtSangreOculta"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="27dp"
+        android:layout_below="@+id/edtxtPHegh"
+        android:layout_marginLeft="73dp"
+        android:layout_toRightOf="@+id/txtvSangreOculta"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvCitologiaFecalegh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvSangreOculta"
+        android:text="@string/label_citologia_fecal"
+        android:textStyle="bold"
+        />
+
+    <TextView
+        android:id="@+id/txtvBacterias"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvCitologiaFecalegh"
+        android:text="@string/label_bacterias"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtBacterias"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:layout_below="@+id/txtvCitologiaFecalegh"
+        android:layout_marginLeft="107dp"
+        android:layout_toRightOf="@+id/txtvBacterias"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvLevaduras"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvBacterias"
+        android:text="@string/label_levaduras"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtLevaduras"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_below="@+id/edtxtBacterias"
+        android:layout_marginLeft="98dp"
+        android:layout_toRightOf="@+id/txtvLevaduras"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvLeucocitos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvLevaduras"
+        android:text="@string/label_leucocitos"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtLeucocitos"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="23dp"
+        android:layout_below="@+id/edtxtLevaduras"
+        android:layout_marginLeft="94dp"
+        android:layout_toRightOf="@+id/txtvLeucocitos"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvEritrocitos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvLeucocitos"
+        android:text="@string/label_eritrocitos"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtEritrocitos"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:layout_below="@+id/edtxtLeucocitos"
+        android:layout_marginLeft="98dp"
+        android:layout_toRightOf="@+id/txtvEritrocitos"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvFilamentosMucosos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_below="@+id/txtvEritrocitos"
+        android:text="@string/label_filamentos_mucosos"
+        android:textStyle="bold"
+        />
+
+    <EditText
+        android:id="@+id/edtxtFilamentosMucosos"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/edtxtEritrocitos"
+        android:layout_marginLeft="24dp"
+        android:layout_toRightOf="@+id/txtvFilamentosMucosos"
+        android:enabled="false"
+        style="@style/EditTextEstilo"
+        />
+
+</RelativeLayout>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+
+    tools:context=".diagnosticoactivities.DiagnosticoPlanesActivity">
+
+
+    <!-- Header aligned to top -->
+
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@color/color_border_edit_text_normal"
+        android:gravity="center" >
+
+        <Button
+            android:id="@+id/btnPlanes"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:layout_marginTop="7dp"
+            android:text="@string/boton_diagnostico_Planes"
+            android:layout_alignParentTop="true"
+            android:onClick="onClick_btnPlanes"
+            android:drawableRight="@drawable/reducir"/>
+
+    </RelativeLayout>
+
+
+
+    <!-- Content below header and above footer -->
+
+    <RelativeLayout
+        android:id="@+id/content"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+
+        android:layout_below="@id/header"
+        android:gravity="top" >
+
+        <EditText
+            android:id="@+id/edtxtPlanes"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="top"
+            />
+    </RelativeLayout>
+</RelativeLayout>
