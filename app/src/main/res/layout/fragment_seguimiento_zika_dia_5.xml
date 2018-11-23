@@ -135,6 +135,45 @@
             android:text="@string/label_sintomas"
             android:textColor="#fff"
             android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/txtvPosSeg5"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="40dp"
+            android:gravity="center"
+            android:background="@drawable/bg_textview_rectangulo2"
+            android:text="@string/label_s"
+            android:textColor="#fff"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/txtvNegSeg5"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="5dp"
+            android:gravity="center"
+            android:background="@drawable/bg_textview_rectangulo2"
+            android:text="@string/label_n"
+            android:textColor="#fff"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/txtvDesSeg5"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="5dp"
+            android:gravity="center"
+            android:background="@drawable/bg_textview_rectangulo2"
+            android:text="@string/label_d"
+            android:textColor="#fff"
+            android:textStyle="bold"
+            />
     </LinearLayout>
 
     <LinearLayout

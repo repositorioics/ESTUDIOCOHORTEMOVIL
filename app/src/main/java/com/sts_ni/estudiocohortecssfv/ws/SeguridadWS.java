@@ -28,7 +28,7 @@ import java.util.Properties;
 public class SeguridadWS {
 
   //  private static String URL = "http://54.183.17.90:8080/seguridadWS/SeguridadWS?wsdl";
-    private static String URL = "http://192.168.1.191:8080/seguridadWS/SeguridadWS?wsdl";
+    private static String URL = "http://192.168.1.97:8080/seguridadWS/SeguridadWS?wsdl";
  // private static String URL = "http://192.168.1.95:8080/seguridadWS/SeguridadWS?wsdl";
     private static String CODIGO_SISTEMA;
 

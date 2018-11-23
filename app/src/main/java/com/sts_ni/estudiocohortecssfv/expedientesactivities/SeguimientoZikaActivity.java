@@ -49,7 +49,6 @@ import com.sts_ni.estudiocohortecssfv.utils.DateUtils;
 import com.sts_ni.estudiocohortecssfv.utils.StringUtils;
 import com.sts_ni.estudiocohortecssfv.utils.UserTask;
 import com.sts_ni.estudiocohortecssfv.ws.ConsultaWS;
-import com.sts_ni.estudiocohortecssfv.ws.SeguimientoInfluenzaWS;
 import com.sts_ni.estudiocohortecssfv.ws.SeguimientoZikaWS;
 
 import java.io.File;
@@ -148,6 +147,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.dwlSeguimientoZika));
     }
+
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
@@ -746,6 +746,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
             });
         }
 
+
+
         /***
          * Metodo para llamar el servicio que crea Hoja de seguimiento.
          */
@@ -914,6 +916,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 }
             }
         }
+
 
         /**
          * Metodo que llama servicio para cerrar seguimiento de zika
@@ -1397,8 +1400,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 mSeguimientoZikaActivity.adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
 
-                View view = inflater.inflate(R.layout.fragment_seguimiento_zika_dia_1, container, false);
 
+
+                View view = inflater.inflate(R.layout.fragment_seguimiento_zika_dia_1, container, false);
 
                 if (mPage == 2) {
                     view = inflater.inflate(R.layout.fragment_seguimiento_zika_dia_2, container, false);
@@ -1570,7 +1574,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         imgLimpiarSeguimiento1.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                limpiarControlesTab();
+                                setControlesTab(0);
                             }
                         });
                         break;
@@ -1579,7 +1583,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         imgLimpiarSeguimiento2.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                limpiarControlesTab();
+                                setControlesTab(0);
                             }
                         });
                         break;
@@ -1588,7 +1592,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         imgLimpiarSeguimiento3.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                limpiarControlesTab();
+                                setControlesTab(0);
                             }
                         });
                         break;
@@ -1597,7 +1601,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         imgLimpiarSeguimiento4.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                limpiarControlesTab();
+                                setControlesTab(0);
                             }
                         });
                         break;
@@ -1606,7 +1610,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         imgLimpiarSeguimiento5.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                limpiarControlesTab();
+                                setControlesTab(0);
                             }
                         });
                         break;
@@ -1615,7 +1619,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         imgLimpiarSeguimiento6.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                limpiarControlesTab();
+                                setControlesTab(0);
                             }
                         });
                         break;
@@ -1624,7 +1628,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         imgLimpiarSeguimiento7.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                limpiarControlesTab();
+                                setControlesTab(0);
                             }
                         });
                         break;
@@ -1633,7 +1637,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         imgLimpiarSeguimiento8.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                limpiarControlesTab();
+                                setControlesTab(0);
                             }
                         });
                         break;
@@ -1642,7 +1646,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         imgLimpiarSeguimiento9.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                limpiarControlesTab();
+                                setControlesTab(0);
                             }
                         });
                         break;
@@ -1651,7 +1655,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         imgLimpiarSeguimiento10.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                limpiarControlesTab();
+                                setControlesTab(0);
                             }
                         });
                         break;
@@ -1660,7 +1664,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         imgLimpiarSeguimiento11.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                limpiarControlesTab();
+                                setControlesTab(0);
                             }
                         });
                         break;
@@ -1669,7 +1673,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         imgLimpiarSeguimiento12.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                limpiarControlesTab();
+                                setControlesTab(0);
                             }
                         });
                         break;
@@ -1678,7 +1682,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         imgLimpiarSeguimiento13.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                limpiarControlesTab();
+                                setControlesTab(0);
                             }
                         });
                         break;
@@ -1688,13 +1692,62 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         imgLimpiarSeguimiento14.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                limpiarControlesTab();
+                                setControlesTab(0);
                             }
                         });
                         break;
 
                 }
             }
+
+            public void confirmation(final int value){
+                try{
+                    DialogInterface.OnClickListener questionDialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which){
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    setControlesTab(value);
+
+                                    break;
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    break;
+                            }
+                        }
+                    };
+
+                    switch (value) {
+                        case 1:
+                            MensajesHelper.mostrarMensajeYesNo(CONTEXT,
+                                    String.format(getResources().getString(R.string.msg_change_yes2), mPage), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    questionDialogClickListener);
+                            break;
+
+                        case 2:
+                            MensajesHelper.mostrarMensajeYesNo(CONTEXT,
+                                    String.format(getResources().getString(R.string.msg_change_no2), mPage),  getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    questionDialogClickListener);
+                            break;
+
+                        case 3:
+                            MensajesHelper.mostrarMensajeYesNo(CONTEXT,
+                                    String.format(getResources().getString(R.string.msg_change_desc2), mPage), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    questionDialogClickListener);
+                            break;
+                    }
+
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    MensajesHelper.mostrarMensajeError(CONTEXT, e.getMessage(), getString(R.string.title_estudio_sostenible), null);
+                }
+
+            }
+
 
             public void establecerBotones() {
                 //botones para la busqueda de los médicos
@@ -1712,6 +1765,32 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                                 DlogBuscar.show(fm, "Buscar");
                             }
                         });
+
+                       TextView txtPosSeg1 = (TextView) getActivity().findViewById(R.id.txtvPosSeg1);
+                       TextView txtNegSeg1 = (TextView) getActivity().findViewById(R.id.txtvNegSeg1);
+                       TextView txtDesSeg1 = (TextView) getActivity().findViewById(R.id.txtvDesSeg1);
+
+                        txtNegSeg1.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                              confirmation(2);
+                            }
+                        });
+
+                        txtPosSeg1.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtDesSeg1.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
+
 
                         ImageButton imgBusquedaSupervisor1 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaSupervisor1);
                         imgBusquedaSupervisor1.setOnClickListener(new View.OnClickListener() {
@@ -1753,6 +1832,31 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                             }
                         });
 
+                        TextView txtPosSeg2 = (TextView) getActivity().findViewById(R.id.txtvPosSeg2);
+                        TextView txtNegSeg2 = (TextView) getActivity().findViewById(R.id.txtvNegSeg2);
+                        TextView txtDesSeg2 = (TextView) getActivity().findViewById(R.id.txtvDesSeg2);
+
+                        txtNegSeg2.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                               confirmation(2);
+                            }
+                        });
+
+                        txtPosSeg2.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtDesSeg2.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
+
                         break;
                     case 3:
                         ImageButton imgBusquedaMedico3 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico3);
@@ -1778,6 +1882,31 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 DlogBuscar.setTargetFragment(mCorrienteFragmento, 0);
                                 DlogBuscar.show(fm, "Buscar");
+                            }
+                        });
+
+                        TextView txtPosSeg3 = (TextView) getActivity().findViewById(R.id.txtvPosSeg3);
+                        TextView txtNegSeg3 = (TextView) getActivity().findViewById(R.id.txtvNegSeg3);
+                        TextView txtDesSeg3 = (TextView) getActivity().findViewById(R.id.txtvDesSeg3);
+
+                        txtNegSeg3.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtPosSeg3.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtDesSeg3.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
                             }
                         });
                         break;
@@ -1807,6 +1936,31 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                                 DlogBuscar.show(fm, "Buscar");
                             }
                         });
+
+                        TextView txtPosSeg4 = (TextView) getActivity().findViewById(R.id.txtvPosSeg4);
+                        TextView txtNegSeg4 = (TextView) getActivity().findViewById(R.id.txtvNegSeg4);
+                        TextView txtDesSeg4 = (TextView) getActivity().findViewById(R.id.txtvDesSeg4);
+
+                        txtNegSeg4.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtPosSeg4.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtDesSeg4.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
                         break;
                     case 5:
                         ImageButton imgBusquedaMedico5 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico5);
@@ -1834,6 +1988,32 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                                 DlogBuscar.show(fm, "Buscar");
                             }
                         });
+
+                        TextView txtPosSeg5 = (TextView) getActivity().findViewById(R.id.txtvPosSeg5);
+                        TextView txtNegSeg5 = (TextView) getActivity().findViewById(R.id.txtvNegSeg5);
+                        TextView txtDesSeg5 = (TextView) getActivity().findViewById(R.id.txtvDesSeg5);
+
+                        txtNegSeg5.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtPosSeg5.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtDesSeg5.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
+
                         break;
                     case 6:
                         ImageButton imgBusquedaMedico6 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico6);
@@ -1861,6 +2041,31 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                                 DlogBuscar.show(fm, "Buscar");
                             }
                         });
+
+                        TextView txtPosSeg6 = (TextView) getActivity().findViewById(R.id.txtvPosSeg6);
+                        TextView txtNegSeg6 = (TextView) getActivity().findViewById(R.id.txtvNegSeg6);
+                        TextView txtDesSeg6 = (TextView) getActivity().findViewById(R.id.txtvDesSeg6);
+
+                        txtNegSeg6.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtPosSeg6.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtDesSeg6.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
                         break;
                     case 7:
                         ImageButton imgBusquedaMedico7 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico7);
@@ -1886,6 +2091,31 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 DlogBuscar.setTargetFragment(mCorrienteFragmento, 0);
                                 DlogBuscar.show(fm, "Buscar");
+                            }
+                        });
+
+                        TextView txtPosSeg7 = (TextView) getActivity().findViewById(R.id.txtvPosSeg7);
+                        TextView txtNegSeg7 = (TextView) getActivity().findViewById(R.id.txtvNegSeg7);
+                        TextView txtDesSeg7 = (TextView) getActivity().findViewById(R.id.txtvDesSeg7);
+
+                        txtNegSeg7.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtPosSeg7.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtDesSeg7.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
                             }
                         });
                         break;
@@ -1916,6 +2146,31 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                             }
                         });
 
+                        TextView txtPosSeg8 = (TextView) getActivity().findViewById(R.id.txtvPosSeg8);
+                        TextView txtNegSeg8 = (TextView) getActivity().findViewById(R.id.txtvNegSeg8);
+                        TextView txtDesSeg8 = (TextView) getActivity().findViewById(R.id.txtvDesSeg8);
+
+                        txtNegSeg8.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtPosSeg8.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtDesSeg8.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
+
                         break;
                     case 9:
                         ImageButton imgBusquedaMedico9 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico9);
@@ -1943,6 +2198,31 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                                 DlogBuscar.show(fm, "Buscar");
                             }
                         });
+
+                        TextView txtPosSeg9 = (TextView) getActivity().findViewById(R.id.txtvPosSeg9);
+                        TextView txtNegSeg9 = (TextView) getActivity().findViewById(R.id.txtvNegSeg9);
+                        TextView txtDesSeg9 = (TextView) getActivity().findViewById(R.id.txtvDesSeg9);
+
+                        txtNegSeg9.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtPosSeg9.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtDesSeg9.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
                         break;
                     case 10:
                         ImageButton imgBusquedaMedico10 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico10);
@@ -1968,6 +2248,31 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 DlogBuscar.setTargetFragment(mCorrienteFragmento, 0);
                                 DlogBuscar.show(fm, "Buscar");
+                            }
+                        });
+
+                        TextView txtPosSeg10 = (TextView) getActivity().findViewById(R.id.txtvPosSeg10);
+                        TextView txtNegSeg10 = (TextView) getActivity().findViewById(R.id.txtvNegSeg10);
+                        TextView txtDesSeg10 = (TextView) getActivity().findViewById(R.id.txtvDesSeg10);
+
+                        txtNegSeg10.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtPosSeg10.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtDesSeg10.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
                             }
                         });
                         break;
@@ -1998,6 +2303,31 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                                 DlogBuscar.show(fm, "Buscar");
                             }
                         });
+
+                        TextView txtPosSeg11 = (TextView) getActivity().findViewById(R.id.txtvPosSeg11);
+                        TextView txtNegSeg11 = (TextView) getActivity().findViewById(R.id.txtvNegSeg11);
+                        TextView txtDesSeg11 = (TextView) getActivity().findViewById(R.id.txtvDesSeg11);
+
+                        txtNegSeg11.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtPosSeg11.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtDesSeg11.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
                         break;
                     case 12:
                         ImageButton imgBusquedaMedico12 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico12);
@@ -2023,6 +2353,31 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 DlogBuscar.setTargetFragment(mCorrienteFragmento, 0);
                                 DlogBuscar.show(fm, "Buscar");
+                            }
+                        });
+
+                        TextView txtPosSeg12 = (TextView) getActivity().findViewById(R.id.txtvPosSeg12);
+                        TextView txtNegSeg12 = (TextView) getActivity().findViewById(R.id.txtvNegSeg12);
+                        TextView txtDesSeg12 = (TextView) getActivity().findViewById(R.id.txtvDesSeg12);
+
+                        txtNegSeg12.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtPosSeg12.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtDesSeg12.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
                             }
                         });
                         break;
@@ -2053,6 +2408,32 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                                 DlogBuscar.show(fm, "Buscar");
                             }
                         });
+
+                        TextView txtPosSeg13 = (TextView) getActivity().findViewById(R.id.txtvPosSeg13);
+                        TextView txtNegSeg13 = (TextView) getActivity().findViewById(R.id.txtvNegSeg13);
+                        TextView txtDesSeg13 = (TextView) getActivity().findViewById(R.id.txtvDesSeg13);
+
+                        txtNegSeg13.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtPosSeg13.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtDesSeg13.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
+
                         break;
 
                     case 14:
@@ -2079,6 +2460,31 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 DlogBuscar.setTargetFragment(mCorrienteFragmento, 0);
                                 DlogBuscar.show(fm, "Buscar");
+                            }
+                        });
+
+                        TextView txtPosSeg14 = (TextView) getActivity().findViewById(R.id.txtvPosSeg14);
+                        TextView txtNegSeg14 = (TextView) getActivity().findViewById(R.id.txtvNegSeg14);
+                        TextView txtDesSeg14 = (TextView) getActivity().findViewById(R.id.txtvDesSeg14);
+
+                        txtNegSeg14.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtPosSeg14.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtDesSeg14.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
                             }
                         });
                         break;
@@ -12730,6 +13136,10 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento1).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor1).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor1).setEnabled(habilitar);
+
+                        getActivity().findViewById(R.id.txtvPosSeg1).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSeg1).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSeg1).setEnabled(habilitar);
                         break;
                     case 2:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento2)).setText(seguimientoZika.getFechaSeguimiento());
@@ -12880,6 +13290,10 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento2).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor2).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor2).setEnabled(habilitar);
+
+                        getActivity().findViewById(R.id.txtvPosSeg2).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSeg2).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSeg2).setEnabled(habilitar);
                         break;
                     case 3:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento3)).setText(seguimientoZika.getFechaSeguimiento());
@@ -13030,6 +13444,10 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento3).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor3).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor3).setEnabled(habilitar);
+
+                        getActivity().findViewById(R.id.txtvPosSeg3).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSeg3).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSeg3).setEnabled(habilitar);
                         break;
                     case 4:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento4)).setText(seguimientoZika.getFechaSeguimiento());
@@ -13180,6 +13598,10 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento4).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor4).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor4).setEnabled(habilitar);
+
+                        getActivity().findViewById(R.id.txtvPosSeg4).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSeg4).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSeg4).setEnabled(habilitar);
                         break;
                     case 5:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento5)).setText(seguimientoZika.getFechaSeguimiento());
@@ -13330,6 +13752,10 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnSupervisor5).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor5).setEnabled(habilitar);
                         setSupervisor(seguimientoZika.getSupervisor());
+
+                        getActivity().findViewById(R.id.txtvPosSeg5).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSeg5).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSeg5).setEnabled(habilitar);
                         break;
                     case 6:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento6)).setText(seguimientoZika.getFechaSeguimiento());
@@ -13480,6 +13906,10 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnSupervisor6).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor6).setEnabled(habilitar);
                         setSupervisor(seguimientoZika.getSupervisor());
+
+                        getActivity().findViewById(R.id.txtvPosSeg6).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSeg6).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSeg6).setEnabled(habilitar);
                         break;
                     case 7:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento7)).setText(seguimientoZika.getFechaSeguimiento());
@@ -13630,6 +14060,10 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnSupervisor7).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor7).setEnabled(habilitar);
                         setSupervisor(seguimientoZika.getSupervisor());
+
+                        getActivity().findViewById(R.id.txtvPosSeg7).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSeg7).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSeg7).setEnabled(habilitar);
                         break;
                     case 8:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento8)).setText(seguimientoZika.getFechaSeguimiento());
@@ -13780,6 +14214,10 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnSupervisor8).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor8).setEnabled(habilitar);
                         setSupervisor(seguimientoZika.getSupervisor());
+
+                        getActivity().findViewById(R.id.txtvPosSeg8).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSeg8).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSeg8).setEnabled(habilitar);
                         break;
 
                     case 9:
@@ -13931,6 +14369,10 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnSupervisor9).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor9).setEnabled(habilitar);
                         setSupervisor(seguimientoZika.getSupervisor());
+
+                        getActivity().findViewById(R.id.txtvPosSeg9).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSeg9).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSeg9).setEnabled(habilitar);
                         break;
 
                     case 10:
@@ -14082,6 +14524,10 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnSupervisor10).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor10).setEnabled(habilitar);
                         setSupervisor(seguimientoZika.getSupervisor());
+
+                        getActivity().findViewById(R.id.txtvPosSeg10).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSeg10).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSeg10).setEnabled(habilitar);
                         break;
 
                     case 11:
@@ -14233,6 +14679,10 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnSupervisor11).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor11).setEnabled(habilitar);
                         setSupervisor(seguimientoZika.getSupervisor());
+
+                        getActivity().findViewById(R.id.txtvPosSeg11).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSeg11).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSeg11).setEnabled(habilitar);
                         break;
 
                     case 12:
@@ -14384,6 +14834,10 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento12).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor12).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor12).setEnabled(habilitar);
+
+                        getActivity().findViewById(R.id.txtvPosSeg12).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSeg12).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSeg12).setEnabled(habilitar);
                         break;
 
 
@@ -14536,6 +14990,10 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento13).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor13).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor13).setEnabled(habilitar);
+
+                        getActivity().findViewById(R.id.txtvPosSeg13).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSeg13).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSeg13).setEnabled(habilitar);
                         break;
 
                     case 14:
@@ -14687,6 +15145,10 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento14).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor14).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor14).setEnabled(habilitar);
+
+                        getActivity().findViewById(R.id.txtvPosSeg14).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSeg14).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSeg14).setEnabled(habilitar);
                         break;
                 }
             }
@@ -14742,726 +15204,803 @@ public class SeguimientoZikaActivity extends ActionBarActivity
             /***
              * Metodo que limpia los datos al utilizar el boton cleaner.
              */
-            public void limpiarControlesTab() {
+            public void setControlesTab(int value) {
                 switch (mPage) {
                     case 1:
-                        ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento1)).setText("");
-                        setMedico(0);
-                        setSupervisor(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila1)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila2)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila3)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila4)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila5)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila6)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila7)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila8)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila9)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila10)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila11)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila12)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila13)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila14)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila15)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila16)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila17)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila18)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila19)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila20)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila21)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila22)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila23)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila24)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila25)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila26)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila27)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila28)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila29)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila30)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila31)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila32)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila33)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila34)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila35)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila36)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila37)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila38)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila39)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila40)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila41)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila42)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila43)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila44)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila45)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila46)).setSelection(0);
+                        if (value == 0 ){
+                            ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento1)).setText("");
+                            setMedico(0);
+                            setSupervisor(0);
+                        }
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila15)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila16)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila17)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila18)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila19)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila20)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila21)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila22)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila23)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila24)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila25)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila26)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila27)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila28)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila29)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila30)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila31)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila32)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila33)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila34)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila35)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila36)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila37)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila38)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila39)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila40)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila41)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila42)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila43)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila44)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila45)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila46)).setSelection(value);
+
+                        if (value != 0){
+                            cargarDatosSintomasDia1();
+                        }
                         break;
                     case 2:
-                        ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento2)).setText("");
-                        setMedico(0);
-                        setSupervisor(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila1)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila2)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila3)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila4)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila5)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila6)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila7)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila8)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila9)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila10)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila11)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila12)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila13)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila14)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila15)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila16)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila17)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila18)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila19)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila20)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila21)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila22)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila23)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila24)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila25)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila26)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila27)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila28)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila29)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila30)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila31)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila32)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila33)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila34)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila35)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila36)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila37)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila38)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila39)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila40)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila41)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila42)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila43)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila44)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila45)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila46)).setSelection(0);
+                        if (value == 0 ){
+                            ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento2)).setText("");
+                            setMedico(0);
+                            setSupervisor(0);
+                        }
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila15)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila16)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila17)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila18)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila19)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila20)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila21)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila22)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila23)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila24)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila25)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila26)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila27)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila28)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila29)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila30)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila31)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila32)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila33)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila34)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila35)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila36)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila37)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila38)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila39)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila40)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila41)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila42)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila43)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila44)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila45)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila46)).setSelection(value);
+                        if (value != 0){
+                            cargarDatosSintomasDia2();
+                        }
                         break;
                     case 3:
-                        ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento3)).setText("");
-                        setMedico(0);
-                        setSupervisor(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila1)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila2)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila3)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila4)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila5)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila6)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila7)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila8)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila9)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila10)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila11)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila12)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila13)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila14)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila15)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila16)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila17)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila18)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila19)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila20)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila21)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila22)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila23)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila24)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila25)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila26)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila27)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila28)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila29)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila30)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila31)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila32)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila33)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila34)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila35)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila36)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila37)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila38)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila39)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila40)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila41)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila42)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila43)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila44)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila45)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila46)).setSelection(0);
+                        if (value == 0 ){
+                            ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento3)).setText("");
+                            setMedico(0);
+                            setSupervisor(0);
+                        }
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila15)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila16)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila17)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila18)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila19)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila20)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila21)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila22)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila23)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila24)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila25)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila26)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila27)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila28)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila29)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila30)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila31)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila32)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila33)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila34)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila35)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila36)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila37)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila38)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila39)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila40)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila41)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila42)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila43)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila44)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila45)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila46)).setSelection(value);
+                        if (value != 0){
+                            cargarDatosSintomasDia3();
+                        }
+
                         break;
                     case 4:
-                        ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento4)).setText("");
-                        setMedico(0);
-                        setSupervisor(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila1)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila2)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila3)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila4)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila5)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila6)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila7)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila8)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila9)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila10)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila11)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila12)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila13)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila14)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila15)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila16)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila17)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila18)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila19)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila20)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila21)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila22)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila23)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila24)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila25)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila26)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila27)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila28)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila29)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila30)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila31)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila32)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila33)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila34)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila35)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila36)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila37)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila38)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila39)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila40)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila41)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila42)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila43)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila44)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila45)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila46)).setSelection(0);
+                        if (value == 0 ){
+                            ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento4)).setText("");
+                            setMedico(0);
+                            setSupervisor(0);
+                        }
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila15)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila16)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila17)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila18)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila19)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila20)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila21)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila22)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila23)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila24)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila25)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila26)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila27)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila28)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila29)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila30)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila31)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila32)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila33)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila34)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila35)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila36)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila37)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila38)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila39)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila40)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila41)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila42)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila43)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila44)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila45)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila46)).setSelection(value);
+                        if (value != 0){
+                            cargarDatosSintomasDia4();
+                        }
                         break;
                     case 5:
-                        ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento5)).setText("");
-                        setMedico(0);
-                        setSupervisor(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila1)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila2)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila3)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila4)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila5)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila6)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila7)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila8)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila9)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila10)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila11)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila12)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila13)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila14)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila15)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila16)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila17)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila18)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila19)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila20)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila21)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila22)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila23)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila24)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila25)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila26)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila27)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila28)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila29)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila30)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila31)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila32)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila33)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila34)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila35)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila36)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila37)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila38)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila39)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila40)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila41)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila42)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila43)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila44)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila45)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila46)).setSelection(0);
+                        if (value == 0 ){
+                            ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento5)).setText("");
+                            setMedico(0);
+                            setSupervisor(0);
+                        }
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila15)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila16)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila17)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila18)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila19)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila20)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila21)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila22)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila23)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila24)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila25)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila26)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila27)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila28)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila29)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila30)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila31)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila32)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila33)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila34)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila35)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila36)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila37)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila38)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila39)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila40)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila41)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila42)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila43)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila44)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila45)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila46)).setSelection(value);
+                        if (value != 0){
+                            cargarDatosSintomasDia5();
+                        }
                         break;
                     case 6:
-                        ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento6)).setText("");
-                        setMedico(0);
-                        setSupervisor(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila1)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila2)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila3)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila4)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila5)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila6)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila7)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila8)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila9)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila10)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila11)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila12)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila13)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila14)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila15)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila16)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila17)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila18)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila19)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila20)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila21)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila22)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila23)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila24)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila25)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila26)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila27)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila28)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila29)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila30)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila31)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila32)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila33)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila34)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila35)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila36)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila37)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila38)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila39)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila40)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila41)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila42)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila43)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila44)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila45)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila46)).setSelection(0);
+                        if (value == 0 ){
+                            ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento6)).setText("");
+                            setMedico(0);
+                            setSupervisor(0);
+                        }
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila15)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila16)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila17)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila18)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila19)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila20)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila21)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila22)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila23)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila24)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila25)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila26)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila27)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila28)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila29)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila30)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila31)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila32)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila33)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila34)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila35)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila36)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila37)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila38)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila39)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila40)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila41)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila42)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila43)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila44)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila45)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila46)).setSelection(value);
+                        if (value != 0){
+                            cargarDatosSintomasDia6();
+                        }
                         break;
                     case 7:
-                        ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento7)).setText("");
-                        setMedico(0);
-                        setSupervisor(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila1)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila2)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila3)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila4)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila5)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila6)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila7)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila8)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila9)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila10)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila11)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila12)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila13)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila14)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila15)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila16)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila17)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila18)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila19)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila20)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila21)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila22)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila23)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila24)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila25)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila26)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila27)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila28)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila29)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila30)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila31)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila32)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila33)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila34)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila35)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila36)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila37)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila38)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila39)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila40)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila41)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila42)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila43)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila44)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila45)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila46)).setSelection(0);
+                        if (value == 0 ){
+                            ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento7)).setText("");
+                            setMedico(0);
+                            setSupervisor(0);
+                        }
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila15)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila16)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila17)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila18)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila19)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila20)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila21)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila22)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila23)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila24)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila25)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila26)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila27)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila28)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila29)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila30)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila31)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila32)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila33)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila34)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila35)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila36)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila37)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila38)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila39)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila40)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila41)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila42)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila43)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila44)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila45)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila46)).setSelection(value);
+                        if (value != 0){
+                            cargarDatosSintomasDia7();
+                        }
                         break;
                     case 8:
-                        ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento8)).setText("");
-                        setMedico(0);
-                        setSupervisor(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila1)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila2)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila3)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila4)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila5)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila6)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila7)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila8)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila9)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila10)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila11)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila12)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila13)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila14)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila15)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila16)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila17)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila18)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila19)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila20)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila21)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila22)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila23)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila24)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila25)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila26)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila27)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila28)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila29)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila30)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila31)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila32)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila33)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila34)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila35)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila36)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila37)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila38)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila39)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila40)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila41)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila42)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila43)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila44)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila45)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila46)).setSelection(0);
+                        if (value == 0 ){
+                            ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento8)).setText("");
+                            setMedico(0);
+                            setSupervisor(0);
+                        }
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila15)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila16)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila17)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila18)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila19)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila20)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila21)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila22)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila23)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila24)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila25)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila26)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila27)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila28)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila29)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila30)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila31)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila32)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila33)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila34)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila35)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila36)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila37)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila38)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila39)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila40)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila41)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila42)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila43)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila44)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila45)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila46)).setSelection(value);
+                        if (value != 0){
+                            cargarDatosSintomasDia8();
+                        }
                         break;
                     case 9:
-                        ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento9)).setText("");
-                        setMedico(0);
-                        setSupervisor(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila1)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila2)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila3)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila4)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila5)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila6)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila7)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila8)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila9)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila10)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila11)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila12)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila13)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila14)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila15)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila16)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila17)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila18)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila19)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila20)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila21)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila22)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila23)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila24)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila25)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila26)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila27)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila28)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila29)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila30)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila31)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila32)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila33)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila34)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila35)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila36)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila37)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila38)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila39)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila40)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila41)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila42)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila43)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila44)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila45)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila46)).setSelection(0);
+                        if (value == 0 ){
+                            ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento9)).setText("");
+                            setMedico(0);
+                            setSupervisor(0);
+                        }
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila15)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila16)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila17)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila18)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila19)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila20)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila21)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila22)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila23)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila24)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila25)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila26)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila27)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila28)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila29)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila30)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila31)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila32)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila33)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila34)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila35)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila36)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila37)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila38)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila39)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila40)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila41)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila42)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila43)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila44)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila45)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila46)).setSelection(value);
+                        if (value != 0){
+                            cargarDatosSintomasDia9();
+                        }
                         break;
                     case 10:
-                        ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento10)).setText("");
-                        setMedico(0);
-                        setSupervisor(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila1)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila2)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila3)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila4)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila5)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila6)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila7)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila8)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila9)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila10)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila11)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila12)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila13)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila14)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila15)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila16)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila17)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila18)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila19)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila20)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila21)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila22)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila23)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila24)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila25)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila26)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila27)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila28)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila29)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila30)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila31)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila32)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila33)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila34)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila35)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila36)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila37)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila38)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila39)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila40)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila41)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila42)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila43)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila44)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila45)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila46)).setSelection(0);
+                        if (value == 0 ){
+                            ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento10)).setText("");
+                            setMedico(0);
+                            setSupervisor(0);
+                        }
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila15)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila16)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila17)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila18)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila19)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila20)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila21)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila22)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila23)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila24)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila25)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila26)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila27)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila28)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila29)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila30)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila31)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila32)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila33)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila34)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila35)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila36)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila37)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila38)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila39)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila40)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila41)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila42)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila43)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila44)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila45)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila46)).setSelection(value);
+                        if (value != 0){
+                            cargarDatosSintomasDia10();
+                        }
                         break;
 
                     case 11:
-                        ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento11)).setText("");
-                        setMedico(0);
-                        setSupervisor(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila1)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila2)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila3)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila4)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila5)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila6)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila7)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila8)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila9)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila10)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila11)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila12)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila13)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila14)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila15)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila16)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila17)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila18)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila19)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila20)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila21)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila22)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila23)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila24)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila25)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila26)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila27)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila28)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila29)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila30)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila31)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila32)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila33)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila34)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila35)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila36)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila37)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila38)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila39)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila40)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila41)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila42)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila43)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila44)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila45)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila46)).setSelection(0);
+                        if (value == 0 ){
+                            ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento11)).setText("");
+                            setMedico(0);
+                            setSupervisor(0);
+                        }
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila15)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila16)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila17)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila18)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila19)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila20)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila21)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila22)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila23)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila24)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila25)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila26)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila27)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila28)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila29)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila30)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila31)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila32)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila33)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila34)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila35)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila36)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila37)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila38)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila39)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila40)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila41)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila42)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila43)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila44)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila45)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila46)).setSelection(value);
+                        if (value != 0){
+                            cargarDatosSintomasDia11();
+                        }
                         break;
                     case 12:
-                        ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento12)).setText("");
-                        setMedico(0);
-                        setSupervisor(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila1)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila2)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila3)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila4)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila5)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila6)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila7)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila8)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila9)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila10)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila11)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila12)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila13)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila14)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila15)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila16)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila17)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila18)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila19)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila20)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila21)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila22)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila23)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila24)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila25)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila26)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila27)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila28)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila29)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila30)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila31)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila32)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila33)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila34)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila35)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila36)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila37)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila38)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila39)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila40)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila41)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila42)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila43)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila44)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila45)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila46)).setSelection(0);
+                        if (value == 0 ){
+                            ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento12)).setText("");
+                            setMedico(0);
+                            setSupervisor(0);
+                        }
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila15)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila16)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila17)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila18)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila19)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila20)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila21)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila22)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila23)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila24)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila25)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila26)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila27)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila28)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila29)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila30)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila31)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila32)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila33)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila34)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila35)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila36)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila37)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila38)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila39)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila40)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila41)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila42)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila43)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila44)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila45)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila46)).setSelection(value);
+                        if (value != 0){
+                            cargarDatosSintomasDia12();
+                        }
                         break;
 
                     case 13:
-                        ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento13)).setText("");
-                        setMedico(0);
-                        setSupervisor(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila1)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila2)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila3)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila4)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila5)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila6)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila7)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila8)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila9)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila10)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila11)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila12)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila13)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila14)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila15)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila16)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila17)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila18)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila19)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila20)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila21)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila22)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila23)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila24)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila25)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila26)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila27)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila28)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila29)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila30)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila31)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila32)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila33)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila34)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila35)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila36)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila37)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila38)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila39)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila40)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila41)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila42)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila43)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila44)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila45)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila46)).setSelection(0);
+                        if (value == 0 ){
+                            ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento13)).setText("");
+                            setMedico(0);
+                            setSupervisor(0);
+                        }
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila15)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila16)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila17)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila18)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila19)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila20)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila21)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila22)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila23)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila24)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila25)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila26)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila27)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila28)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila29)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila30)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila31)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila32)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila33)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila34)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila35)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila36)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila37)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila38)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila39)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila40)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila41)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila42)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila43)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila44)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila45)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila46)).setSelection(value);
+                        if (value != 0){
+                            cargarDatosSintomasDia13();
+                        }
+
                         break;
                     case 14:
-                        ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento14)).setText("");
-                        setMedico(0);
-                        setSupervisor(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila1)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila2)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila3)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila4)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila5)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila6)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila7)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila8)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila9)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila10)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila11)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila12)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila13)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila14)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila15)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila16)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila17)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila18)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila19)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila20)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila21)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila22)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila23)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila24)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila25)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila26)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila27)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila28)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila29)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila30)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila31)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila32)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila33)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila34)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila35)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila36)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila37)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila38)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila39)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila40)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila41)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila42)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila43)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila44)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila45)).setSelection(0);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila46)).setSelection(0);
+                        if (value == 0 ){
+                            ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento14)).setText("");
+                            setMedico(0);
+                            setSupervisor(0);
+                        }
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila15)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila16)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila17)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila18)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila19)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila20)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila21)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila22)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila23)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila24)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila25)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila26)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila27)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila28)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila29)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila30)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila31)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila32)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila33)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila34)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila35)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila36)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila37)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila38)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila39)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila40)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila41)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila42)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila43)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila44)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila45)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila46)).setSelection(value);
+                        if (value != 0){
+                            cargarDatosSintomasDia14();
+                        }
+
                         break;
                 }
-                removerNuevoSeguimientoPorDia(mPage);
+                if (value ==0){
+                    removerNuevoSeguimientoPorDia(mPage);
+                }
+
             }
 
             /***

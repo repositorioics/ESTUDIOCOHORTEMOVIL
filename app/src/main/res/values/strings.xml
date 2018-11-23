@@ -484,6 +484,10 @@
     <string name="msg_change_no">Cambiar a no todos los campos de %1s ?</string>
     <string name="msg_change_desc">Cambiar a desconocido todos los campos de %1s ?</string>
 
+    <string name="msg_change_yes2">Cambiar a Si todos los campos del día %1s del Seguimiento de Zika?</string>
+    <string name="msg_change_no2">Cambiar a No todos los campos del día %1s del Seguimiento de Zika?</string>
+    <string name="msg_change_desc2">Cambiar a Desconocido todos los campos del día %1s del Seguimiento de Zika?</string>
+
     <!--Diagnostico tratamiento !-->
 
     <string name="label_Acetamenofen">Acetamenofén</string>
