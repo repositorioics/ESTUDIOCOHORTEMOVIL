@@ -409,7 +409,7 @@ public class CSintomasTabFragment extends Fragment {
      */
     private boolean validarCamposFueraRango(ArrayList<ControlCambiosDTO> controlCambios) {
         int cont = 0;
-        if (!estaEnRango(1, 100, ((EditText)getActivity().findViewById(R.id.edtxtPesoKgSintoma)).getText().toString())) {
+        if (!estaEnRango(1, 200, ((EditText)getActivity().findViewById(R.id.edtxtPesoKgSintoma)).getText().toString())) {
             vFueraRango = StringUtils.concatenar(vFueraRango, getResources().getString(R.string.label_peso));
             cont++;
            /* ControlCambiosDTO ctrCambios = new ControlCambiosDTO();

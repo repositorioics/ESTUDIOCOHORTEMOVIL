@@ -922,16 +922,24 @@ public class SeguimientoZikaActivity extends ActionBarActivity
          * Metodo que llama servicio para cerrar seguimiento de zika
          */
         private void cerrarHojaZika() {
+            Spinner sint1 =(Spinner) getActivity().findViewById(R.id.spnSintoma1);
+            Spinner sint2 =(Spinner) getActivity().findViewById(R.id.spnSintoma2);
+            Spinner sint3 =(Spinner) getActivity().findViewById(R.id.spnSintoma3);
+            Spinner sint4 =(Spinner) getActivity().findViewById(R.id.spnSintoma4);
+            Spinner categoria =(Spinner) getActivity().findViewById(R.id.spnCategoria);
 
-            if (mSeguimientoZikaActivity.mCodExp > 0 || mSeguimientoZikaActivity.mNumSeg > 0) {
+
+            String sin1 = sint1.getSelectedItem().toString();
+            String sin2 = sint2.getSelectedItem().toString();
+            String sin3 = sint3.getSelectedItem().toString();
+            String sin4 = sint4.getSelectedItem().toString();
+            String cat = categoria.getSelectedItem().toString();
+
+            if (mSeguimientoZikaActivity.mCodExp > 0 && mSeguimientoZikaActivity.mNumSeg > 0 && sin1.compareTo("Seleccione") != 0 && cat.compareTo("Seleccione") != 0) {
                 if (mSeguimientoZikaActivity.mCerrarHojaSeguimientoTask == null ||
                         mSeguimientoZikaActivity.mCerrarHojaSeguimientoTask.getStatus() == CerrarHojaSeguimientoTask.Status.FINISHED) {
+
                     HojaZikaDTO hojaZika = new HojaZikaDTO();
-                    Spinner categoria =(Spinner) getActivity().findViewById(R.id.spnCategoria);
-                    Spinner sint1 =(Spinner) getActivity().findViewById(R.id.spnSintoma1);
-                    Spinner sint2 =(Spinner) getActivity().findViewById(R.id.spnSintoma2);
-                    Spinner sint3 =(Spinner) getActivity().findViewById(R.id.spnSintoma3);
-                    Spinner sint4 =(Spinner) getActivity().findViewById(R.id.spnSintoma4);
 
                     hojaZika.setCodExpediente(mSeguimientoZikaActivity.mCodExp);
                     hojaZika.setNumHojaSeguimiento(mSeguimientoZikaActivity.mNumSeg);
@@ -940,17 +948,26 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     hojaZika.setCategoria(categoria.getSelectedItem().toString());
                     hojaZika.setSintomaInicial1(sint1.getSelectedItem().toString());
 
-                    hojaZika.setSintomaInicial2(sint2.getSelectedItem().toString());
-                    hojaZika.setSintomaInicial3(sint3.getSelectedItem().toString());
-                    hojaZika.setSintomaInicial4(sint4.getSelectedItem().toString());
+                    if (sin2.compareTo("Seleccione") != 0){
+                        hojaZika.setSintomaInicial2(sint2.getSelectedItem().toString());
+                    }
+
+                    if (sin3.compareTo("Seleccione") != 0){
+                        hojaZika.setSintomaInicial3(sint3.getSelectedItem().toString());
+                    }
+
+                    if (sin4.compareTo("Seleccione") != 0){
+                        hojaZika.setSintomaInicial4(sint4.getSelectedItem().toString());
+                    }
                     hojaZika.setFechaCierre(Calendar.getInstance());
                     hojaZika.setCerrado('S');
 
                     ArrayList<SeguimientoZikaDTO> lstSeg = new ArrayList<>();
+                    int cont = 0;
                     for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.nuevaListaSegZika) {
                         if (!StringUtils.isNullOrEmpty(seguimientoZika.getFechaSeguimiento())) {
-                            if((seguimientoZika.getUsuarioMedico() > 0) &&
-                                    seguimientoZika.getSupervisor() > 0 &&
+                            cont ++;
+                            if ((seguimientoZika.getUsuarioMedico() > 0) &&
                                     !StringUtils.isNullOrEmpty(seguimientoZika.getFiebre()) &&
                                     !StringUtils.isNullOrEmpty(seguimientoZika.getAstenia()) &&
                                     !StringUtils.isNullOrEmpty(seguimientoZika.getAstenia()) &&
@@ -1005,8 +1022,20 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                                         getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
                                 return;
                             }
+
+
+                        }
+
+                        if(cont == 0){
+                            MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                                    getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento),
+                                    String.valueOf(seguimientoZika.getControlDia())),
+                                    getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                            return;
                         }
                     }
+
+
 
                     hojaZika.setLstSeguimientoZika(lstSeg);
                     mSeguimientoZikaActivity.mCerrarHojaSeguimientoTask = (CerrarHojaSeguimientoZikaTask) new
@@ -1014,6 +1043,11 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
 
                 }
+            }else{
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_cierre_campos_requeridos)),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return;
             }
         }
 
@@ -2687,7 +2721,14 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia1Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia1Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
-                cargarDatosSintomasDia1();
+                for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
+                    if (seguimientoZika.getControlDia() == 1){
+                        loadSpinners2(seguimientoZika);
+                    }
+
+                }
+
+
             }
 
             public void llenarDia2Spn() {
@@ -2738,7 +2779,12 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia2Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia2Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
-                cargarDatosSintomasDia2();
+                for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
+                    if (seguimientoZika.getControlDia() == 2){
+                        loadSpinners2(seguimientoZika);
+                    }
+
+                }
             }
 
             public void llenarDia3Spn() {
@@ -2789,7 +2835,12 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia3Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia3Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
-                cargarDatosSintomasDia3();
+                for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
+                    if (seguimientoZika.getControlDia() == 3){
+                        loadSpinners2(seguimientoZika);
+                    }
+
+                }
             }
 
             public void llenarDia4Spn() {
@@ -2840,7 +2891,12 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia4Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia4Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
-                cargarDatosSintomasDia4();
+                for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
+                    if (seguimientoZika.getControlDia() == 4){
+                        loadSpinners2(seguimientoZika);
+                    }
+
+                }
             }
 
             public void llenarDia5Spn() {
@@ -2891,7 +2947,12 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia5Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia5Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
-                cargarDatosSintomasDia5();
+                for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
+                    if (seguimientoZika.getControlDia() == 5){
+                        loadSpinners2(seguimientoZika);
+                    }
+
+                }
             }
 
             public void llenarDia6Spn() {
@@ -2942,7 +3003,12 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia6Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia6Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
-                cargarDatosSintomasDia6();
+                for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
+                    if (seguimientoZika.getControlDia() == 6){
+                        loadSpinners2(seguimientoZika);
+                    }
+
+                }
             }
 
             private void llenarDia7Spn() {
@@ -2993,7 +3059,12 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia7Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia7Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
-                cargarDatosSintomasDia7();
+                for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
+                    if (seguimientoZika.getControlDia() == 7){
+                        loadSpinners2(seguimientoZika);
+                    }
+
+                }
             }
 
             private void llenarDia8Spn() {
@@ -3044,7 +3115,12 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia8Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia8Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
-                cargarDatosSintomasDia8();
+                for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
+                    if (seguimientoZika.getControlDia() == 8){
+                        loadSpinners2(seguimientoZika);
+                    }
+
+                }
             }
 
             private void llenarDia9Spn() {
@@ -3095,7 +3171,12 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia9Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia9Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
-                cargarDatosSintomasDia9();
+                for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
+                    if (seguimientoZika.getControlDia() == 9){
+                        loadSpinners2(seguimientoZika);
+                    }
+
+                }
             }
 
 
@@ -3147,7 +3228,12 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia10Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia10Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
-                cargarDatosSintomasDia10();
+                for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
+                    if (seguimientoZika.getControlDia() == 10){
+                        loadSpinners2(seguimientoZika);
+                    }
+
+                }
             }
 
             private void llenarDia11Spn() {
@@ -3198,7 +3284,12 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia11Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia11Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
-                cargarDatosSintomasDia11();
+                for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
+                    if (seguimientoZika.getControlDia() == 11){
+                        loadSpinners2(seguimientoZika);
+                    }
+
+                }
             }
 
             public void llenarDia12Spn() {
@@ -3249,7 +3340,12 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia12Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia12Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
-                cargarDatosSintomasDia12();
+                for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
+                    if (seguimientoZika.getControlDia() == 12){
+                        loadSpinners2(seguimientoZika);
+                    }
+
+                }
             }
 
             public void llenarDia13Spn() {
@@ -3300,7 +3396,12 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia13Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia13Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
-                cargarDatosSintomasDia13();
+                for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
+                    if (seguimientoZika.getControlDia() == 13){
+                        loadSpinners2(seguimientoZika);
+                    }
+
+                }
             }
 
             public void llenarDia14Spn() {
@@ -3351,7 +3452,12 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia14Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia14Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
-                cargarDatosSintomasDia14();
+                for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
+                    if (seguimientoZika.getControlDia() == 14){
+                        loadSpinners2(seguimientoZika);
+                    }
+
+                }
             }
 
 
@@ -15260,7 +15366,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia1Fila46)).setSelection(value);
 
                         if (value != 0){
-                            cargarDatosSintomasDia1();
+                            loadSpinners(value);
                         }
                         break;
                     case 2:
@@ -15316,7 +15422,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia2Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia2Fila46)).setSelection(value);
                         if (value != 0){
-                            cargarDatosSintomasDia2();
+                           loadSpinners(value);
                         }
                         break;
                     case 3:
@@ -15372,7 +15478,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia3Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia3Fila46)).setSelection(value);
                         if (value != 0){
-                            cargarDatosSintomasDia3();
+                           loadSpinners(value);
                         }
 
                         break;
@@ -15429,7 +15535,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia4Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia4Fila46)).setSelection(value);
                         if (value != 0){
-                            cargarDatosSintomasDia4();
+                           loadSpinners(value);
                         }
                         break;
                     case 5:
@@ -15485,7 +15591,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia5Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia5Fila46)).setSelection(value);
                         if (value != 0){
-                            cargarDatosSintomasDia5();
+                           loadSpinners(value);
                         }
                         break;
                     case 6:
@@ -15541,7 +15647,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia6Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia6Fila46)).setSelection(value);
                         if (value != 0){
-                            cargarDatosSintomasDia6();
+                           loadSpinners(value);
                         }
                         break;
                     case 7:
@@ -15597,7 +15703,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia7Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia7Fila46)).setSelection(value);
                         if (value != 0){
-                            cargarDatosSintomasDia7();
+                           loadSpinners(value);
                         }
                         break;
                     case 8:
@@ -15653,7 +15759,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia8Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia8Fila46)).setSelection(value);
                         if (value != 0){
-                            cargarDatosSintomasDia8();
+                           loadSpinners(value);
                         }
                         break;
                     case 9:
@@ -15709,7 +15815,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia9Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia9Fila46)).setSelection(value);
                         if (value != 0){
-                            cargarDatosSintomasDia9();
+                           loadSpinners(value);
                         }
                         break;
                     case 10:
@@ -15765,7 +15871,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia10Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia10Fila46)).setSelection(value);
                         if (value != 0){
-                            cargarDatosSintomasDia10();
+                           loadSpinners(value);
                         }
                         break;
 
@@ -15822,7 +15928,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia11Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia11Fila46)).setSelection(value);
                         if (value != 0){
-                            cargarDatosSintomasDia11();
+                           loadSpinners(value);
                         }
                         break;
                     case 12:
@@ -15878,7 +15984,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia12Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia12Fila46)).setSelection(value);
                         if (value != 0){
-                            cargarDatosSintomasDia12();
+                           loadSpinners(value);
                         }
                         break;
 
@@ -15935,7 +16041,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia13Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia13Fila46)).setSelection(value);
                         if (value != 0){
-                            cargarDatosSintomasDia13();
+                            loadSpinners(value);
                         }
 
                         break;
@@ -15992,7 +16098,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia14Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia14Fila46)).setSelection(value);
                         if (value != 0){
-                            cargarDatosSintomasDia14();
+                          loadSpinners(value);
                         }
 
                         break;
@@ -16727,6 +16833,124 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         }
                     }
                 }
+            }
+
+            public void loadSpinners(int value){
+                cargarConsultaInicial(value);
+                cargarFiebre(value);
+                cargarAstenia(value);
+                cargarMalEstadoGral(value);
+                cargarEscalosfrios(value);
+                cargarConvulsiones(value);
+                cargarCefalea(value);
+                cargarRigidezCuello(value);
+                cargarDolorRetroocular(value);
+                cargarPocoApetito(value);
+                cargarNauseas(value);
+                cargarVomitos(value);
+                cargarDiarrea(value);
+                cargarDolorAbdominalContinuo(value);
+                cargarArtralgiaProximal(value);
+                cargarArtralgiaDistal(value);
+                cargarMialgia(value);
+                cargarConjuntivitisNoPurulenta(value);
+                cargarEdemaArtProxMS(value);
+                cargarEdemaArtDistalMS(value);
+                cargarEdemaArtProxMI(value);
+                cargarEdemaArtDistalMI(value);
+                cargarEdemaPeriauricular(value);
+                cargarAdenopatiaCervAnt(value);
+                cargarAdenopatiaCervPost(value);
+                cargarAdenopatiaRetroAuricular(value);
+                cargarRash(value);
+                cargarEquimosis(value);
+                cargarPruebaTorniquetePos(value);
+                cargarEpistaxis(value);
+                cargarGingivorragia(value);
+                cargarPetequiasEspontaneas(value);
+                cargarHematemesis(value);
+                cargarMelena(value);
+                cargarOftalmoplejia(value);
+                cargarDificultadResp(value);
+                cargarDebilidadMuscMS(value);
+                cargarDebilidadMuscMI(value);
+                cargarParestesiaMS(value);
+                cargarParestesiaMI(value);
+                cargarParalisisMuscMS(value);
+                cargarParalisisMuscMI(value);
+                cargarTos(value);
+                cargarRinorrea(value);
+                cargarDolorGarganta(value);
+                cargarPrurito(value);
+            }
+
+            public void loadSpinners2(SeguimientoZikaDTO seg){
+
+                if(seg.getConsultaInicial() != null) cargarConsultaInicial(setValueSpinner(seg.getConsultaInicial()));
+                if(seg.getFiebre() != null) cargarFiebre(setValueSpinner(seg.getFiebre()));
+                if(seg.getAstenia() != null) cargarAstenia(setValueSpinner(seg.getAstenia()));
+                if(seg.getMalEstadoGral() != null) cargarMalEstadoGral(setValueSpinner(seg.getMalEstadoGral()));
+                if(seg.getEscalosfrios() != null) cargarEscalosfrios(setValueSpinner(seg.getEscalosfrios()));
+                if(seg.getConvulsiones() != null)cargarConvulsiones(setValueSpinner(seg.getConvulsiones()));
+                if(seg.getCefalea() != null) cargarCefalea(setValueSpinner(seg.getCefalea()));
+                if(seg.getRigidezCuello() != null) cargarRigidezCuello(setValueSpinner(seg.getRigidezCuello()));
+                if(seg.getDolorRetroocular() != null) cargarDolorRetroocular(setValueSpinner(seg.getDolorRetroocular()));
+                if(seg.getPocoApetito() != null) cargarPocoApetito(setValueSpinner(seg.getPocoApetito()));
+                if(seg.getNauseas() != null) cargarNauseas(setValueSpinner(seg.getNauseas()));
+                if(seg.getVomitos() != null) cargarVomitos(setValueSpinner(seg.getVomitos()));
+                if(seg.getDiarrea() != null)cargarDiarrea(setValueSpinner(seg.getDiarrea()));
+                if(seg.getDolorAbdominalContinuo() != null)cargarDolorAbdominalContinuo(setValueSpinner(seg.getDolorAbdominalContinuo()));
+                if(seg.getArtralgiaProximal() != null)cargarArtralgiaProximal(setValueSpinner(seg.getArtralgiaProximal()));
+                if(seg.getArtralgiaDistal() != null)cargarArtralgiaDistal(setValueSpinner(seg.getArtralgiaDistal()));
+                if(seg.getMialgia() != null)cargarMialgia(setValueSpinner(seg.getMialgia()));
+                if(seg.getConjuntivitisNoPurulenta() != null)cargarConjuntivitisNoPurulenta(setValueSpinner(seg.getConjuntivitisNoPurulenta()));
+                if(seg.getEdemaArtProxMS() != null)cargarEdemaArtProxMS(setValueSpinner(seg.getEdemaArtProxMS()));
+                if(seg.getEdemaArtDistMS() != null)cargarEdemaArtDistalMS(setValueSpinner(seg.getEdemaArtDistMS()));
+                if(seg.getEdemaArtProxMI() != null)cargarEdemaArtProxMI(setValueSpinner(seg.getEdemaArtProxMI()));
+                if(seg.getEdemaArtDistMI() != null)cargarEdemaArtDistalMI(setValueSpinner(seg.getEdemaArtDistMI()));
+                if(seg.getEdemaPeriauricular() != null)cargarEdemaPeriauricular(setValueSpinner(seg.getEdemaPeriauricular()));
+                if(seg.getAdenopatiaCervAnt() != null)cargarAdenopatiaCervAnt(setValueSpinner(seg.getAdenopatiaCervAnt()));
+                if(seg.getAdenopatiaCervPost() != null)cargarAdenopatiaCervPost(setValueSpinner(seg.getAdenopatiaCervPost()));
+                if(seg.getAdenopatiaRetroAuricular() != null)cargarAdenopatiaRetroAuricular(setValueSpinner(seg.getAdenopatiaRetroAuricular()));
+                if(seg.getRash() != null)cargarRash(setValueSpinner(seg.getRash()));
+                if(seg.getEquimosis() != null)cargarEquimosis(setValueSpinner(seg.getEquimosis()));
+                if(seg.getPruebaTorniquetePos() != null)cargarPruebaTorniquetePos(setValueSpinner(seg.getPruebaTorniquetePos()));
+                if(seg.getEpistaxis() !=null)cargarEpistaxis(setValueSpinner(seg.getEpistaxis()));
+                if(seg.getGingivorragia() != null)cargarGingivorragia(setValueSpinner(seg.getGingivorragia()));
+                if(seg.getPetequiasEspontaneas() != null)cargarPetequiasEspontaneas(setValueSpinner(seg.getPetequiasEspontaneas()));
+                if(seg.getHematemesis() !=null)cargarHematemesis(setValueSpinner(seg.getHematemesis()));
+                if(seg.getMelena() !=null)cargarMelena(setValueSpinner(seg.getMelena()));
+                if(seg.getOftalmoplejia() != null)cargarOftalmoplejia(setValueSpinner(seg.getOftalmoplejia()));
+                if(seg.getDificultadResp() !=null)cargarDificultadResp(setValueSpinner(seg.getDificultadResp()));
+                if(seg.getDebilidadMuscMS() !=null)cargarDebilidadMuscMS(setValueSpinner(seg.getDebilidadMuscMS()));
+                if(seg.getDebilidadMuscMI() !=null)cargarDebilidadMuscMI(setValueSpinner(seg.getDebilidadMuscMI()));
+                if(seg.getParestesiaMS() !=null)cargarParestesiaMS(setValueSpinner(seg.getParestesiaMS()));
+                if(seg.getParestesiaMI() !=null)cargarParestesiaMI(setValueSpinner(seg.getParestesiaMI()));
+                if(seg.getParalisisMuscMS() !=null)cargarParalisisMuscMS(setValueSpinner(seg.getParalisisMuscMS()));
+                if(seg.getParalisisMuscMI() != null)cargarParalisisMuscMI(setValueSpinner(seg.getParalisisMuscMI()));
+                if(seg.getTos() != null)cargarTos(setValueSpinner(seg.getTos()));
+                if(seg.getRinorrea() !=null)cargarRinorrea(setValueSpinner(seg.getRinorrea()));
+                if(seg.getDolorGarganta() !=null)cargarDolorGarganta(setValueSpinner(seg.getDolorGarganta()));
+                if(seg.getPrurito() !=null)cargarPrurito(setValueSpinner(seg.getPrurito()));
+
+                if(seg.getFechaSeguimiento() != null)cargarFechaSeguimiento(seg.getFechaSeguimiento());
+            }
+
+            public Integer setValueSpinner(String value){
+                Integer value2 = null;
+                switch (value) {
+                    case "S":
+                        value2 = 1;
+                        break;
+                    case "N":
+                        value2 = 2;
+                        break;
+                    case "D":
+                        value2 = 3;
+                        break;
+                }
+
+                return value2;
             }
 
             //metodos botones next y back

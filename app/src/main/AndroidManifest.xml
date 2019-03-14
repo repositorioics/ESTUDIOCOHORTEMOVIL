@@ -57,76 +57,76 @@
             </intent-filter>
         </activity>
         <activity android:name=".ConsultaActivity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".sintomasactivities.GeneralesSintomasActivity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".sintomasactivities.EstadoGeneralSintomasActivity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".sintomasactivities.GastrointestinalSintomasActivity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".sintomasactivities.OsteomuscularSintomasActivity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".sintomasactivities.CabezaSintomaActivity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".sintomasactivities.DeshidratacionSintomasActivity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".sintomasactivities.CutaneoSintomaActivity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".sintomasactivities.GargantaSintomasActivity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".sintomasactivities.RenalSintomasActivity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".sintomasactivities.EstadoNutriSintomasAcitvity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".sintomasactivities.RespiratorioSintomasActivity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".sintomasactivities.ReferenciaSintomasActivity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".sintomasactivities.VacunasSintomasActivity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".sintomasactivities.CategoriaSintomaActivity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".diagnostiscoactivities.DiagnosticoExamenHistoriaActivity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".diagnostiscoactivities.DiagnosticoPlanesActivity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".diagnostiscoactivities.DiagnosticoActivity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".diagnostiscoactivities.DiagnosticoProximaCitaActivity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".diagnostiscoactivities.DiagnosticoTratamientoActivity"
-            android:label="@string/tilte_hoja_consulta">
+            android:label="@string/tilte_hoja_consulta" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".MalariaResultadoActivity"
-            android:label="@string/tilte_malaria_resultados">
+            android:label="@string/tilte_malaria_resultados" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".PerifericoResultadoActivity"
-            android:label="@string/title_periferico_resultado">
+            android:label="@string/title_periferico_resultado" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".EghResultadoActivity"
-            android:label="@string/title_egh_resultado">
+            android:label="@string/title_egh_resultado" android:screenOrientation="portrait">
         </activity>
         <activity android:name=".EgoResultadoActivity"
-            android:label="@string/title_ego_resultado">
+            android:label="@string/title_ego_resultado" android:screenOrientation="portrait">
         </activity>
         <activity android:name="com.sts_ni.estudiocohortecssfv.expedientesactivities.ExpedienteActivity"
             android:label="@string/title_expedientes">

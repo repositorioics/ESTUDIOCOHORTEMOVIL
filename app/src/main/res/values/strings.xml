@@ -32,6 +32,7 @@
     <string name="title_estudio_sostenible">Instituto de Ciencias Sostenibles</string>
     <string name="title_procesando">Procesando...</string>
 
+
     <!-- etiquetas Strings -->
 
     <string name="label_menu">MENU</string>
@@ -429,7 +430,7 @@
     <string name="msj_paciente_no_atiende_llamado">Está seguro que Paciente no Atiende Llamado?</string>
     <string name="msj_cierre_seguimiento_influenza">Está seguro que desea realizar el cierre?</string>
     <string name="msj_esta_seguro_de_cancelar">Está seguro de Cancelar la Hoja de Consulta?</string>
-    <string name="msj_cambio_hoja_consulta">Se han modificado datos, desea confirmar el cambio?</string>
+    <string name="msj_cambio_hoja_consulta">Se han modificado datos en hoja cerrada, desea confirmar el cambio?</string>
     <string name="msj_esta_seguro_agregar_hoja">Desea agregar Hoja de Consulta para Observación?</string>
     <string name="msj_espere_por_favor">Espere por favor.</string>
     <string name="msj_no_tiene_conexion">No se encuentra con conexión a Internet, intente mas tarde.</string>
@@ -473,6 +474,7 @@
     <string name="msj_debe_ingresar_fecha_vacuna">Debe ingresar la fecha de vacuna</string>
     <string name="msj_la_fecha_menor_dos_meses">La proxima cita debe ser menor de dos meses</string>
     <string name="msj_hora_vacia">Tiene ingresado Ultima Dosis Antipirético debe ingresar la hora.</string>
+    <string name="msj_cierre_campos_requeridos">Se debe de completar los campos requeridos para poder realizar el cierre de hoja.</string>
 
     <string name="msj_debe_ingresar_hemoconcentracion">Debe ingresar la informacion en el campo Hemoconcentración</string>
     <string name="msj_fecha_menor_fecha_nacimiento">Fecha no debe ser menor a la fecha de nacimiento del paciente</string>

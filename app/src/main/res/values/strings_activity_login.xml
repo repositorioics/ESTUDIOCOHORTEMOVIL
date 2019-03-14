@@ -8,6 +8,8 @@
     <string name="prompt_password">Ingrese su clave</string>
     <string name="action_sign_in">Iniciar Sesión</string>
     <string name="action_sign_in_short">Sign in</string>
+    <string name="version">Versión 1.0.0</string>
+    <string name="date_version">Enero 11, 2019</string>
 
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>

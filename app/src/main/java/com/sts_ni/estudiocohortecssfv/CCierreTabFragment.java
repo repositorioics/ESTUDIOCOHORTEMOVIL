@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -112,14 +113,13 @@ public class CCierreTabFragment extends Fragment implements CancelacionDialog.Di
      * @param rootView
      */
     private void inicializarControles(final View rootView) {
-
         rootView.findViewById(R.id.imgBtnCerrarHoja).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 rootView.findViewById(R.id.imgBtnCambioTurno).setEnabled(false);
                 rootView.findViewById(R.id.btnCancelarCierre).setEnabled(false);
                 rootView.findViewById(R.id.btnNoAtiendeLlamadoCierre).setEnabled(false);
-                llamarProcesoCierre();
+                llamarProcesoCierre(rootView);
                 //Desabilitar el boton cambio turno cuando se cerro la hoja de consulta
 
             }
@@ -314,7 +314,7 @@ public class CCierreTabFragment extends Fragment implements CancelacionDialog.Di
     /***
      * Metodo para llamar servicio que realiza el proceso de cierra de Hoja de consulta.
      */
-    private void llamarProcesoCierre(){
+    private void llamarProcesoCierre(final View rootView){
         AsyncTask<Void, Void, Void> procesoCierreTask = new AsyncTask<Void, Void, Void>() {
             private ProgressDialog PD;
             private ConnectivityManager CM = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -369,12 +369,22 @@ public class CCierreTabFragment extends Fragment implements CancelacionDialog.Di
                                         getResources().getString(R.string.msj_se_ejecuto_la_impresion)),
                                 getResources().getString(
                                         R.string.title_estudio_sostenible), null);
+
+                        rootView.findViewById(R.id.imgBtnCerrarHoja).setEnabled(false);
+                        mPacienteSeleccionado.setCodigoEstado('7');
+
+
+
+
                     } else if (RESPUESTA.getCodigoError().intValue() == 1){
                         MensajesHelper.mostrarMensajeInfo(getActivity(),
                                new StringBuffer().append(getResources().getString(R.string.msj_cerrado_exitosamente).concat(
                                        " ").concat(getResources().getString(R.string.msj_se_ejecuto_la_impresion))).
                                        append(" ").append(RESPUESTA.getMensajeError()).toString(),getResources().getString(
                                         R.string.title_estudio_sostenible), null);
+
+                        rootView.findViewById(R.id.imgBtnCerrarHoja).setEnabled(false);
+                        mPacienteSeleccionado.setCodigoEstado('7');
 
                     } else {
                         MensajesHelper.mostrarMensajeError(getActivity(),

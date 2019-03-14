@@ -796,8 +796,10 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                     hojaInfluenza.setCerrado('S');
 
                     ArrayList<SeguimientoInfluenzaDTO> lstSeg = new ArrayList<>();
+                    int cont = 0;
                     for(SeguimientoInfluenzaDTO seguimientoInfluenza : mSeguimientoInfluenzaActivity.nuevaListaSegInfluenza) {
                         if (!StringUtils.isNullOrEmpty(seguimientoInfluenza.getFechaSeguimiento())) {
+                            cont ++;
                             if((seguimientoInfluenza.getUsuarioMedico() > 0) &&
                                     !StringUtils.isNullOrEmpty(seguimientoInfluenza.getFaltaEscuela()) &&
                                     !StringUtils.isNullOrEmpty(seguimientoInfluenza.getQuedoEnCama()) &&
@@ -823,6 +825,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                                 return;
                             }
                         }
+
+                        if(cont == 0){
+                            MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                                    getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento),
+                                    String.valueOf(seguimientoInfluenza.getControlDia())),
+                                    getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                            return;
+                        }
                     }
 
                     hojaInfluenza.setLstSeguimientoInfluenza(lstSeg);
@@ -831,6 +841,11 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
 
 
                 }
+            }else{
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_cierre_campos_requeridos)),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return;
             }
         }
 
@@ -1711,6 +1726,15 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia1Fila15)).setAdapter(mSeguimientoInfluenzaActivity.adapter);
 
                 cargarDatosSintomasDia1();
+
+                for(SeguimientoInfluenzaDTO seguimientoInfluenza : mSeguimientoInfluenzaActivity.listaSegInfluenza) {
+                    if (seguimientoInfluenza.getControlDia() == 1){
+                        cargarFechaSeguimiento(seguimientoInfluenza.getFechaSeguimiento());
+                    }
+
+                }
+
+
             }
 
             public void llenarDia2Spn() {
@@ -1731,6 +1755,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia2Fila15)).setAdapter(mSeguimientoInfluenzaActivity.adapter);
 
                 cargarDatosSintomasDia2();
+
+
+                for(SeguimientoInfluenzaDTO seguimientoInfluenza : mSeguimientoInfluenzaActivity.listaSegInfluenza) {
+                    if (seguimientoInfluenza.getControlDia() == 2){
+                        cargarFechaSeguimiento(seguimientoInfluenza.getFechaSeguimiento());
+                    }
+
+                }
             }
 
             public void llenarDia3Spn() {
@@ -1751,6 +1783,13 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia3Fila15)).setAdapter(mSeguimientoInfluenzaActivity.adapter);
 
                 cargarDatosSintomasDia3();
+
+                for(SeguimientoInfluenzaDTO seguimientoInfluenza : mSeguimientoInfluenzaActivity.listaSegInfluenza) {
+                    if (seguimientoInfluenza.getControlDia() == 3){
+                        cargarFechaSeguimiento(seguimientoInfluenza.getFechaSeguimiento());
+                    }
+
+                }
             }
 
             public void llenarDia4Spn() {
@@ -1771,6 +1810,13 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia4Fila15)).setAdapter(mSeguimientoInfluenzaActivity.adapter);
 
                 cargarDatosSintomasDia4();
+
+                for(SeguimientoInfluenzaDTO seguimientoInfluenza : mSeguimientoInfluenzaActivity.listaSegInfluenza) {
+                    if (seguimientoInfluenza.getControlDia() == 4){
+                        cargarFechaSeguimiento(seguimientoInfluenza.getFechaSeguimiento());
+                    }
+
+                }
             }
 
             public void llenarDia5Spn() {
@@ -1791,6 +1837,13 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia5Fila15)).setAdapter(mSeguimientoInfluenzaActivity.adapter);
 
                 cargarDatosSintomasDia5();
+
+                for(SeguimientoInfluenzaDTO seguimientoInfluenza : mSeguimientoInfluenzaActivity.listaSegInfluenza) {
+                    if (seguimientoInfluenza.getControlDia() == 5){
+                        cargarFechaSeguimiento(seguimientoInfluenza.getFechaSeguimiento());
+                    }
+
+                }
             }
 
             public void llenarDia6Spn() {
@@ -1811,6 +1864,13 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia6Fila15)).setAdapter(mSeguimientoInfluenzaActivity.adapter);
 
                 cargarDatosSintomasDia6();
+
+                for(SeguimientoInfluenzaDTO seguimientoInfluenza : mSeguimientoInfluenzaActivity.listaSegInfluenza) {
+                    if (seguimientoInfluenza.getControlDia() == 6){
+                        cargarFechaSeguimiento(seguimientoInfluenza.getFechaSeguimiento());
+                    }
+
+                }
             }
 
             private void llenarDia7Spn() {
@@ -1831,6 +1891,13 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia7Fila15)).setAdapter(mSeguimientoInfluenzaActivity.adapter);
 
                 cargarDatosSintomasDia7();
+
+                for(SeguimientoInfluenzaDTO seguimientoInfluenza : mSeguimientoInfluenzaActivity.listaSegInfluenza) {
+                    if (seguimientoInfluenza.getControlDia() == 7){
+                        cargarFechaSeguimiento(seguimientoInfluenza.getFechaSeguimiento());
+                    }
+
+                }
             }
 
             private void llenarDia8Spn() {
@@ -1851,6 +1918,13 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia8Fila15)).setAdapter(mSeguimientoInfluenzaActivity.adapter);
 
                 cargarDatosSintomasDia8();
+
+                for(SeguimientoInfluenzaDTO seguimientoInfluenza : mSeguimientoInfluenzaActivity.listaSegInfluenza) {
+                    if (seguimientoInfluenza.getControlDia() == 8){
+                        cargarFechaSeguimiento(seguimientoInfluenza.getFechaSeguimiento());
+                    }
+
+                }
             }
 
             private void llenarDia9Spn() {
@@ -1871,6 +1945,13 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia9Fila15)).setAdapter(mSeguimientoInfluenzaActivity.adapter);
 
                 cargarDatosSintomasDia9();
+
+                for(SeguimientoInfluenzaDTO seguimientoInfluenza : mSeguimientoInfluenzaActivity.listaSegInfluenza) {
+                    if (seguimientoInfluenza.getControlDia() == 9){
+                        cargarFechaSeguimiento(seguimientoInfluenza.getFechaSeguimiento());
+                    }
+
+                }
             }
 
             private void llenarDia10Spn() {
@@ -1891,6 +1972,13 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia10Fila15)).setAdapter(mSeguimientoInfluenzaActivity.adapter);
 
                 cargarDatosSintomasDia10();
+
+                for(SeguimientoInfluenzaDTO seguimientoInfluenza : mSeguimientoInfluenzaActivity.listaSegInfluenza) {
+                    if (seguimientoInfluenza.getControlDia() == 10){
+                        cargarFechaSeguimiento(seguimientoInfluenza.getFechaSeguimiento());
+                    }
+
+                }
             }
 
             private void llenarDia11Spn() {
@@ -1911,6 +1999,13 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia11Fila15)).setAdapter(mSeguimientoInfluenzaActivity.adapter);
 
                 cargarDatosSintomasDia11();
+
+                for(SeguimientoInfluenzaDTO seguimientoInfluenza : mSeguimientoInfluenzaActivity.listaSegInfluenza) {
+                    if (seguimientoInfluenza.getControlDia() == 11){
+                        cargarFechaSeguimiento(seguimientoInfluenza.getFechaSeguimiento());
+                    }
+
+                }
             }
 
             private void llenarDia12Spn() {
@@ -1931,6 +2026,13 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia12Fila15)).setAdapter(mSeguimientoInfluenzaActivity.adapter);
 
                 cargarDatosSintomasDia12();
+
+                for(SeguimientoInfluenzaDTO seguimientoInfluenza : mSeguimientoInfluenzaActivity.listaSegInfluenza) {
+                    if (seguimientoInfluenza.getControlDia() == 12){
+                        cargarFechaSeguimiento(seguimientoInfluenza.getFechaSeguimiento());
+                    }
+
+                }
             }
 
             public void establerCargaIU() {
@@ -1944,6 +2046,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
             }
 
             public void cargarDatosSintomasDia1() {
+
                 ((Spinner) getActivity().findViewById(R.id.spnDia1Fila1)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
