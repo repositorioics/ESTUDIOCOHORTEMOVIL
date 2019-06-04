@@ -1724,9 +1724,18 @@ public class CExamenesTabFragment extends Fragment {
                                 if (RESPUESTA.getObjecRespuesta().getBhc().compareTo('0') == 0) {
                                     CheckBox chkbSBHCExamen = (CheckBox) getActivity().findViewById(R.id.chkbSBHCExamen);
                                     chkbSBHCExamen.setChecked(true);
+                                    // Aparentemente, llamar jumpDrawablesToCurrentState()justo después de llamar setChecked(true)
+                                    // parece solucionar el problema y muestra el estado adecuado.
+                                    // Parece un error de animación
+                                    // chkbSBHCExamen.jumpDrawablesToCurrentState();
                                 } else {
                                     CheckBox chkbSBHCExamen = (CheckBox) getActivity().findViewById(R.id.chkbNBHCExamen);
                                     chkbSBHCExamen.setChecked(true);
+                                    // Aparentemente, llamar jumpDrawablesToCurrentState()justo después de llamar setChecked(true)
+                                    // parece solucionar el problema y muestra el estado adecuado.
+                                    // Parece un error de animación
+                                    // chkbSBHCExamen.jumpDrawablesToCurrentState();
+
                                 }
                             }
                             if (RESPUESTA.getObjecRespuesta().getSerologiaDengue() != null) {

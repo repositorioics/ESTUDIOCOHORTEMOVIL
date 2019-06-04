@@ -19,6 +19,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,6 +45,7 @@ import com.sts_ni.estudiocohortecssfv.dto.SeguimientoInfluenzaDTO;
 import com.sts_ni.estudiocohortecssfv.helper.MensajesHelper;
 import com.sts_ni.estudiocohortecssfv.tools.BuscarDialogMedico;
 import com.sts_ni.estudiocohortecssfv.tools.DatePickerFragment;
+import com.sts_ni.estudiocohortecssfv.tools.DecimalDigitsInputFilter;
 import com.sts_ni.estudiocohortecssfv.utils.DateUtils;
 import com.sts_ni.estudiocohortecssfv.utils.StringUtils;
 import com.sts_ni.estudiocohortecssfv.utils.UserTask;
@@ -58,6 +60,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Controlador de la UI de Seguimiento Influenza
@@ -98,6 +101,8 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
     public String mFif = null;
     public ArrayList<SeguimientoInfluenzaDTO> listaSegInfluenza;
     public ArrayList<SeguimientoInfluenzaDTO> nuevaListaSegInfluenza;
+    public static boolean isEmptyFIF = false;
+    //public static int posicionMedico = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,7 +123,6 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
         actionBar.setCustomView(R.layout.custom_action_bar_title_center);
         ((TextView) actionBar.getCustomView().findViewById(R.id.myTitleBar)).setText(getResources().getString(R.string.label_seguimiento_influenza));
         ((TextView) actionBar.getCustomView().findViewById(R.id.myUserBar)).setText(((CssfvApp) getApplication()).getInfoSessionWSDTO().getUser());
-
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
@@ -278,6 +282,15 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
 
         ((EditText) this.findViewById(R.id.edtxtFIF)).setText(hojaInfluenza.getFif());
 
+        /*Si la FIF es null o vacia y existe detalle en el seguimiento inlfuenza
+           habilitamos el (EditText = edtxtFIF )para poder ingresar la FIF*/
+        if (StringUtils.isNullOrEmpty(hojaInfluenza.getFif())
+                && (hojaInfluenza.getLstSeguimientoInfluenza() != null && hojaInfluenza.getLstSeguimientoInfluenza().size() > 0)) {
+            this.findViewById(R.id.edtxtFIF).setEnabled(true);
+            isEmptyFIF = true;
+            ((EditText) this.findViewById(R.id.edtxtFIF)).setKeyListener(null);
+        }
+
         this.findViewById(R.id.ibtImprimir).setEnabled(true);
 
         if (hojaInfluenza.getCerrado() == 'S') {
@@ -309,7 +322,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         long diferenciaEn_ms = dNow.getTime() - fSeg.getTime();
                         long dias = diferenciaEn_ms / (1000 * 60 * 60 * 24);
 
-                        if(dias >= 5){
+                        if(dias >= 14){ /* dias >= 5 / Ahora son 14 dias */
                             presentaAviso = true;
                             mensajeAviso = String.format(getResources().getString(R.string.msj_aviso_fecha_cierre_seguimiento), dias);
                         }
@@ -376,6 +389,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
         pd.show();
         this.mCodExp = 0;
         this.mNumSeg = 0;
+        //this.posicionMedico = 0;
         this.findViewById(R.id.ibtCrearHoja).setEnabled(true);
         this.findViewById(R.id.ibtBuscarExp).setEnabled(true);
         this.findViewById(R.id.edtxtNumSeguimiento).setEnabled(true);
@@ -467,7 +481,6 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 mSeguimientoInfluenzaActivity.listaSegInfluenza = (ArrayList<SeguimientoInfluenzaDTO>) savedInstanceState.getSerializable("listaSeguimiento");
                 mSeguimientoInfluenzaActivity.nuevaListaSegInfluenza = (ArrayList<SeguimientoInfluenzaDTO>) savedInstanceState.getSerializable("nuevaListaSeguimiento");
             }
-
             if(mSeguimientoInfluenzaActivity.mNumSeg > 0 && mSeguimientoInfluenzaActivity.mCodExp > 0) {
                 ViewPager viewPager = (ViewPager) seguiminetoLayout.findViewById(R.id.vpDias);
                 viewPager.setOffscreenPageLimit(2);
@@ -476,6 +489,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 ViewPager viewPager = (ViewPager) seguiminetoLayout.findViewById(R.id.vpDias);
                 viewPager.setVisibility(View.INVISIBLE);
             }
+            inicializarControlFif(seguiminetoLayout);
             return seguiminetoLayout;
         }
 
@@ -546,6 +560,36 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 ((EditText) getActivity().findViewById(R.id.edtxtFIS)).setText(mSeguimientoInfluenzaActivity.mFis);
                 ((EditText) getActivity().findViewById(R.id.edtxtFIF)).setText(mSeguimientoInfluenzaActivity.mFif);
             }
+        }
+
+        /*
+        * Metodo para inicializar el ingreso de la fecha FIF
+        * */
+        public void inicializarControlFif(View rootView) {
+            rootView.findViewById(R.id.edtxtFIF).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    showDatePickerDialogFIF(view);
+                }
+            });
+        }
+
+        /*Ingreso fif*/
+        public void showDatePickerDialogFIF(View view) {
+            DialogFragment newFragment = new DatePickerFragment(){
+                @Override
+                public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(year, monthOfYear, dayOfMonth);
+                    ((EditText) getActivity().findViewById(R.id.edtxtFIF)).setError(null);
+                    //((EditText) getActivity().findViewById(R.id.edtxtFIF)).setText(null);
+                    if(DateUtils.esMayorFechaHoy(calendar)){
+                        ((EditText)getActivity().findViewById(R.id.edtxtFIF)).setError(getString(R.string.msj_fecha_fif_mayor_hoy));
+                    }
+                    ((EditText) getActivity().findViewById(R.id.edtxtFIF)).setText(new SimpleDateFormat("dd/MM/yyyy").format(calendar.getTime()));
+                }
+            };
+            newFragment.show(getActivity().getSupportFragmentManager(), getString(R.string.title_date_picker));
         }
 
         /***
@@ -621,7 +665,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 public void onClick(View view) {
                     if(existeDetalle) {
                         obtenerSeguimientoInflunzaPdf();
-                    }else{
+                    } else {
                         MensajesHelper.mostrarMensajeInfo(getActivity(),
                                 getResources().getString(R.string.msj_sin_detalle_seg_influenza),
                                 getResources().getString(R.string.app_name), null);
@@ -731,6 +775,34 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 if (mSeguimientoInfluenzaActivity.mGuardarSeguimientoTask == null ||
                         mSeguimientoInfluenzaActivity.mGuardarSeguimientoTask.getStatus() == GuardarSeguimientoTask.Status.FINISHED) {
 
+                    /*Verificamos que la FIF no sea vacia o null y isEmptyFIF = true*/
+                    if (!StringUtils.isNullOrEmpty(((EditText) getActivity().findViewById(R.id.edtxtFIF)).getText().toString())
+                            && isEmptyFIF) {
+
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                        try {
+                            ((EditText) getActivity().findViewById(R.id.edtxtFIF)).setError(null);
+                            Calendar fif = Calendar.getInstance();
+                            Calendar currentDate = Calendar.getInstance();
+                            fif.setTime(sdf.parse(((EditText) getActivity().findViewById(R.id.edtxtFIF)).getText().toString()));
+                            Date dateFIS = sdf.parse(((EditText) getActivity().findViewById(R.id.edtxtFIS)).getText().toString());
+                            Date dateFIF = sdf.parse(((EditText) getActivity().findViewById(R.id.edtxtFIF)).getText().toString());
+                            /*Si la FIF es menor que la FIS retornamos y enviamos mensaje*/
+                            if (dateFIF.compareTo(dateFIS) < 0) {
+                                ((EditText) getActivity().findViewById(R.id.edtxtFIF)).setError(getString(R.string.msj_fif_menor_que_fis));
+                                return;
+                            }
+                            /*Si la FIF es mayor a la fecha actual retornamos y enviamos mensaje*/
+                            if(fif.after(currentDate)) {
+                                ((EditText)getActivity().findViewById(R.id.edtxtFIF)).setError(getString(R.string.msj_fecha_fif_mayor_hoy));
+                                return;
+                            }
+                            isEmptyFIF = false;
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                     HojaInfluenzaDTO hojaInfluenza = new HojaInfluenzaDTO();
 
                     hojaInfluenza.setCodExpediente(mSeguimientoInfluenzaActivity.mCodExp);
@@ -740,6 +812,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
 
                     hojaInfluenza.setCerrado('N');
 
+                    getActivity().findViewById(R.id.edtxtFIF).setEnabled(false);
                     ArrayList<SeguimientoInfluenzaDTO> lstSeg = new ArrayList<>();
 
                     for(SeguimientoInfluenzaDTO seguimientoInfluenza : mSeguimientoInfluenzaActivity.nuevaListaSegInfluenza) {
@@ -770,12 +843,151 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                             }
                         }
                     }
-
-                    hojaInfluenza.setLstSeguimientoInfluenza(lstSeg);
-                    mSeguimientoInfluenzaActivity.mGuardarSeguimientoTask = (GuardarSeguimientoTask) new
-                            GuardarSeguimientoTask(mSeguimientoInfluenzaActivity).execute(hojaInfluenza);
+                    if (verificarDiasContinuos(lstSeg)) {
+                        hojaInfluenza.setLstSeguimientoInfluenza(lstSeg);
+                        mSeguimientoInfluenzaActivity.mGuardarSeguimientoTask = (GuardarSeguimientoTask) new
+                                GuardarSeguimientoTask(mSeguimientoInfluenzaActivity).execute(hojaInfluenza);
+                    }
                 }
             }
+        }
+
+        /**
+         * Metodo para verificar que no se salten el llenado de dias en la hoja de influenza,
+         * para no dejar el dia anterior sin datos
+         */
+        public boolean verificarDiasContinuos(ArrayList<SeguimientoInfluenzaDTO> lstSeg) {
+            SeguimientoInfluenzaDTO seguimientoInfluenzaByDias = new SeguimientoInfluenzaDTO();
+            ArrayList<SeguimientoInfluenzaDTO> lstSegDia1 = new ArrayList<>();
+            ArrayList<SeguimientoInfluenzaDTO> lstSegDia2 = new ArrayList<>();
+            ArrayList<SeguimientoInfluenzaDTO> lstSegDia3 = new ArrayList<>();
+            ArrayList<SeguimientoInfluenzaDTO> lstSegDia4 = new ArrayList<>();
+            ArrayList<SeguimientoInfluenzaDTO> lstSegDia5 = new ArrayList<>();
+            ArrayList<SeguimientoInfluenzaDTO> lstSegDia6 = new ArrayList<>();
+            ArrayList<SeguimientoInfluenzaDTO> lstSegDia7 = new ArrayList<>();
+            ArrayList<SeguimientoInfluenzaDTO> lstSegDia8 = new ArrayList<>();
+            ArrayList<SeguimientoInfluenzaDTO> lstSegDia9 = new ArrayList<>();
+            ArrayList<SeguimientoInfluenzaDTO> lstSegDia10 = new ArrayList<>();
+            ArrayList<SeguimientoInfluenzaDTO> lstSegDia11 = new ArrayList<>();
+            ArrayList<SeguimientoInfluenzaDTO> lstSegDia12 = new ArrayList<>();
+            for (int i = 0; i < lstSeg.size(); i++) {
+                seguimientoInfluenzaByDias = lstSeg.get(i);
+                if (seguimientoInfluenzaByDias.getControlDia() == 1) {
+                    lstSegDia1.add(seguimientoInfluenzaByDias);
+                }
+                if(seguimientoInfluenzaByDias.getControlDia() == 2) {
+                    lstSegDia2.add(seguimientoInfluenzaByDias);
+                }
+                if (seguimientoInfluenzaByDias.getControlDia() == 3) {
+                    lstSegDia3.add(seguimientoInfluenzaByDias);
+                }
+                if(seguimientoInfluenzaByDias.getControlDia() == 4) {
+                    lstSegDia4.add(seguimientoInfluenzaByDias);
+                }
+                if(seguimientoInfluenzaByDias.getControlDia() == 5) {
+                    lstSegDia5.add(seguimientoInfluenzaByDias);
+                }
+                if(seguimientoInfluenzaByDias.getControlDia() == 6) {
+                    lstSegDia6.add(seguimientoInfluenzaByDias);
+                }
+                if(seguimientoInfluenzaByDias.getControlDia() == 7) {
+                    lstSegDia7.add(seguimientoInfluenzaByDias);
+                }
+                if(seguimientoInfluenzaByDias.getControlDia() == 8) {
+                    lstSegDia8.add(seguimientoInfluenzaByDias);
+                }
+                if(seguimientoInfluenzaByDias.getControlDia() == 9) {
+                    lstSegDia9.add(seguimientoInfluenzaByDias);
+                }
+                if(seguimientoInfluenzaByDias.getControlDia() == 10) {
+                    lstSegDia10.add(seguimientoInfluenzaByDias);
+                }
+                if(seguimientoInfluenzaByDias.getControlDia() == 11) {
+                    lstSegDia11.add(seguimientoInfluenzaByDias);
+                }
+                if(seguimientoInfluenzaByDias.getControlDia() == 12) {
+                    lstSegDia12.add(seguimientoInfluenzaByDias);
+                }
+            }
+
+            if(lstSegDia2.size() > 0 && lstSegDia1.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("1")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia3.size() > 0 && lstSegDia2.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("2")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia4.size() > 0 && lstSegDia3.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("3")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia5.size() > 0 && lstSegDia4.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("4")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia6.size() > 0 && lstSegDia5.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("5")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia7.size() > 0 && lstSegDia6.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("6")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia8.size() > 0 && lstSegDia7.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("7")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia9.size() > 0 && lstSegDia8.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("8")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia10.size() > 0 && lstSegDia9.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("9")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia11.size() > 0 && lstSegDia10.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("10")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia12.size() > 0 && lstSegDia11.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("11")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            return  true;
         }
 
         /**
@@ -1420,6 +1632,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 switch (mPage) {
                     case 1:
                         ImageButton imgBusquedaMedico1 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico1);
+                        imgBusquedaMedico1.setEnabled(false);
                         imgBusquedaMedico1.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -1433,6 +1646,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         break;
                     case 2:
                         ImageButton imgBusquedaMedico2 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico2);
+                        imgBusquedaMedico2.setEnabled(false);
                         imgBusquedaMedico2.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -1446,6 +1660,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         break;
                     case 3:
                         ImageButton imgBusquedaMedico3 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico3);
+                        imgBusquedaMedico3.setEnabled(false);
                         imgBusquedaMedico3.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -1459,6 +1674,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         break;
                     case 4:
                         ImageButton imgBusquedaMedico4 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico4);
+                        imgBusquedaMedico4.setEnabled(false);
                         imgBusquedaMedico4.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -1472,6 +1688,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         break;
                     case 5:
                         ImageButton imgBusquedaMedico5 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico5);
+                        imgBusquedaMedico5.setEnabled(false);
                         imgBusquedaMedico5.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -1485,6 +1702,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         break;
                     case 6:
                         ImageButton imgBusquedaMedico6 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico6);
+                        imgBusquedaMedico6.setEnabled(false);
                         imgBusquedaMedico6.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -1498,6 +1716,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         break;
                     case 7:
                         ImageButton imgBusquedaMedico7 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico7);
+                        imgBusquedaMedico7.setEnabled(false);
                         imgBusquedaMedico7.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -1511,6 +1730,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         break;
                     case 8:
                         ImageButton imgBusquedaMedico8 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico8);
+                        imgBusquedaMedico8.setEnabled(false);
                         imgBusquedaMedico8.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -1525,6 +1745,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
 
                     case 9:
                         ImageButton imgBusquedaMedico9 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico9);
+                        imgBusquedaMedico9.setEnabled(false);
                         imgBusquedaMedico9.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -1539,6 +1760,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
 
                     case 10:
                         ImageButton imgBusquedaMedico10 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico10);
+                        imgBusquedaMedico10.setEnabled(false);
                         imgBusquedaMedico10.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -1552,6 +1774,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         break;
                     case 11:
                         ImageButton imgBusquedaMedico11 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico11);
+                        imgBusquedaMedico11.setEnabled(false);
                         imgBusquedaMedico11.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -1566,6 +1789,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
 
                     case 12:
                         ImageButton imgBusquedaMedico12 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico12);
+                        imgBusquedaMedico12.setEnabled(false);
                         imgBusquedaMedico12.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -1731,10 +1955,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                     if (seguimientoInfluenza.getControlDia() == 1){
                         cargarFechaSeguimiento(seguimientoInfluenza.getFechaSeguimiento());
                     }
-
                 }
-
-
             }
 
             public void llenarDia2Spn() {
@@ -2030,6 +2251,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 for(SeguimientoInfluenzaDTO seguimientoInfluenza : mSeguimientoInfluenzaActivity.listaSegInfluenza) {
                     if (seguimientoInfluenza.getControlDia() == 12){
                         cargarFechaSeguimiento(seguimientoInfluenza.getFechaSeguimiento());
+
                     }
 
                 }
@@ -4590,7 +4812,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                     switch (mPage) {
                         case 1:
                             Spinner spnMedico1 = (Spinner) getActivity().findViewById(R.id.spnMedico1);
+                            spnMedico1.setEnabled(false);
                             spnMedico1.setAdapter(adapterMedico1);
+                            /*for (int i = 0; i < adapterMedico1.getCount(); i++) {
+                                if (adapterMedico1.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4605,7 +4834,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                             break;
                         case 2:
                             Spinner spnMedico2 = (Spinner) getActivity().findViewById(R.id.spnMedico2);
+                            spnMedico2.setEnabled(false);
                             spnMedico2.setAdapter(adapterMedico2);
+                            /*for (int i = 0; i < adapterMedico2.getCount(); i++) {
+                                if (adapterMedico2.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4620,7 +4856,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                             break;
                         case 3:
                             Spinner spnMedico3 = (Spinner) getActivity().findViewById(R.id.spnMedico3);
+                            spnMedico3.setEnabled(false);
                             spnMedico3.setAdapter(adapterMedico3);
+                            /*for (int i = 0; i < adapterMedico3.getCount(); i++) {
+                                if (adapterMedico3.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4635,7 +4878,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                             break;
                         case 4:
                             Spinner spnMedico4 = (Spinner) getActivity().findViewById(R.id.spnMedico4);
+                            spnMedico4.setEnabled(false);
                             spnMedico4.setAdapter(adapterMedico4);
+                            /*for (int i = 0; i < adapterMedico4.getCount(); i++) {
+                                if (adapterMedico4.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico4.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4650,7 +4900,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                             break;
                         case 5:
                             Spinner spnMedico5 = (Spinner) getActivity().findViewById(R.id.spnMedico5);
+                            spnMedico5.setEnabled(false);
                             spnMedico5.setAdapter(adapterMedico5);
+                            /*for (int i = 0; i < adapterMedico5.getCount(); i++) {
+                                if (adapterMedico5.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico5.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4665,7 +4922,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                             break;
                         case 6:
                             Spinner spnMedico6 = (Spinner) getActivity().findViewById(R.id.spnMedico6);
+                            spnMedico6.setEnabled(false);
                             spnMedico6.setAdapter(adapterMedico6);
+                            /*for (int i = 0; i < adapterMedico6.getCount(); i++) {
+                                if (adapterMedico6.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico6.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4680,7 +4944,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                             break;
                         case 7:
                             Spinner spnMedico7 = (Spinner) getActivity().findViewById(R.id.spnMedico7);
+                            spnMedico7.setEnabled(false);
                             spnMedico7.setAdapter(adapterMedico7);
+                            /*for (int i = 0; i < adapterMedico7.getCount(); i++) {
+                                if (adapterMedico7.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico7.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4695,7 +4966,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                             break;
                         case 8:
                             Spinner spnMedico8 = (Spinner) getActivity().findViewById(R.id.spnMedico8);
+                            spnMedico8.setEnabled(false);
                             spnMedico8.setAdapter(adapterMedico8);
+                            /*for (int i = 0; i < adapterMedico8.getCount(); i++) {
+                                if (adapterMedico8.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico8.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4710,7 +4988,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                             break;
                         case 9:
                             Spinner spnMedico9 = (Spinner) getActivity().findViewById(R.id.spnMedico9);
+                            spnMedico9.setEnabled(false);
                             spnMedico9.setAdapter(adapterMedico9);
+                            /*for (int i = 0; i < adapterMedico9.getCount(); i++) {
+                                if (adapterMedico9.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico9.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4726,7 +5011,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
 
                         case 10:
                             Spinner spnMedico10 = (Spinner) getActivity().findViewById(R.id.spnMedico10);
+                            spnMedico10.setEnabled(false);
                             spnMedico10.setAdapter(adapterMedico10);
+                            /*for (int i = 0; i < adapterMedico10.getCount(); i++) {
+                                if (adapterMedico10.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico10.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4741,7 +5033,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                             break;
                         case 11:
                             Spinner spnMedico11 = (Spinner) getActivity().findViewById(R.id.spnMedico11);
+                            spnMedico11.setEnabled(false);
                             spnMedico11.setAdapter(adapterMedico11);
+                            /*for (int i = 0; i < adapterMedico11.getCount(); i++) {
+                                if (adapterMedico11.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico11.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4756,7 +5055,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                             break;
                         case 12:
                             Spinner spnMedico12 = (Spinner) getActivity().findViewById(R.id.spnMedico12);
+                            spnMedico12.setEnabled(false);
                             spnMedico12.setAdapter(adapterMedico12);
+                            /*for (int i = 0; i < adapterMedico12.getCount(); i++) {
+                                if (adapterMedico12.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico12.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4771,11 +5077,19 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                             break;
                     }
                     esCargaInicial = false;
+                    //posicionMedico = 0;
                 }else{
                     switch (mPage){
                         case 1:
                             Spinner spnMedico1 = (Spinner) getActivity().findViewById(R.id.spnMedico1);
+                            spnMedico1.setEnabled(false);
                             spnMedico1.setAdapter(adapterMedico1);
+                            /*for (int i = 0; i < adapterMedico1.getCount(); i++) {
+                                if (adapterMedico1.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4791,7 +5105,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
 
                         case 2:
                             Spinner spnMedico2 = (Spinner) getActivity().findViewById(R.id.spnMedico2);
+                            spnMedico2.setEnabled(false);
                             spnMedico2.setAdapter(adapterMedico2);
+                            /*for (int i = 0; i < adapterMedico2.getCount(); i++) {
+                                if (adapterMedico2.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4807,7 +5128,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
 
                         case 3:
                             Spinner spnMedico3 = (Spinner) getActivity().findViewById(R.id.spnMedico3);
+                            spnMedico3.setEnabled(false);
                             spnMedico3.setAdapter(adapterMedico3);
+                            /*for (int i = 0; i < adapterMedico3.getCount(); i++) {
+                                if (adapterMedico3.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4823,7 +5151,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
 
                         case 4:
                             Spinner spnMedico4 = (Spinner) getActivity().findViewById(R.id.spnMedico4);
+                            spnMedico4.setEnabled(false);
                             spnMedico4.setAdapter(adapterMedico4);
+                            /*for (int i = 0; i < adapterMedico4.getCount(); i++) {
+                                if (adapterMedico4.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico4.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4839,7 +5174,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
 
                         case 5:
                             Spinner spnMedico5 = (Spinner) getActivity().findViewById(R.id.spnMedico5);
+                            spnMedico5.setEnabled(false);
                             spnMedico5.setAdapter(adapterMedico5);
+                            /*for (int i = 0; i < adapterMedico5.getCount(); i++) {
+                                if (adapterMedico5.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico5.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4855,7 +5197,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
 
                         case 6:
                             Spinner spnMedico6 = (Spinner) getActivity().findViewById(R.id.spnMedico6);
+                            spnMedico6.setEnabled(false);
                             spnMedico6.setAdapter(adapterMedico6);
+                           /* for (int i = 0; i < adapterMedico6.getCount(); i++) {
+                                if (adapterMedico6.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico6.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4871,7 +5220,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
 
                         case 7:
                             Spinner spnMedico7 = (Spinner) getActivity().findViewById(R.id.spnMedico7);
+                            spnMedico7.setEnabled(false);
                             spnMedico7.setAdapter(adapterMedico7);
+                            /*for (int i = 0; i < adapterMedico7.getCount(); i++) {
+                                if (adapterMedico7.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico7.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4886,7 +5242,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                             break;
                         case 8:
                             Spinner spnMedico8 = (Spinner) getActivity().findViewById(R.id.spnMedico8);
+                            spnMedico8.setEnabled(false);
                             spnMedico8.setAdapter(adapterMedico8);
+                            /*for (int i = 0; i < adapterMedico8.getCount(); i++) {
+                                if (adapterMedico8.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico8.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4902,7 +5265,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
 
                         case 9:
                             Spinner spnMedico9 = (Spinner) getActivity().findViewById(R.id.spnMedico9);
+                            spnMedico9.setEnabled(false);
                             spnMedico9.setAdapter(adapterMedico9);
+                            /*for (int i = 0; i < adapterMedico9.getCount(); i++) {
+                                if (adapterMedico9.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico9.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4918,7 +5288,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
 
                         case 10:
                             Spinner spnMedico10 = (Spinner) getActivity().findViewById(R.id.spnMedico10);
+                            spnMedico10.setEnabled(false);
                             spnMedico10.setAdapter(adapterMedico10);
+                            /*for (int i = 0; i < adapterMedico10.getCount(); i++) {
+                                if (adapterMedico10.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico10.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4934,7 +5311,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
 
                         case 11:
                             Spinner spnMedico11 = (Spinner) getActivity().findViewById(R.id.spnMedico11);
+                            spnMedico11.setEnabled(false);
                             spnMedico11.setAdapter(adapterMedico11);
+                            /*for (int i = 0; i < adapterMedico11.getCount(); i++) {
+                                if (adapterMedico11.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico11.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4950,7 +5334,14 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
 
                         case 12:
                             Spinner spnMedico12 = (Spinner) getActivity().findViewById(R.id.spnMedico12);
+                            spnMedico12.setEnabled(false);
                             spnMedico12.setAdapter(adapterMedico12);
+                            /*for (int i = 0; i < adapterMedico12.getCount(); i++) {
+                                if (adapterMedico12.getItem(i).getIdMedico().intValue() == ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId()) {
+                                    posicionMedico = i;
+                                    //medicoEncontrado = adapterMedico1.getItem(i);
+                                }
+                            }*/
                             spnMedico12.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
                                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -4964,6 +5355,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                             });
                             break;
                     }
+                    //posicionMedico = 0;
                 }
             }
 
@@ -5037,8 +5429,8 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia1Fila15)).setSelection(mSeguimientoInfluenzaActivity.adapter.getPosition((seguimientoInfluenza.getQuedoEnCama() != null) ?
                                 seguimientoInfluenza.getQuedoEnCama().trim() : ""));*/
                         setMedico(seguimientoInfluenza.getUsuarioMedico());
-                        getActivity().findViewById(R.id.spnMedico1).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico1).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico1).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico1).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento1).setEnabled(habilitar);
                         break;
                     case 2:
@@ -5095,8 +5487,8 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia2Fila15)).setSelection(mSeguimientoInfluenzaActivity.adapter.getPosition((seguimientoInfluenza.getQuedoEnCama() != null) ?
                                 seguimientoInfluenza.getQuedoEnCama().trim() : ""));*/
                         setMedico(seguimientoInfluenza.getUsuarioMedico());
-                        getActivity().findViewById(R.id.spnMedico2).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico2).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico2).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico2).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento2).setEnabled(habilitar);
                         break;
                     case 3:
@@ -5153,8 +5545,8 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia3Fila15)).setSelection(mSeguimientoInfluenzaActivity.adapter.getPosition((seguimientoInfluenza.getQuedoEnCama() != null) ?
                                 seguimientoInfluenza.getQuedoEnCama().trim() : ""));*/
                         setMedico(seguimientoInfluenza.getUsuarioMedico());
-                        getActivity().findViewById(R.id.spnMedico3).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico3).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico3).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico3).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento3).setEnabled(habilitar);
                         break;
                     case 4:
@@ -5212,8 +5604,8 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia4Fila15)).setSelection(mSeguimientoInfluenzaActivity.adapter.getPosition((seguimientoInfluenza.getQuedoEnCama() != null) ?
                                 seguimientoInfluenza.getQuedoEnCama().trim() : ""));*/
                         setMedico(seguimientoInfluenza.getUsuarioMedico());
-                        getActivity().findViewById(R.id.spnMedico4).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico4).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico4).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico4).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento4).setEnabled(habilitar);
                         break;
                     case 5:
@@ -5271,8 +5663,8 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia5Fila15)).setSelection(mSeguimientoInfluenzaActivity.adapter.getPosition((seguimientoInfluenza.getQuedoEnCama() != null) ?
                                 seguimientoInfluenza.getQuedoEnCama().trim() : ""));*/
                         setMedico(seguimientoInfluenza.getUsuarioMedico());
-                        getActivity().findViewById(R.id.spnMedico5).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico5).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico5).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico5).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento5).setEnabled(habilitar);
                         break;
                     case 6:
@@ -5330,8 +5722,8 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia6Fila15)).setSelection(mSeguimientoInfluenzaActivity.adapter.getPosition((seguimientoInfluenza.getQuedoEnCama() != null) ?
                                 seguimientoInfluenza.getQuedoEnCama().trim() : ""));*/
                         setMedico(seguimientoInfluenza.getUsuarioMedico());
-                        getActivity().findViewById(R.id.spnMedico6).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico6).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico6).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico6).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento6).setEnabled(habilitar);
                         break;
                     case 7:
@@ -5389,8 +5781,8 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia7Fila15)).setSelection(mSeguimientoInfluenzaActivity.adapter.getPosition((seguimientoInfluenza.getQuedoEnCama() != null) ?
                                 seguimientoInfluenza.getQuedoEnCama().trim() : ""));;*/
                         setMedico(seguimientoInfluenza.getUsuarioMedico());
-                        getActivity().findViewById(R.id.spnMedico7).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico7).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico7).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico7).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento7).setEnabled(habilitar);
                         break;
 
@@ -5443,8 +5835,8 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                                 seguimientoInfluenza.getQuedoEnCama().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia8Fila15).setEnabled(habilitar);
                         setMedico(seguimientoInfluenza.getUsuarioMedico());
-                        getActivity().findViewById(R.id.spnMedico8).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico8).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico8).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico8).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento8).setEnabled(habilitar);
                         break;
 
@@ -5497,8 +5889,8 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                                 seguimientoInfluenza.getQuedoEnCama().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia9Fila15).setEnabled(habilitar);
                         setMedico(seguimientoInfluenza.getUsuarioMedico());
-                        getActivity().findViewById(R.id.spnMedico9).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico9).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico9).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico9).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento9).setEnabled(habilitar);
                         break;
 
@@ -5551,8 +5943,8 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                                 seguimientoInfluenza.getQuedoEnCama().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia10Fila15).setEnabled(habilitar);
                         setMedico(seguimientoInfluenza.getUsuarioMedico());
-                        getActivity().findViewById(R.id.spnMedico10).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico10).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico10).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico10).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento10).setEnabled(habilitar);
                         break;
 
@@ -5605,8 +5997,8 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                                 seguimientoInfluenza.getQuedoEnCama().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia11Fila15).setEnabled(habilitar);
                         setMedico(seguimientoInfluenza.getUsuarioMedico());
-                        getActivity().findViewById(R.id.spnMedico11).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico11).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico11).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico11).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento11).setEnabled(habilitar);
                         break;
 
@@ -5659,8 +6051,8 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                                 seguimientoInfluenza.getQuedoEnCama().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia12Fila15).setEnabled(habilitar);
                         setMedico(seguimientoInfluenza.getUsuarioMedico());
-                        getActivity().findViewById(R.id.spnMedico12).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico12).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico12).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico12).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento12).setEnabled(habilitar);
                         break;
                 }
@@ -5721,7 +6113,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 switch (mPage) {
                     case 1:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento1)).setText("");
-                        setMedico(0);
+                        //setMedico(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia1Fila1)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia1Fila2)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia1Fila3)).setSelection(0);
@@ -5740,7 +6132,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         break;
                     case 2:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento2)).setText("");
-                        setMedico(0);
+                        //setMedico(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia2Fila1)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia2Fila2)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia2Fila3)).setSelection(0);
@@ -5759,7 +6151,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         break;
                     case 3:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento3)).setText("");
-                        setMedico(0);
+                        //setMedico(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia3Fila1)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia3Fila2)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia3Fila3)).setSelection(0);
@@ -5778,7 +6170,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         break;
                     case 4:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento4)).setText("");
-                        setMedico(0);
+                        //setMedico(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia4Fila1)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia4Fila2)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia4Fila3)).setSelection(0);
@@ -5797,7 +6189,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         break;
                     case 5:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento5)).setText("");
-                        setMedico(0);
+                        //setMedico(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia5Fila1)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia5Fila2)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia5Fila3)).setSelection(0);
@@ -5816,7 +6208,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         break;
                     case 6:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento6)).setText("");
-                        setMedico(0);
+                        //setMedico(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia6Fila1)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia6Fila2)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia6Fila3)).setSelection(0);
@@ -5835,7 +6227,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         break;
                     case 7:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento7)).setText("");
-                        setMedico(0);
+                        //setMedico(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia7Fila1)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia7Fila2)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia7Fila3)).setSelection(0);
@@ -5854,7 +6246,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         break;
                     case 8:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento8)).setText("");
-                        setMedico(0);
+                        //setMedico(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia8Fila1)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia8Fila2)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia8Fila3)).setSelection(0);
@@ -5873,7 +6265,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         break;
                     case 9:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento9)).setText("");
-                        setMedico(0);
+                        //setMedico(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia9Fila1)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia9Fila2)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia9Fila3)).setSelection(0);
@@ -5892,7 +6284,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         break;
                     case 10:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento10)).setText("");
-                        setMedico(0);
+                        //setMedico(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia10Fila1)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia10Fila2)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia10Fila3)).setSelection(0);
@@ -5911,7 +6303,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         break;
                     case 11:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento11)).setText("");
-                        setMedico(0);
+                        //setMedico(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia11Fila1)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia11Fila2)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia11Fila3)).setSelection(0);
@@ -5930,7 +6322,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         break;
                     case 12:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento12)).setText("");
-                        setMedico(0);
+                        //setMedico(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia12Fila1)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia12Fila2)).setSelection(0);
                         ((Spinner) getActivity().findViewById(R.id.spnDia12Fila3)).setSelection(0);
@@ -6266,6 +6658,34 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 }
                 return false;
             }
+
+        /*    // Metodo para verificar que no se salten de dias en la hoja de influenza
+            public boolean verificarDias() {
+                SeguimientoInfluenzaDTO seguimiento1 = null;
+                SeguimientoInfluenzaDTO seguimiento2 = null;
+                SeguimientoInfluenzaDTO seguimiento3 = null;
+                switch (mPage){
+                    case 1:
+                        seguimiento1 = (obtenerSeguimientoPorDia(1) != null) ? obtenerSeguimientoPorDia(1) : obtenerSeguimientoPorDia(1);
+                        if(seguimiento1 == null && seguimiento2 != null) {
+                            return false;
+                        }
+                        break;
+                    case 2:
+                        seguimiento2 = (obtenerSeguimientoPorDia(2) != null) ? obtenerSeguimientoPorDia(2) : obtenerSeguimientoPorDia(2);
+                        if(seguimiento2 == null && seguimiento3 != null) {
+                            return false;
+                        }
+                        break;
+                    case 3:
+                        seguimiento3 = (obtenerSeguimientoPorDia(3) != null) ? obtenerSeguimientoPorDia(3) : obtenerSeguimientoPorDia(3);
+                        if(seguimiento3 == null && seguimiento2 != null) {
+                            return false;
+                        }
+                        break;
+                }
+                return  true;
+            }*/
 
             public void setMedico(int usuarioMedico){
                 MedicosDTO medicoEncontrado = new MedicosDTO();

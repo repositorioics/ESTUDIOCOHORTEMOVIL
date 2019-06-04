@@ -305,4 +305,25 @@ public class EstudioCohorteCssfvWS {
     public static final String METODO_IMPRIMIROJASEGUIMIENTOZ_PDF = "imprimirSeguimientoZikaPdf";
     public static final String ACCIOSOAP_IMPRIMIRHOJASEGUIMIENTOZ_PDF = NAMESPACE + METODO_IMPRIMIROJASEGUIMIENTOZ_PDF;
 
+    // Vigilancia Integrada
+    public static final String BUSCAR_FICHA_VIGILANCIA_INTEGRADA = "buscarFichaVigilanciaIntegrada";
+    public static final String ACCIOSOAP_BUSCAR_FICHA_VIGILANCIA_INTEGRADA = NAMESPACE + BUSCAR_FICHA_VIGILANCIA_INTEGRADA;
+
+    public static final String METODO_GUARDAR_FICHA_VIGILANCIA_INTEGRADA  = "guardarFichaVigilanciaIntegrada";
+    public static final String ACCIOSOAP_METODO_GUARDAR_FICHA_VIGILANCIA_INTEGRADA = NAMESPACE + METODO_GUARDAR_FICHA_VIGILANCIA_INTEGRADA;
+
+    // Departamentos
+    public static final String METODO_GET_DEPARTAMENTOS  = "getDepartamentos";
+    public static final String ACCIOSOAP_METODO_GET_DEPARTAMENTOS = NAMESPACE + METODO_GET_DEPARTAMENTOS;
+
+    // Municipios
+    public static final String METODO_GET_MUNICIPIOS  = "getMunicipios";
+    public static final String ACCIOSOAP_METODO_GET_MUNICIPIOS = NAMESPACE + METODO_GET_MUNICIPIOS;
+
+    public static final String METODO_VISUALIZAR_FICHA_PDF = "getFichaPdf";
+    public static final String ACCIOSOAP_METODO_VISUALIZAR_FICHA_PDF = NAMESPACE + METODO_VISUALIZAR_FICHA_PDF;
+
+    public static final String METODO_IMPRIMIR_FICHA_PDF = "imprimirFichaPdf";
+    public static final String ACCIOSOAP_METODO_IMPRIMIR_FICHA_PDF = NAMESPACE + METODO_IMPRIMIR_FICHA_PDF;
+
 }

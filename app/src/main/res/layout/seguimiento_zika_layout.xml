@@ -300,7 +300,8 @@
             android:layout_below="@+id/edtxSint3"
             android:layout_alignLeft="@+id/edtxtFIS"
             android:layout_marginTop="75dp"
-            android:background="@drawable/bg_button_gris_selector"
+            android:background="@drawable/bg_button_verder_oscuro_selector"
+
             android:text="@string/boton_guardar_hoja_consulta"
             android:textColor="@android:color/white"
             android:textSize="14dp" />
@@ -326,7 +327,7 @@
             android:layout_toRightOf="@+id/btnCerrarSeguimiento"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="75dp"
-            android:background="@drawable/bg_button_verder_oscuro_selector"
+            android:background="@drawable/bg_button_gris_selector"
             android:text="@string/boton_limpiar"
             android:textColor="@android:color/white"
             android:textSize="14dp" />

@@ -149,8 +149,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name="com.sts_ni.estudiocohortecssfv.expedientesactivities.VigilanciaIntegradaActivity"
+            android:label="@string/title_vigilancia_integrada_irag_eti" android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="com.sts_ni.estudiocohortecssfv.vigilancia_integrada_action" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
-
-
 
 </manifest>

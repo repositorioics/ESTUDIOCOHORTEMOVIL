@@ -824,6 +824,14 @@ public class CategoriaSintomaActivity extends ActionBarActivity {
             throw new Exception(getString(R.string.msj_aviso_control_cambios1,vFueraRango));
 
         }
+        //PRUEBA
+        /*String test = (((EditText)findViewById(R.id.edtxtSIU)).getText().toString());
+        int longitud = test.length();
+        if(((CheckBox)findViewById(R.id.chkbTMDSSintoma)).isChecked()){
+            if (longitud > 32) {
+                throw new Exception(getString(R.string.tiene_mas_caracteres));
+            }
+        }*/
         return true;
     }
 

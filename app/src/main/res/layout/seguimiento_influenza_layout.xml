@@ -55,13 +55,13 @@
 
         <EditText
             android:id="@+id/edtxtNumSeguimiento"
+            style="@style/EditTextEstiloSeguimiento"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/txtvNumSeguimiento"
             android:layout_below="@id/txtvTituloSeguimientoInfluenza"
+            android:layout_marginLeft="3dp"
             android:layout_marginTop="41dp"
-            android:layout_marginLeft="5dp"
-            style="@style/EditTextEstiloSeguimiento"
+            android:layout_toRightOf="@+id/txtvNumSeguimiento"
             android:inputType="number" />
 
         <Button
@@ -243,7 +243,7 @@
             android:layout_below="@+id/edtxtFIS"
             android:layout_alignLeft="@+id/edtxtFIS"
             android:layout_marginTop="45dp"
-            android:background="@drawable/bg_button_gris_selector"
+            android:background="@drawable/bg_button_verder_oscuro_selector"
             android:text="@string/boton_guardar_hoja_consulta"
             android:textColor="@android:color/white"
             android:textSize="14dp" />
@@ -269,7 +269,8 @@
             android:layout_toRightOf="@+id/btnCerrarSeguimiento"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="45dp"
-            android:background="@drawable/bg_button_verder_oscuro_selector"
+            android:background="@drawable/bg_button_gris_selector"
+
             android:text="@string/boton_limpiar"
             android:textColor="@android:color/white"
             android:textSize="14dp" />

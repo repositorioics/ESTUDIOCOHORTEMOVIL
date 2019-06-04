@@ -328,7 +328,8 @@ public class EstadoNutriSintomasAcitvity extends ActionBarActivity {
             throw new Exception(getString(R.string.msj_completar_informacion) + ", debe seleccionar un estado nutricional.");
         }
 
-        if (!estaEnRango(5, 50, ((EditText) findViewById(R.id.edtxtimc)).getText().toString())) {
+        // Aumento en el rango imc valorAnterior = 50, valorActual = 70
+        if (!estaEnRango(5, 70, ((EditText) findViewById(R.id.edtxtimc)).getText().toString())) {
             throw new Exception(getString(R.string.msj_aviso_control_cambios2, getString(R.string.label_imc)));
            /* vFueraRango = StringUtils.concatenar(vFueraRango, getResources().getString(R.string.label_imc));
             ControlCambiosDTO ctrCambios = new ControlCambiosDTO();

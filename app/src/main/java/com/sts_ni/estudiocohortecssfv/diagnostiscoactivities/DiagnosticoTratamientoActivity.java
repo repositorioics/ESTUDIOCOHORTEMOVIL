@@ -11,9 +11,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.method.ScrollingMovementMethod;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.sts_ni.estudiocohortecssfv.ConsultaActivity;
@@ -45,6 +50,7 @@ public class DiagnosticoTratamientoActivity extends ActionBarActivity
     private String mUsuarioLogiado;
     private TextView viewTxtvNo;
     private TextView viewTxtvSi;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +91,35 @@ public class DiagnosticoTratamientoActivity extends ActionBarActivity
                 SintomaMarcado(view, true);
             }
         });
+
+        // Setiando el peso y la temperatura para visualizarlos en la pantalla
+        CabeceraSintomaDTO CabeceraSintomaDTO = ((CabeceraSintomaDTO) getIntent().getSerializableExtra("cabeceraSintoma"));
+
+        EditText edtxtTratamientoPeso = (EditText)findViewById(R.id.edtxtTratamientoPeso);
+        EditText edtxtTratamientoTalla = (EditText)findViewById(R.id.edtxtTratamientoTalla);
+        edtxtTratamientoPeso.setText(String.valueOf(CabeceraSintomaDTO.getPesoKg()));
+        edtxtTratamientoTalla.setText(String.valueOf(CabeceraSintomaDTO.getTallaCm()));
+        // ---------------------------------------------------------------------
+
+        // funcion para hacer el texto escroleable
+        EditText edtxtPlanes = (EditText)findViewById(R.id.edtxtPlanes);
+        /*edtxtPlanes.setVerticalScrollBarEnabled(true);
+        edtxtPlanes.setMovementMethod(new ScrollingMovementMethod());*/
+        edtxtPlanes.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (view.getId() == R.id.edtxtPlanes) {
+                    view.getParent().requestDisallowInterceptTouchEvent(true);
+                    switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
+                        case MotionEvent.ACTION_UP:
+                            view.getParent().requestDisallowInterceptTouchEvent(false);
+                            break;
+                    }
+                }
+                return false;
+            }
+        });
+        //----------------------------------------------------------------------
     }
 
     @Override
@@ -351,8 +386,9 @@ public class DiagnosticoTratamientoActivity extends ActionBarActivity
             throw new Exception(getString(R.string.msj_completar_informacion));
         }else if(((CheckBox) findViewById(R.id.chkOtrosSi)).isChecked() && StringUtils.isNullOrEmpty( ((EditText) findViewById(R.id.edtxtOtro)).getText().toString()) ){
             throw new Exception(getString(R.string.msj_completar_informacion));
+        }else if(StringUtils.isNullOrEmpty(((EditText) findViewById(R.id.edtxtPlanes)).getText().toString())) {
+            throw new Exception(getString(R.string.msj_completar_los_planes));
         }
-
     }
 
     public HojaConsultaDTO cargarHojaConsulta() {
@@ -444,7 +480,6 @@ public class DiagnosticoTratamientoActivity extends ActionBarActivity
         };
         HojaConsulta.execute(hojaconsulta);
     }
-
 
     public void onChkboxClickedTratamiento(View view) {
         // Is the view now checked?

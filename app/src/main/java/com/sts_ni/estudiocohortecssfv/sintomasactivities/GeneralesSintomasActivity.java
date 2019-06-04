@@ -447,7 +447,9 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
                     ((EditText) getActivity().findViewById(R.id.edtxtHoraGeneralesSint)).setError(null);
                     ((EditText) getActivity().findViewById(R.id.edtxtHoraGeneralesSint)).setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.timer, 0);
                 }
+
                 ((EditText) getActivity().findViewById(R.id.edtxtHoraGeneralesSint)).setText(new SimpleDateFormat("KK:mm a").format(calendar.getTime()));
+                //String a = ((EditText) findViewById(R.id.edtxtHoraGeneralesSint)).getText().toString();
 
                 /*if(DateUtils.esMayorHoraActual(hourOfDay, minute)) {
                     ((EditText)getActivity().findViewById(R.id.edtxtHoraGeneralesSint)).setError(getString(R.string.msj_hora_mayor_actual));
@@ -477,7 +479,6 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
 
         try {
             validarCampoRequerido(controlCambios);
-
             if( controlCambios.size() > 0){
                 genControlCambios = new GeneralesControlCambiosDTO();
                 genControlCambios.setUsuario(((CssfvApp) this.getApplication()).getInfoSessionWSDTO().getUser());
@@ -592,7 +593,8 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
             }
         }
         int cont = 0;
-        if (!estaEnRango(55, 135, pas)) {
+        //if (!estaEnRango(55, 135, pas)) { // rangos anteriores
+        if (!estaEnRango(55, 220, pas)) {
            vFueraRango = StringUtils.concatenar(vFueraRango, getResources().getString(R.string.label_pas));
             cont++;
            /* ControlCambiosDTO ctrCambios = new ControlCambiosDTO();
@@ -602,7 +604,8 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
             controlCambios.add(ctrCambios);*/
         }
 
-        if (!estaEnRango(35, 100, pad)) {
+        //if (!estaEnRango(35, 100, pad)) { // rangos anteriores
+        if (!estaEnRango(35, 160, pad)) {
             vFueraRango = StringUtils.concatenar(vFueraRango, getResources().getString(R.string.label_pad));
             cont++;
           /*  ControlCambiosDTO ctrCambios = new ControlCambiosDTO();
@@ -630,7 +633,7 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
             ctrCambios.setTipoControl(ctrCambios.discrepancia);
             controlCambios.add(ctrCambios);*/
         }
-        if (!estaEnRango(34, 42, ((EditText) findViewById(R.id.edtxtTempMedGeneralesSint)).getText().toString())) {
+        if (!estaEnRango(35.5, 41, ((EditText) findViewById(R.id.edtxtTempMedGeneralesSint)).getText().toString())) {
            vFueraRango = StringUtils.concatenar(vFueraRango, getResources().getString(R.string.label_temp_med_c));
             cont++;
            /* ControlCambiosDTO ctrCambios = new ControlCambiosDTO();

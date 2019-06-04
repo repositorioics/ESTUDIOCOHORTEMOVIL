@@ -56,6 +56,10 @@ public class AndroidUtils {
         return (((CheckBox)viewS).isChecked()) ? '0' : '1';
     }
 
+    public static Character resultadoGenericoChk(View view) {
+        return (((CheckBox) view).isChecked()) ? '0' : '1';
+    }
+
     /***
      * Metodo para obtener el valor para S, N, D, en seleccion de chekbox
      *

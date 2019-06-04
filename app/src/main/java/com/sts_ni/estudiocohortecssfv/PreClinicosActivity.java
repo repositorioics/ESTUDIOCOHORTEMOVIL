@@ -409,7 +409,8 @@ public class PreClinicosActivity extends ActionBarActivity
         }
 
         int cont = 0;
-        if (!estaEnRango(1, 100, edtxtPeso.getText().toString())) {
+        //if (!estaEnRango(1, 100, edtxtPeso.getText().toString())) { // Rangos anteriores
+        if (!estaEnRango(1, 200, edtxtPeso.getText().toString())) {
             vFueraRango = StringUtils.concatenar(vFueraRango, getResources().getString(R.string.label_peso));
             cont++;
             /*ControlCambiosDTO ctrCambios = new ControlCambiosDTO();
@@ -420,7 +421,8 @@ public class PreClinicosActivity extends ActionBarActivity
 
         }
 
-        if (!estaEnRango(20, 200, edtxtTalla.getText().toString())) {
+        //if (!estaEnRango(20, 200, edtxtTalla.getText().toString())) { // Rangos Anteriores
+        if (!estaEnRango(20, 220, edtxtTalla.getText().toString())) {
             vFueraRango = StringUtils.concatenar(vFueraRango, getResources().getString(R.string.label_talla));
             cont++;
            /* ControlCambiosDTO ctrCambios = new ControlCambiosDTO();
@@ -430,7 +432,8 @@ public class PreClinicosActivity extends ActionBarActivity
             controlCambios.add(ctrCambios);*/
         }
 
-        if (!estaEnRango(34, 42, edtxtTemp.getText().toString())) {
+        // if (!estaEnRango(34, 42, edtxtTemp.getText().toString())) { // Rangos Anteriores
+        if (!estaEnRango(35.5, 41, edtxtTemp.getText().toString())) {
             vFueraRango = StringUtils.concatenar(vFueraRango, getResources().getString(R.string.label_temp));
             cont++;
             /*ControlCambiosDTO ctrCambios = new ControlCambiosDTO();
@@ -932,7 +935,13 @@ public class PreClinicosActivity extends ActionBarActivity
                 month = month - 1;
             }
 
-            if(age == 0) {
+            if(month == 0) {
+                Long tDias = (today.getTimeInMillis() - fechaNac.getTimeInMillis())  / (1000 * 60 * 60 * 24);
+                edtxtEdad.setText(tDias + " dias");
+                //return new StringBuffer().append(tDias).append(" dias").toString();
+
+            }
+            else if(age == 0) {
                 age = today.get(Calendar.MONTH) - fechaNac.get(Calendar.MONTH);
                 if(age == 0) {
                     age = today.get(Calendar.DAY_OF_MONTH) - fechaNac.get(Calendar.DAY_OF_MONTH);
@@ -942,12 +951,7 @@ public class PreClinicosActivity extends ActionBarActivity
                     edtxtEdad.setText(age + " meses");
                     //return new StringBuffer().append(age).append(" meses").toString();
                 }
-            }else if(month == 0) {
-                Long tDias = (today.getTimeInMillis() - fechaNac.getTimeInMillis())  / (1000 * 60 * 60 * 24);
-                edtxtEdad.setText(tDias + " dias");
-                //return new StringBuffer().append(tDias).append(" dias").toString();
-
-            }else if (month > 0 && month < 12) {
+            } else if (month > 0 && month < 12) {
                 edtxtEdad.setText(month + " meses");
                 //return new StringBuffer().append(month).append(" meses").toString();
 

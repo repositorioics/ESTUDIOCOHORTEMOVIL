@@ -12,6 +12,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.sts_ni.estudiocohortecssfv.ConsultaActivity;
@@ -25,6 +26,7 @@ import com.sts_ni.estudiocohortecssfv.dto.ResultadoObjectWSDTO;
 import com.sts_ni.estudiocohortecssfv.helper.MensajesHelper;
 import com.sts_ni.estudiocohortecssfv.tools.CancelacionDialog;
 import com.sts_ni.estudiocohortecssfv.utils.AndroidUtils;
+import com.sts_ni.estudiocohortecssfv.utils.StringUtils;
 import com.sts_ni.estudiocohortecssfv.ws.SintomasWS;
 
 /**
@@ -39,6 +41,7 @@ public class EstadoGeneralSintomasActivity extends ActionBarActivity {
     private String mUsuarioLogiado;
     private TextView viewTxtvNEGSintoma;
     private TextView viewTxtvSEGSintoma;
+    private String vFueraRango = new String();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -258,7 +261,6 @@ public class EstadoGeneralSintomasActivity extends ActionBarActivity {
             throw new Exception(getString(R.string.msj_completar_informacion));
         }
     }
-
     /***
      * Metodo que carga la informacion de Estado general cuando ya se habia guardado anteriormente.
      * @return

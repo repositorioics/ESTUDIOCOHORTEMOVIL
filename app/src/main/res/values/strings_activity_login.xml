@@ -8,9 +8,18 @@
     <string name="prompt_password">Ingrese su clave</string>
     <string name="action_sign_in">Iniciar Sesión</string>
     <string name="action_sign_in_short">Sign in</string>
-    <string name="version">Versión 1.0.0</string>
-    <string name="date_version">Enero 11, 2019</string>
-
+    <!--<string name="version">Versión 1.0.0</string>
+    <string name="date_version">Enero 11, 2019</string> -->
+    <!--<string name="version">Versión 1.0.1</string>
+    <string name="date_version">Marzo 18, 2019</string> -->
+    <!--<string name="version">Versión 1.0.2</string>
+    <string name="date_version">Abril 3, 2019</string>-->
+   <!-- <string name="version">Versión 1.0.3</string>
+    <string name="date_version">Mayo 10, 2019</string>-->
+    <!--<string name="version">Versión 1.0.4</string>
+    <string name="date_version">Mayo 21, 2019</string>-->
+    <string name="version">Versión 1.0.5</string>
+    <string name="date_version">Junio 03, 2019</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>

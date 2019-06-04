@@ -23,7 +23,12 @@ public class DateUtils {
             month = month - 1;
         }
 
-        if(age == 0) {
+        if(month == 0) {
+            Long tDias = (today.getTimeInMillis() - fechaNacimiento.getTimeInMillis())  / (1000 * 60 * 60 * 24);
+            return new StringBuffer().append(tDias).append(" dias").toString();
+
+        }
+        else if(age == 0) {
             age = today.get(Calendar.MONTH) - fechaNacimiento.get(Calendar.MONTH);
             if(age == 0) {
                 age = today.get(Calendar.DAY_OF_MONTH) - fechaNacimiento.get(Calendar.DAY_OF_MONTH);
@@ -31,11 +36,7 @@ public class DateUtils {
             }else {
                 return new StringBuffer().append(age).append(" meses").toString();
             }
-        }else if(month == 0) {
-            Long tDias = (today.getTimeInMillis() - fechaNacimiento.getTimeInMillis())  / (1000 * 60 * 60 * 24);
-            return new StringBuffer().append(tDias).append(" dias").toString();
-
-        }else if (month > 0 && month < 12) {
+        } else if (month > 0 && month < 12) {
             return new StringBuffer().append(month).append(" meses").toString();
 
         }else {

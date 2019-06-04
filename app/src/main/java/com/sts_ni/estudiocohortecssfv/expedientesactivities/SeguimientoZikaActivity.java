@@ -348,7 +348,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         long diferenciaEn_ms = dNow.getTime() - fSeg.getTime();
                         long dias = diferenciaEn_ms / (1000 * 60 * 60 * 24);
 
-                        if(dias >= 5){
+                        if(dias >= 21){ /* dias >= 5 / Ahora son 21 dias */
                             presentaAviso = true;
                             mensajeAviso = String.format(getResources().getString(R.string.msj_aviso_fecha_cierre_seguimiento), dias);
                         }
@@ -901,11 +901,11 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                                 }
                             }
                         }
-
-
-                        hojaZika.setLstSeguimientoZika(lstSeg);
-                        mSeguimientoZikaActivity.mGuardarSeguimientoTask = (GuardarSeguimientoZikaTask) new
-                                GuardarSeguimientoZikaTask(mSeguimientoZikaActivity).execute(hojaZika);
+                        if(verificarDiasContinuos(lstSeg)){
+                            hojaZika.setLstSeguimientoZika(lstSeg);
+                            mSeguimientoZikaActivity.mGuardarSeguimientoTask = (GuardarSeguimientoZikaTask) new
+                                    GuardarSeguimientoZikaTask(mSeguimientoZikaActivity).execute(hojaZika);
+                        }
                     }else{
                         MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
                                 getResources().getString(R.string.msj_aviso_requerido_hoja_zika),
@@ -917,6 +917,164 @@ public class SeguimientoZikaActivity extends ActionBarActivity
             }
         }
 
+        /**
+         * Metodo para verificar que no se salten el llenado de dias en la hoja de zika,
+         * para no dejar el dia anterior sin datos
+         */
+        public boolean verificarDiasContinuos(ArrayList<SeguimientoZikaDTO> lstSeg) {
+            SeguimientoZikaDTO seguimientoZikaByDias = new SeguimientoZikaDTO();
+            ArrayList<SeguimientoZikaDTO> lstSegDia1 = new ArrayList<>();
+            ArrayList<SeguimientoZikaDTO> lstSegDia2 = new ArrayList<>();
+            ArrayList<SeguimientoZikaDTO> lstSegDia3 = new ArrayList<>();
+            ArrayList<SeguimientoZikaDTO> lstSegDia4 = new ArrayList<>();
+            ArrayList<SeguimientoZikaDTO> lstSegDia5 = new ArrayList<>();
+            ArrayList<SeguimientoZikaDTO> lstSegDia6 = new ArrayList<>();
+            ArrayList<SeguimientoZikaDTO> lstSegDia7 = new ArrayList<>();
+            ArrayList<SeguimientoZikaDTO> lstSegDia8 = new ArrayList<>();
+            ArrayList<SeguimientoZikaDTO> lstSegDia9 = new ArrayList<>();
+            ArrayList<SeguimientoZikaDTO> lstSegDia10 = new ArrayList<>();
+            ArrayList<SeguimientoZikaDTO> lstSegDia11 = new ArrayList<>();
+            ArrayList<SeguimientoZikaDTO> lstSegDia12 = new ArrayList<>();
+            ArrayList<SeguimientoZikaDTO> lstSegDia13 = new ArrayList<>();
+            ArrayList<SeguimientoZikaDTO> lstSegDia14 = new ArrayList<>();
+            for (int i = 0; i < lstSeg.size(); i++) {
+                seguimientoZikaByDias = lstSeg.get(i);
+                if (seguimientoZikaByDias.getControlDia() == 1) {
+                    lstSegDia1.add(seguimientoZikaByDias);
+                }
+                if(seguimientoZikaByDias.getControlDia() == 2) {
+                    lstSegDia2.add(seguimientoZikaByDias);
+                }
+                if (seguimientoZikaByDias.getControlDia() == 3) {
+                    lstSegDia3.add(seguimientoZikaByDias);
+                }
+                if(seguimientoZikaByDias.getControlDia() == 4) {
+                    lstSegDia4.add(seguimientoZikaByDias);
+                }
+                if(seguimientoZikaByDias.getControlDia() == 5) {
+                    lstSegDia5.add(seguimientoZikaByDias);
+                }
+                if(seguimientoZikaByDias.getControlDia() == 6) {
+                    lstSegDia6.add(seguimientoZikaByDias);
+                }
+                if(seguimientoZikaByDias.getControlDia() == 7) {
+                    lstSegDia7.add(seguimientoZikaByDias);
+                }
+                if(seguimientoZikaByDias.getControlDia() == 8) {
+                    lstSegDia8.add(seguimientoZikaByDias);
+                }
+                if(seguimientoZikaByDias.getControlDia() == 9) {
+                    lstSegDia9.add(seguimientoZikaByDias);
+                }
+                if(seguimientoZikaByDias.getControlDia() == 10) {
+                    lstSegDia10.add(seguimientoZikaByDias);
+                }
+                if(seguimientoZikaByDias.getControlDia() == 11) {
+                    lstSegDia11.add(seguimientoZikaByDias);
+                }
+                if(seguimientoZikaByDias.getControlDia() == 12) {
+                    lstSegDia12.add(seguimientoZikaByDias);
+                }
+                if(seguimientoZikaByDias.getControlDia() == 13) {
+                    lstSegDia13.add(seguimientoZikaByDias);
+                }
+                if(seguimientoZikaByDias.getControlDia() == 14) {
+                    lstSegDia14.add(seguimientoZikaByDias);
+                }
+            }
+            if(lstSegDia2.size() > 0 && lstSegDia1.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("1")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia3.size() > 0 && lstSegDia2.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("2")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia4.size() > 0 && lstSegDia3.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("3")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia5.size() > 0 && lstSegDia4.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("4")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia6.size() > 0 && lstSegDia5.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("5")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia7.size() > 0 && lstSegDia6.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("6")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia8.size() > 0 && lstSegDia7.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("7")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia9.size() > 0 && lstSegDia8.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("8")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia10.size() > 0 && lstSegDia9.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("9")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia11.size() > 0 && lstSegDia10.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("10")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia12.size() > 0 && lstSegDia11.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("11")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia13.size() > 0 && lstSegDia12.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("12")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            if(lstSegDia14.size() > 0 && lstSegDia13.size() == 0) {
+                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento_sin_completar),
+                        String.valueOf("13")),
+                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                return false;
+            }
+            return true;
+        }
 
         /**
          * Metodo que llama servicio para cerrar seguimiento de zika
@@ -1788,6 +1946,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 switch (mPage) {
                     case 1:
                         ImageButton imgBusquedaMedico1 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico1);
+                        imgBusquedaMedico1.setEnabled(false);
                         imgBusquedaMedico1.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -1841,6 +2000,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         break;
                     case 2:
                         ImageButton imgBusquedaMedico2 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico2);
+                        imgBusquedaMedico2.setEnabled(false);
                         imgBusquedaMedico2.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -1894,6 +2054,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         break;
                     case 3:
                         ImageButton imgBusquedaMedico3 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico3);
+                        imgBusquedaMedico3.setEnabled(false);
                         imgBusquedaMedico3.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -1946,6 +2107,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         break;
                     case 4:
                         ImageButton imgBusquedaMedico4 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico4);
+                        imgBusquedaMedico4.setEnabled(false);
                         imgBusquedaMedico4.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -1998,6 +2160,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         break;
                     case 5:
                         ImageButton imgBusquedaMedico5 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico5);
+                        imgBusquedaMedico5.setEnabled(false);
                         imgBusquedaMedico5.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -2051,6 +2214,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         break;
                     case 6:
                         ImageButton imgBusquedaMedico6 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico6);
+                        imgBusquedaMedico6.setEnabled(false);
                         imgBusquedaMedico6.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -2103,6 +2267,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         break;
                     case 7:
                         ImageButton imgBusquedaMedico7 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico7);
+                        imgBusquedaMedico7.setEnabled(false);
                         imgBusquedaMedico7.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -2155,6 +2320,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         break;
                     case 8:
                         ImageButton imgBusquedaMedico8 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico8);
+                        imgBusquedaMedico8.setEnabled(false);
                         imgBusquedaMedico8.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -2208,6 +2374,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         break;
                     case 9:
                         ImageButton imgBusquedaMedico9 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico9);
+                        imgBusquedaMedico9.setEnabled(false);
                         imgBusquedaMedico9.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -2260,6 +2427,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         break;
                     case 10:
                         ImageButton imgBusquedaMedico10 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico10);
+                        imgBusquedaMedico10.setEnabled(false);
                         imgBusquedaMedico10.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -2313,6 +2481,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                     case 11:
                         ImageButton imgBusquedaMedico11 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico11);
+                        imgBusquedaMedico11.setEnabled(false);
                         imgBusquedaMedico11.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -2365,6 +2534,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         break;
                     case 12:
                         ImageButton imgBusquedaMedico12 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico12);
+                        imgBusquedaMedico12.setEnabled(false);
                         imgBusquedaMedico12.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -2418,6 +2588,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                     case 13:
                         ImageButton imgBusquedaMedico13 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico13);
+                        imgBusquedaMedico13.setEnabled(false);
                         imgBusquedaMedico13.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -2472,6 +2643,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                     case 14:
                         ImageButton imgBusquedaMedico14 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico14);
+                        imgBusquedaMedico14.setEnabled(false);
                         imgBusquedaMedico14.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -2721,6 +2893,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia1Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia1Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
+                cargarDatosSintomasDia1();
+
                 for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
                     if (seguimientoZika.getControlDia() == 1){
                         loadSpinners2(seguimientoZika);
@@ -2779,6 +2953,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia2Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia2Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
+                cargarDatosSintomasDia2();
+
                 for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
                     if (seguimientoZika.getControlDia() == 2){
                         loadSpinners2(seguimientoZika);
@@ -2834,6 +3010,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia3Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia3Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia3Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+
+                cargarDatosSintomasDia3();
 
                 for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
                     if (seguimientoZika.getControlDia() == 3){
@@ -2891,6 +3069,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia4Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia4Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
+                cargarDatosSintomasDia4();
+
                 for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
                     if (seguimientoZika.getControlDia() == 4){
                         loadSpinners2(seguimientoZika);
@@ -2946,6 +3126,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia5Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia5Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia5Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+
+                cargarDatosSintomasDia5();
 
                 for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
                     if (seguimientoZika.getControlDia() == 5){
@@ -3003,6 +3185,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia6Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia6Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
+                cargarDatosSintomasDia6();
+
                 for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
                     if (seguimientoZika.getControlDia() == 6){
                         loadSpinners2(seguimientoZika);
@@ -3058,6 +3242,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia7Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia7Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia7Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+
+                cargarDatosSintomasDia7();
 
                 for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
                     if (seguimientoZika.getControlDia() == 7){
@@ -3115,6 +3301,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia8Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia8Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
+                cargarDatosSintomasDia8();
+
                 for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
                     if (seguimientoZika.getControlDia() == 8){
                         loadSpinners2(seguimientoZika);
@@ -3170,6 +3358,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia9Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia9Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia9Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+
+                cargarDatosSintomasDia9();
 
                 for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
                     if (seguimientoZika.getControlDia() == 9){
@@ -3228,6 +3418,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia10Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia10Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
+                cargarDatosSintomasDia10();
+
                 for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
                     if (seguimientoZika.getControlDia() == 10){
                         loadSpinners2(seguimientoZika);
@@ -3283,6 +3475,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia11Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia11Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia11Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+
+                cargarDatosSintomasDia11();
 
                 for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
                     if (seguimientoZika.getControlDia() == 11){
@@ -3340,6 +3534,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia12Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia12Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
+                cargarDatosSintomasDia12();
+
                 for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
                     if (seguimientoZika.getControlDia() == 12){
                         loadSpinners2(seguimientoZika);
@@ -3396,6 +3592,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia13Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia13Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
 
+                cargarDatosSintomasDia13();
+
                 for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
                     if (seguimientoZika.getControlDia() == 13){
                         loadSpinners2(seguimientoZika);
@@ -3451,6 +3649,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia14Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia14Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia14Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+
+                cargarDatosSintomasDia14();
 
                 for(SeguimientoZikaDTO seguimientoZika : mSeguimientoZikaActivity.listaSegZika) {
                     if (seguimientoZika.getControlDia() == 14){
@@ -12097,6 +12297,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     switch (mPage) {
                         case 1:
                                 Spinner spnMedico1 = (Spinner) getActivity().findViewById(R.id.spnMedico1);
+                                spnMedico1.setEnabled(false);
                                 spnMedico1.setAdapter(adapterMedico1);
                                 spnMedico1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                     @Override
@@ -12113,6 +12314,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                             break;
                         case 2:
                             Spinner spnMedico2 = (Spinner) getActivity().findViewById(R.id.spnMedico2);
+                            spnMedico2.setEnabled(false);
                             spnMedico2.setAdapter(adapterMedico2);
                             spnMedico2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12130,6 +12332,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                             break;
                         case 3:
                             Spinner spnMedico3 = (Spinner) getActivity().findViewById(R.id.spnMedico3);
+                            spnMedico3.setEnabled(false);
                             spnMedico3.setAdapter(adapterMedico3);
                             spnMedico3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12147,6 +12350,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                             break;
                         case 4:
                             Spinner spnMedico4 = (Spinner) getActivity().findViewById(R.id.spnMedico4);
+                            spnMedico4.setEnabled(false);
                             spnMedico4.setAdapter(adapterMedico4);
                             spnMedico4.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12164,6 +12368,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                             break;
                         case 5:
                             Spinner spnMedico5 = (Spinner) getActivity().findViewById(R.id.spnMedico5);
+                            spnMedico5.setEnabled(false);
                             spnMedico5.setAdapter(adapterMedico5);
                             spnMedico5.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12181,6 +12386,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                             break;
                         case 6:
                             Spinner spnMedico6 = (Spinner) getActivity().findViewById(R.id.spnMedico6);
+                            spnMedico6.setEnabled(false);
                             spnMedico6.setAdapter(adapterMedico6);
                             spnMedico6.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12197,6 +12403,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                             break;
                         case 7:
                             Spinner spnMedico7 = (Spinner) getActivity().findViewById(R.id.spnMedico7);
+                            spnMedico7.setEnabled(false);
                             spnMedico7.setAdapter(adapterMedico7);
                             spnMedico7.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12215,6 +12422,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                             break;
                         case 8:
                             Spinner spnMedico8 = (Spinner) getActivity().findViewById(R.id.spnMedico8);
+                            spnMedico8.setEnabled(false);
                             spnMedico8.setAdapter(adapterMedico8);
                             spnMedico8.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12232,6 +12440,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                             break;
                         case 9:
                             Spinner spnMedico9 = (Spinner) getActivity().findViewById(R.id.spnMedico9);
+                            spnMedico9.setEnabled(false);
                             spnMedico9.setAdapter(adapterMedico9);
                             spnMedico9.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12247,6 +12456,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                             break;
                         case 10:
                             Spinner spnMedico10 = (Spinner) getActivity().findViewById(R.id.spnMedico10);
+                            spnMedico10.setEnabled(false);
                             spnMedico10.setAdapter(adapterMedico10);
                             spnMedico10.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12262,6 +12472,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                             break;
                         case 11:
                             Spinner spnMedico11 = (Spinner) getActivity().findViewById(R.id.spnMedico11);
+                            spnMedico11.setEnabled(false);
                             spnMedico11.setAdapter(adapterMedico11);
                             spnMedico11.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12278,6 +12489,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                         case 12:
                             Spinner spnMedico12 = (Spinner) getActivity().findViewById(R.id.spnMedico12);
+                            spnMedico12.setEnabled(false);
                             spnMedico12.setAdapter(adapterMedico12);
                             spnMedico12.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12294,6 +12506,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                         case 13:
                             Spinner spnMedico13 = (Spinner) getActivity().findViewById(R.id.spnMedico13);
+                            spnMedico13.setEnabled(false);
                             spnMedico13.setAdapter(adapterMedico13);
                             spnMedico13.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12310,6 +12523,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                         case 14:
                             Spinner spnMedico14 = (Spinner) getActivity().findViewById(R.id.spnMedico14);
+                            spnMedico14.setEnabled(false);
                             spnMedico14.setAdapter(adapterMedico14);
                             spnMedico14.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12331,8 +12545,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 }else{
                     switch (mPage){
                         case 1:
-
                                 Spinner spnMedico1 = (Spinner) getActivity().findViewById(R.id.spnMedico1);
+                                spnMedico1.setEnabled(false);
                                 spnMedico1.setAdapter(adapterMedico1);
                                 spnMedico1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                     @Override
@@ -12351,6 +12565,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                         case 2:
                             Spinner spnMedico2 = (Spinner) getActivity().findViewById(R.id.spnMedico2);
+                            spnMedico2.setEnabled(false);
                             spnMedico2.setAdapter(adapterMedico2);
                             spnMedico2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12368,6 +12583,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                         case 3:
                             Spinner spnMedico3 = (Spinner) getActivity().findViewById(R.id.spnMedico3);
+                            spnMedico3.setEnabled(false);
                             spnMedico3.setAdapter(adapterMedico3);
                             spnMedico3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12386,6 +12602,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         case 4:
 
                             Spinner spnMedico4 = (Spinner) getActivity().findViewById(R.id.spnMedico4);
+                            spnMedico4.setEnabled(false);
                             spnMedico4.setAdapter(adapterMedico4);
                             spnMedico4.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12403,6 +12620,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                         case 5:
                             Spinner spnMedico5 = (Spinner) getActivity().findViewById(R.id.spnMedico5);
+                            spnMedico5.setEnabled(false);
                             spnMedico5.setAdapter(adapterMedico5);
                             spnMedico5.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12421,6 +12639,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         case 6:
 
                             Spinner spnMedico6 = (Spinner) getActivity().findViewById(R.id.spnMedico6);
+                            spnMedico6.setEnabled(false);
                             spnMedico6.setAdapter(adapterMedico6);
                             spnMedico6.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12439,6 +12658,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         case 7:
 
                             Spinner spnMedico7 = (Spinner) getActivity().findViewById(R.id.spnMedico7);
+                            spnMedico7.setEnabled(false);
                             spnMedico7.setAdapter(adapterMedico7);
                             spnMedico7.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12457,6 +12677,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         case 8:
 
                             Spinner spnMedico8 = (Spinner) getActivity().findViewById(R.id.spnMedico8);
+                            spnMedico8.setEnabled(false);
                             spnMedico8.setAdapter(adapterMedico8);
                             spnMedico8.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12474,6 +12695,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                             break;
                         case 9:
                             Spinner spnMedico9 = (Spinner) getActivity().findViewById(R.id.spnMedico9);
+                            spnMedico9.setEnabled(false);
                             spnMedico9.setAdapter(adapterMedico9);
                             spnMedico9.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12490,6 +12712,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                             break;
                         case 10:
                             Spinner spnMedico10 = (Spinner) getActivity().findViewById(R.id.spnMedico10);
+                            spnMedico10.setEnabled(false);
                             spnMedico10.setAdapter(adapterMedico10);
                             spnMedico10.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12506,6 +12729,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                             break;
                         case 11:
                             Spinner spnMedico11 = (Spinner) getActivity().findViewById(R.id.spnMedico11);
+                            spnMedico11.setEnabled(false);
                             spnMedico11.setAdapter(adapterMedico11);
                             spnMedico11.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12523,6 +12747,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                         case 12:
                             Spinner spnMedico12 = (Spinner) getActivity().findViewById(R.id.spnMedico12);
+                            spnMedico12.setEnabled(false);
                             spnMedico12.setAdapter(adapterMedico12);
                             spnMedico12.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12540,6 +12765,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                         case 13:
                             Spinner spnMedico13 = (Spinner) getActivity().findViewById(R.id.spnMedico13);
+                            spnMedico13.setEnabled(false);
                             spnMedico13.setAdapter(adapterMedico13);
                             spnMedico13.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -12558,6 +12784,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         case 14:
 
                             Spinner spnMedico14 = (Spinner) getActivity().findViewById(R.id.spnMedico14);
+                            spnMedico14.setEnabled(false);
                             spnMedico14.setAdapter(adapterMedico14);
                             spnMedico14.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                 @Override
@@ -13237,8 +13464,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         setSupervisor(seguimientoZika.getSupervisor());
-                        getActivity().findViewById(R.id.spnMedico1).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico1).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico1).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico1).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento1).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor1).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor1).setEnabled(habilitar);
@@ -13391,8 +13618,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         setSupervisor(seguimientoZika.getSupervisor());
-                        getActivity().findViewById(R.id.spnMedico2).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico2).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico2).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico2).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento2).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor2).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor2).setEnabled(habilitar);
@@ -13545,8 +13772,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         setSupervisor(seguimientoZika.getSupervisor());
-                        getActivity().findViewById(R.id.spnMedico3).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico3).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico3).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico3).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento3).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor3).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor3).setEnabled(habilitar);
@@ -13699,8 +13926,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         setSupervisor(seguimientoZika.getSupervisor());
-                        getActivity().findViewById(R.id.spnMedico4).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico4).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico4).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico4).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento4).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor4).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor4).setEnabled(habilitar);
@@ -13852,8 +14079,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnDia5Fila46).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
-                        getActivity().findViewById(R.id.spnMedico5).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico5).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico5).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico5).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento5).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor5).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor5).setEnabled(habilitar);
@@ -14006,8 +14233,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnDia6Fila46).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
-                        getActivity().findViewById(R.id.spnMedico6).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico6).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico6).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico6).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento6).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor6).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor6).setEnabled(habilitar);
@@ -14160,8 +14387,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnDia7Fila46).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
-                        getActivity().findViewById(R.id.spnMedico7).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico7).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico7).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico7).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento7).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor7).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor7).setEnabled(habilitar);
@@ -14314,8 +14541,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnDia8Fila46).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
-                        getActivity().findViewById(R.id.spnMedico8).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico8).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico8).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico8).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento8).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor8).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor8).setEnabled(habilitar);
@@ -14469,8 +14696,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnDia9Fila46).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
-                        getActivity().findViewById(R.id.spnMedico9).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico9).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico9).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico9).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento9).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor9).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor9).setEnabled(habilitar);
@@ -14624,8 +14851,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnDia10Fila46).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
-                        getActivity().findViewById(R.id.spnMedico10).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico10).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico10).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico10).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento10).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor10).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor10).setEnabled(habilitar);
@@ -14779,8 +15006,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnDia11Fila46).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
-                        getActivity().findViewById(R.id.spnMedico11).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico11).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico11).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico11).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento11).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor11).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor11).setEnabled(habilitar);
@@ -14935,8 +15162,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         setSupervisor(seguimientoZika.getSupervisor());
-                        getActivity().findViewById(R.id.spnMedico12).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico12).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico12).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico12).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento12).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor12).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor12).setEnabled(habilitar);
@@ -15091,8 +15318,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         setSupervisor(seguimientoZika.getSupervisor());
-                        getActivity().findViewById(R.id.spnMedico13).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico13).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico13).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico13).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento13).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor13).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor13).setEnabled(habilitar);
@@ -15246,8 +15473,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         setSupervisor(seguimientoZika.getSupervisor());
-                        getActivity().findViewById(R.id.spnMedico14).setEnabled(habilitar);
-                        getActivity().findViewById(R.id.imgBusquedaMedico14).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.spnMedico14).setEnabled(false);
+                        getActivity().findViewById(R.id.imgBusquedaMedico14).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento14).setEnabled(habilitar);
                         getActivity().findViewById(R.id.spnSupervisor14).setEnabled(habilitar);
                         getActivity().findViewById(R.id.imgBusquedaSupervisor14).setEnabled(habilitar);
@@ -15315,7 +15542,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     case 1:
                         if (value == 0 ){
                             ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento1)).setText("");
-                            setMedico(0);
+                            //setMedico(0);
                             setSupervisor(0);
                         }
                         ((Spinner) getActivity().findViewById(R.id.spnDia1Fila1)).setSelection(value);
@@ -15372,7 +15599,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     case 2:
                         if (value == 0 ){
                             ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento2)).setText("");
-                            setMedico(0);
+                            //setMedico(0);
                             setSupervisor(0);
                         }
                         ((Spinner) getActivity().findViewById(R.id.spnDia2Fila1)).setSelection(value);
@@ -15428,7 +15655,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     case 3:
                         if (value == 0 ){
                             ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento3)).setText("");
-                            setMedico(0);
+                            //setMedico(0);
                             setSupervisor(0);
                         }
                         ((Spinner) getActivity().findViewById(R.id.spnDia3Fila1)).setSelection(value);
@@ -15485,7 +15712,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     case 4:
                         if (value == 0 ){
                             ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento4)).setText("");
-                            setMedico(0);
+                            //setMedico(0);
                             setSupervisor(0);
                         }
                         ((Spinner) getActivity().findViewById(R.id.spnDia4Fila1)).setSelection(value);
@@ -15541,7 +15768,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     case 5:
                         if (value == 0 ){
                             ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento5)).setText("");
-                            setMedico(0);
+                            //setMedico(0);
                             setSupervisor(0);
                         }
                         ((Spinner) getActivity().findViewById(R.id.spnDia5Fila1)).setSelection(value);
@@ -15597,7 +15824,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     case 6:
                         if (value == 0 ){
                             ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento6)).setText("");
-                            setMedico(0);
+                            //setMedico(0);
                             setSupervisor(0);
                         }
                         ((Spinner) getActivity().findViewById(R.id.spnDia6Fila1)).setSelection(value);
@@ -15653,7 +15880,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     case 7:
                         if (value == 0 ){
                             ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento7)).setText("");
-                            setMedico(0);
+                            //setMedico(0);
                             setSupervisor(0);
                         }
                         ((Spinner) getActivity().findViewById(R.id.spnDia7Fila1)).setSelection(value);
@@ -15709,7 +15936,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     case 8:
                         if (value == 0 ){
                             ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento8)).setText("");
-                            setMedico(0);
+                            //setMedico(0);
                             setSupervisor(0);
                         }
                         ((Spinner) getActivity().findViewById(R.id.spnDia8Fila1)).setSelection(value);
@@ -15765,7 +15992,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     case 9:
                         if (value == 0 ){
                             ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento9)).setText("");
-                            setMedico(0);
+                            //setMedico(0);
                             setSupervisor(0);
                         }
                         ((Spinner) getActivity().findViewById(R.id.spnDia9Fila1)).setSelection(value);
@@ -15821,7 +16048,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     case 10:
                         if (value == 0 ){
                             ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento10)).setText("");
-                            setMedico(0);
+                            //setMedico(0);
                             setSupervisor(0);
                         }
                         ((Spinner) getActivity().findViewById(R.id.spnDia10Fila1)).setSelection(value);
@@ -15878,7 +16105,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     case 11:
                         if (value == 0 ){
                             ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento11)).setText("");
-                            setMedico(0);
+                            //setMedico(0);
                             setSupervisor(0);
                         }
                         ((Spinner) getActivity().findViewById(R.id.spnDia11Fila1)).setSelection(value);
@@ -15934,7 +16161,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     case 12:
                         if (value == 0 ){
                             ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento12)).setText("");
-                            setMedico(0);
+                            //setMedico(0);
                             setSupervisor(0);
                         }
                         ((Spinner) getActivity().findViewById(R.id.spnDia12Fila1)).setSelection(value);
@@ -15991,7 +16218,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     case 13:
                         if (value == 0 ){
                             ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento13)).setText("");
-                            setMedico(0);
+                            //setMedico(0);
                             setSupervisor(0);
                         }
                         ((Spinner) getActivity().findViewById(R.id.spnDia13Fila1)).setSelection(value);
@@ -16048,7 +16275,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     case 14:
                         if (value == 0 ){
                             ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento14)).setText("");
-                            setMedico(0);
+                            //setMedico(0);
                             setSupervisor(0);
                         }
                         ((Spinner) getActivity().findViewById(R.id.spnDia14Fila1)).setSelection(value);

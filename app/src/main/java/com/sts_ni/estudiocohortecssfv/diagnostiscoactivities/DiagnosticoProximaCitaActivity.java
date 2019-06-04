@@ -276,8 +276,9 @@ public class DiagnosticoProximaCitaActivity  extends ActionBarActivity implement
         if (((EditText) findViewById(R.id.dpProximaCita)).getText().toString().length() == 0) {
             throw new Exception(getString(R.string.msj_debe_ingresar_proxima_cita));
         }else {
+            // Aumento en los meses de la proxima cita valorAnterior = 2, valorActual = 3
             Calendar fechaMesesDespues = GregorianCalendar.getInstance();
-            fechaMesesDespues.add(Calendar.MONTH, 2);
+            fechaMesesDespues.add(Calendar.MONTH, 3);
             SimpleDateFormat formateador = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
 
             EditText dpProximaCita = (EditText) findViewById(R.id.dpProximaCita);

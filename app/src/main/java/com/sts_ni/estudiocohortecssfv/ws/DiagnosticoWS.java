@@ -396,7 +396,7 @@ public class DiagnosticoWS extends EstudioCohorteCssfvWS {
     }
 
 
-    public ResultadoListWSDTO<DiagnosticoDTO> getListaDiagnostico(){
+    public ResultadoListWSDTO<DiagnosticoDTO> getListaDiagnostico() {
 
         ResultadoListWSDTO<DiagnosticoDTO> retorno = new ResultadoListWSDTO<DiagnosticoDTO>();
 
