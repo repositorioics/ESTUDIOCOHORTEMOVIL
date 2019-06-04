@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent">
+
+    <!--<TextView
+        android:id="@+id/txtvSintomaInicial"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/label_sintomas_vigilancia_integrada"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+
+    <Spinner
+        android:id="@+id/spnSintomaInicial"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/txtvSintomaInicial"
+        android:background="@drawable/rounded_spinner"
+        android:layout_marginTop="25dp" />-->
+
+    <TextView
+        android:id="@+id/txtvUsoAntibioticos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/label_uso_otro_antibiotico"
+        android:textStyle="bold"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+
+    <TextView
+        android:id="@+id/txtvUsoAntibioticoSi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/txtvUsoAntibioticos"
+        android:text="@string/label_vacuna_si"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+    <CheckBox
+        android:id="@+id/chkUsoAntibioticoSi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_toRightOf="@+id/txtvUsoAntibioticoSi"
+        android:layout_below="@+id/txtvUsoAntibioticos"
+        style="@style/customCheckboxStyle"
+        android:layout_marginLeft="7dp"
+        />
+    <TextView
+        android:id="@+id/txtvUsoAntibioticoNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="30dp"
+        android:layout_below="@+id/txtvUsoAntibioticos"
+        android:layout_toRightOf="@+id/chkUsoAntibioticoSi"
+        android:text="@string/label_vacuna_no"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+    <CheckBox
+        android:id="@+id/chkUsoAntibioticoNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_toRightOf="@+id/txtvUsoAntibioticoNo"
+        android:layout_below="@+id/txtvUsoAntibioticos"
+        style="@style/customCheckboxStyle"
+        android:layout_marginLeft="7dp"
+        />
+    <TextView
+        android:id="@+id/txtvUsoAntibioticoNoSabe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="30dp"
+        android:layout_below="@+id/txtvUsoAntibioticos"
+        android:layout_toRightOf="@+id/chkUsoAntibioticoNo"
+        android:text="@string/label_vacuna_no_sabe"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+    <CheckBox
+        android:id="@+id/chkUsoAntibioticoNoSabe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_toRightOf="@+id/txtvUsoAntibioticoNoSabe"
+        android:layout_below="@+id/txtvUsoAntibioticos"
+        style="@style/customCheckboxStyle"
+        android:layout_marginLeft="7dp"
+        />
+
+    <TextView
+        android:id="@+id/txtvCuantosAntibioticos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/txtvUsoAntibioticoSi"
+        android:text="@string/label_cuantos_antibioticos_le_dio"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+
+    <EditText
+        android:id="@+id/edtxtCuantosAntibioticos"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/txtvCuantosAntibioticos"
+        android:layout_below="@+id/txtvUsoAntibioticoSi"
+        android:layout_marginLeft="10dp"
+        android:enabled="false"
+        android:layout_marginTop="8dp"
+        android:inputType="number"
+        android:maxLength="2"
+        android:textColor="@android:color/black"
+        />
+    <TextView
+        android:id="@+id/txtvCualesAntibioticosDio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/txtvCuantosAntibioticos"
+        android:text="@string/label_cuales_antibioticos_le_dio"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+    <EditText
+        android:id="@+id/edtxtCualesAntibioticosDio"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtvCualesAntibioticosDio"
+        android:layout_marginTop="5dp"
+        android:inputType="text"
+        android:enabled="false"
+        android:maxLength="64"
+        style="@style/EditTextEstilo"
+        />
+    <!--<EditText
+        android:id="@+id/edtxtCualesAntibioticosDio"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@+id/txtvCualesAntibioticosDio"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="5dp"
+        android:gravity="left"
+        android:enabled="false"
+        style="@style/EditTextEstilo" />-->
+    <TextView
+        android:id="@+id/txtvDiasUltimoAntibiotico"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/edtxtCualesAntibioticosDio"
+        android:text="@string/label_cuantos_dias_le_dio_ult_antibiotico"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+    <EditText
+        android:id="@+id/edtxtDiasUltimoAntibiotico"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/txtvDiasUltimoAntibiotico"
+        android:layout_below="@+id/edtxtCualesAntibioticosDio"
+        android:layout_marginLeft="10dp"
+        android:enabled="false"
+        android:inputType="number"
+        android:maxLength="2"
+        android:layout_marginTop="8dp"
+        android:textColor="@android:color/black"
+        />
+    <TextView
+        android:id="@+id/txtvVia"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/txtvDiasUltimoAntibiotico"
+        android:text="@string/label_via"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+    <TextView
+        android:id="@+id/txtvViaOral"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_marginLeft="10dp"
+        android:layout_below="@+id/txtvDiasUltimoAntibiotico"
+        android:layout_toRightOf="@+id/txtvVia"
+        android:text="@string/label_via_oral"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+    <CheckBox
+        android:id="@+id/chkViaOral"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_toRightOf="@+id/txtvViaOral"
+        android:layout_below="@+id/txtvDiasUltimoAntibiotico"
+        android:enabled="false"
+        style="@style/customCheckboxStyle"
+        android:layout_marginLeft="7dp"
+        />
+    <TextView
+        android:id="@+id/txtvViaParenteral"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_marginLeft="30dp"
+        android:layout_below="@+id/txtvDiasUltimoAntibiotico"
+        android:layout_toRightOf="@+id/chkViaOral"
+        android:text="@string/label_via_parenteral"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+    <CheckBox
+        android:id="@+id/chkViaParenteral"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_toRightOf="@+id/txtvViaParenteral"
+        android:layout_below="@+id/txtvDiasUltimoAntibiotico"
+        android:enabled="false"
+        style="@style/customCheckboxStyle"
+        android:layout_marginLeft="7dp"
+        />
+    <TextView
+        android:id="@+id/txtvViaAmbas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_marginLeft="30dp"
+        android:layout_below="@+id/txtvDiasUltimoAntibiotico"
+        android:layout_toRightOf="@+id/chkViaParenteral"
+        android:text="@string/label_via_ambas"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+    <CheckBox
+        android:id="@+id/chkViaAmbas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_toRightOf="@+id/txtvViaAmbas"
+        android:layout_below="@+id/txtvDiasUltimoAntibiotico"
+        android:enabled="false"
+        style="@style/customCheckboxStyle"
+        android:layout_marginLeft="7dp"
+        />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="15dp"
+        android:layout_below="@+id/txtvVia"
+        android:background="#FAFAFA" />
+
+    <TextView
+        android:id="@+id/txtvUsoAntivirales"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_below="@+id/txtvVia"
+        android:text="@string/label_antecedentes_uso_antivirales"
+        android:textStyle="bold"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+
+    <TextView
+        android:id="@+id/txtvUsoAntiviralSi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_marginLeft="10dp"
+        android:layout_below="@+id/txtvVia"
+        android:layout_toRightOf="@+id/txtvUsoAntivirales"
+        android:text="@string/label_vacuna_si"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+    <CheckBox
+        android:id="@+id/chkUsoAntiViralSi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_toRightOf="@+id/txtvUsoAntiviralSi"
+        android:layout_below="@+id/txtvVia"
+        style="@style/customCheckboxStyle"
+        android:layout_marginLeft="7dp"
+        />
+    <TextView
+        android:id="@+id/txtvUsoAntiViralNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_marginLeft="30dp"
+        android:layout_below="@+id/txtvVia"
+        android:layout_toRightOf="@+id/chkUsoAntiViralSi"
+        android:text="@string/label_vacuna_no"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+    <CheckBox
+        android:id="@+id/chkUsoAntiViralNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_toRightOf="@+id/txtvUsoAntiViralNo"
+        android:layout_below="@+id/txtvVia"
+        style="@style/customCheckboxStyle"
+        android:layout_marginLeft="7dp"
+        />
+    <TextView
+        android:id="@+id/txtNombreAntiviral"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/txtvUsoAntivirales"
+        android:text="@string/label_nombre_antiviral"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+    <EditText
+        android:id="@+id/edtxtNombreAntiviral"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtNombreAntiviral"
+        android:layout_marginTop="5dp"
+        android:inputType="text"
+        android:enabled="false"
+        android:maxLength="64"
+        style="@style/EditTextEstilo"
+        />
+
+    <TextView
+        android:id="@+id/txtvFecha1raDosis"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/edtxtNombreAntiviral"
+        android:text="@string/label_fecha_1ra_dosis"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+
+    <EditText
+        android:id="@+id/dpFecha1raDosisAntiViral"
+        style="@style/EditTextEstilo"
+        android:layout_width="160dp"
+        android:layout_height="40dp"
+        android:layout_below="@+id/edtxtNombreAntiviral"
+        android:layout_marginLeft="11dp"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@+id/txtvFecha1raDosis"
+        android:drawableRight="@drawable/calendar"
+        android:editable="false"
+        android:ems="10"
+        android:enabled="false"
+        android:inputType="date"
+        android:textCursorDrawable="@null" />
+
+    <TextView
+        android:id="@+id/txtvFechaUltimaDosisAntiViral"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@+id/dpFecha1raDosisAntiViral"
+        android:layout_below="@+id/edtxtNombreAntiviral"
+        android:text="@string/label_fecha_ultima_dosis_antivirales"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+    <EditText
+        android:id="@+id/dpFechaUltDosisAntiViral"
+        android:layout_width="160dp"
+        android:layout_height="40dp"
+        android:inputType="date"
+        android:editable="false"
+        android:layout_toRightOf="@+id/txtvFechaUltimaDosisAntiViral"
+        android:layout_below="@+id/edtxtNombreAntiviral"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="8dp"
+        android:enabled="false"
+        android:ems="10"
+        android:textCursorDrawable="@null"
+        android:drawableRight="@drawable/calendar"
+        style="@style/EditTextEstilo" />
+
+    <TextView
+        android:id="@+id/txtvNoDosisAdministrada"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:layout_below="@+id/txtvFecha1raDosis"
+        android:text="@string/label_no_dosis_adminstradas"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+
+    <EditText
+        android:id="@+id/edtxtNoDosisAdministrada"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/txtvNoDosisAdministrada"
+        android:layout_below="@+id/txtvFecha1raDosis"
+        android:layout_marginLeft="10dp"
+        android:enabled="false"
+        android:layout_marginTop="20dp"
+        android:inputType="number"
+        android:maxLength="2"
+        android:textColor="@android:color/black"
+        />
+   <!-- <Button
+        android:id="@+id/btnGuardarFicha"
+        android:layout_width="110dp"
+        android:layout_height="45dp"
+        android:layout_below="@+id/edtxtNoDosisAdministrada"
+        android:layout_alignLeft="@+id/dpFecha1raDosisAntiViral"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/bg_button_gris_selector"
+        android:text="@string/boton_guardar_hoja_consulta"
+        android:textColor="@android:color/white"
+        android:textSize="14dp" />
+
+    <Button
+        android:id="@+id/btnlimpiarFicha"
+        android:layout_width="110dp"
+        android:layout_height="45dp"
+        android:layout_below="@+id/edtxtNoDosisAdministrada"
+        android:layout_toRightOf="@+id/btnGuardarFicha"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/bg_button_verder_oscuro_selector"
+        android:text="@string/boton_limpiar"
+        android:textColor="@android:color/white"
+        android:textSize="14dp" />
+
+    <ImageButton
+        android:id="@+id/ibtImprimir"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edtxtNoDosisAdministrada"
+        android:layout_toRightOf="@+id/btnlimpiarFicha"
+        android:src="@drawable/printer64"
+        android:background="@null"
+        android:layout_marginLeft="18dp"
+        android:layout_marginTop="40dp" />
+
+    <ImageButton
+        android:id="@+id/ibtFichaPDF"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edtxtNoDosisAdministrada"
+        android:layout_toRightOf="@+id/ibtImprimir"
+        android:src="@drawable/pdf64"
+        android:background="@null"
+        android:layout_marginLeft="18dp"
+        android:layout_marginTop="40dp" />-->
+</RelativeLayout>
