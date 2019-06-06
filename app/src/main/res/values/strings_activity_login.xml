@@ -18,8 +18,10 @@
     <string name="date_version">Mayo 10, 2019</string>-->
     <!--<string name="version">Versión 1.0.4</string>
     <string name="date_version">Mayo 21, 2019</string>-->
-    <string name="version">Versión 1.0.5</string>
-    <string name="date_version">Junio 03, 2019</string>
+   <!-- <string name="version">Versión 1.0.5</string>
+    <string name="date_version">Junio 03, 2019</string>-->
+    <string name="version">Versión 1.0.6</string>
+    <string name="date_version">Junio 05, 2019</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
