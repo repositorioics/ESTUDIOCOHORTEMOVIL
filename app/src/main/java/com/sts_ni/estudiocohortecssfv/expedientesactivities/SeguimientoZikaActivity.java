@@ -10896,8 +10896,6 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                     }
                 });
-
-
             }
 
             public void cargarDatosSintomasDia14() {
@@ -11453,9 +11451,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                     }
                 });
-
-
-            }
+           }
 
 
 
@@ -15332,7 +15328,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     case 14:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento14)).setText(seguimientoZika.getFechaSeguimiento());
                         getActivity().findViewById(R.id.edtxtFechaSeguimiento14).setEnabled(habilitar);
-                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila14)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getConsultaInicial())) ?
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila1)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getConsultaInicial())) ?
                                 seguimientoZika.getConsultaInicial().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia14Fila1).setEnabled(habilitar);
                         ((Spinner) getActivity().findViewById(R.id.spnDia14Fila2)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getFiebre())) ?
