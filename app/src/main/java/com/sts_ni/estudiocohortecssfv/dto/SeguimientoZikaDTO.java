@@ -58,6 +58,9 @@ public class SeguimientoZikaDTO implements Serializable {
     private String rinorrea;
     private String dolorGarganta;
     private String prurito;
+    private String fotofobia;
+    private String mareos;
+    private String sudoracion;
 
     public int getSecHojaZika() {
         return secHojaZika;
@@ -468,4 +471,27 @@ public class SeguimientoZikaDTO implements Serializable {
         this.prurito = prurito;
     }
 
+    public String getFotofobia() {
+        return fotofobia;
+    }
+
+    public void setFotofobia(String fotofobia) {
+        this.fotofobia = fotofobia;
+    }
+
+    public String getMareos() {
+        return mareos;
+    }
+
+    public void setMareos(String mareos) {
+        this.mareos = mareos;
+    }
+
+    public String getSudoracion() {
+        return sudoracion;
+    }
+
+    public void setSudoracion(String sudoracion) {
+        this.sudoracion = sudoracion;
+    }
 }

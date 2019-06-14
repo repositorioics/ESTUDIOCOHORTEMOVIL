@@ -1444,7 +1444,81 @@
                 android:background="@drawable/rounded_spinner" />
 
         </LinearLayout>
+        <!--Fotofobia-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
 
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.15"
+                android:text="@string/label_fotofobia"
+                android:textAppearance="@style/TextViewEstiloSeguimiento" />
+
+            <Spinner
+                android:id="@+id/spnDia4Fila47"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.50"
+                android:background="@drawable/rounded_spinner" />
+
+        </LinearLayout>
+        <!--Mareos-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.15"
+                android:text="@string/label_mareos"
+                android:textAppearance="@style/TextViewEstiloSeguimiento" />
+
+            <Spinner
+                android:id="@+id/spnDia4Fila48"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.50"
+                android:background="@drawable/rounded_spinner" />
+
+        </LinearLayout>
+        <!--Sudoracion-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:orientation="horizontal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.15"
+                android:text="@string/label_sudoracion"
+                android:textAppearance="@style/TextViewEstiloSeguimiento" />
+
+            <Spinner
+                android:id="@+id/spnDia4Fila49"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.50"
+                android:background="@drawable/rounded_spinner" />
+
+        </LinearLayout>
         <ImageButton
             android:id="@+id/img4Back3"
             android:layout_width="55dp"

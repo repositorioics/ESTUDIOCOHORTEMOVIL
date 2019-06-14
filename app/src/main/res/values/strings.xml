@@ -636,6 +636,9 @@
     <string name="label_paralisis_musc_ms">Paralisis Muscular MS</string>
     <string name="label_paralisis_musc_mi">Paralisis Muscular MI</string>
     <string name="label_prurito">Prurito</string>
+    <string name="label_sudoracion">Sudoración</string>
+    <string name="label_fotofobia">Fotofobia</string>
+    <string name="label_mareos">Mareos</string>
     <string name="label_categoria1">Categoría:</string>
     <string name="label_sintomas_iniciales">Sintomas Iniciales:  1</string>
     <string name="btn_siguiente">Siguiente</string>

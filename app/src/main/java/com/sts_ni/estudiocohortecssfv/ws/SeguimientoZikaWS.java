@@ -454,6 +454,9 @@ public class SeguimientoZikaWS extends EstudioCohorteCssfvWS {
                     objenvioSeg.put("rinorrea", String.valueOf(seg.getRinorrea()));
                     objenvioSeg.put("dolorGarganta", String.valueOf(seg.getDolorGarganta()));
                     objenvioSeg.put("prurito", String.valueOf(seg.getPrurito()));
+                    objenvioSeg.put("fotofobia", seg.getFotofobia() != null ? String.valueOf(seg.getFotofobia()) : null);
+                    objenvioSeg.put("mareos", seg.getMareos() != null ? String.valueOf(seg.getMareos()) : null);
+                    objenvioSeg.put("sudoracion", seg.getSudoracion() != null ? String.valueOf(seg.getSudoracion()) : null);
 
 
                     jsonArray.put(objenvioSeg.toString());

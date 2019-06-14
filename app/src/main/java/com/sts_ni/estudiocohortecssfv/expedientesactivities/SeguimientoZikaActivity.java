@@ -112,8 +112,6 @@ public class SeguimientoZikaActivity extends ActionBarActivity
     private static ArrayAdapter<MedicosDTO> adapterSupervisor14;
     private static boolean busqSupervisor = false;
 
-
-
     public static Context CONTEXT;
     public String mNombrePaciente = null;
     public String mEstudio = null;
@@ -1180,8 +1178,6 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                                         getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
                                 return;
                             }
-
-
                         }
 
                         if(cont == 0){
@@ -1193,12 +1189,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         }
                     }
 
-
-
                     hojaZika.setLstSeguimientoZika(lstSeg);
                     mSeguimientoZikaActivity.mCerrarHojaSeguimientoTask = (CerrarHojaSeguimientoZikaTask) new
                             CerrarHojaSeguimientoZikaTask(mSeguimientoZikaActivity).execute(hojaZika);
-
 
                 }
             }else{
@@ -2892,6 +2885,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia1Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia1Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia1Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia1Fila47)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia1Fila48)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia1Fila49)).setAdapter(mSeguimientoZikaActivity.adapter);
 
                 cargarDatosSintomasDia1();
 
@@ -2952,6 +2948,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia2Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia2Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia2Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia2Fila47)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia2Fila48)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia2Fila49)).setAdapter(mSeguimientoZikaActivity.adapter);
 
                 cargarDatosSintomasDia2();
 
@@ -3010,6 +3009,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia3Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia3Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia3Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia3Fila47)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia3Fila48)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia3Fila49)).setAdapter(mSeguimientoZikaActivity.adapter);
 
                 cargarDatosSintomasDia3();
 
@@ -3068,6 +3070,10 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia4Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia4Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia4Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia4Fila47)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia4Fila48)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia4Fila49)).setAdapter(mSeguimientoZikaActivity.adapter);
+
 
                 cargarDatosSintomasDia4();
 
@@ -3126,6 +3132,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia5Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia5Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia5Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia5Fila47)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia5Fila48)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia5Fila49)).setAdapter(mSeguimientoZikaActivity.adapter);
 
                 cargarDatosSintomasDia5();
 
@@ -3184,6 +3193,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia6Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia6Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia6Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia6Fila47)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia6Fila48)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia6Fila49)).setAdapter(mSeguimientoZikaActivity.adapter);
 
                 cargarDatosSintomasDia6();
 
@@ -3242,6 +3254,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia7Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia7Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia7Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia7Fila47)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia7Fila48)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia7Fila49)).setAdapter(mSeguimientoZikaActivity.adapter);
 
                 cargarDatosSintomasDia7();
 
@@ -3300,6 +3315,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia8Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia8Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia8Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia8Fila47)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia8Fila48)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia8Fila49)).setAdapter(mSeguimientoZikaActivity.adapter);
 
                 cargarDatosSintomasDia8();
 
@@ -3358,6 +3376,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia9Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia9Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia9Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia9Fila47)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia9Fila48)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia9Fila49)).setAdapter(mSeguimientoZikaActivity.adapter);
 
                 cargarDatosSintomasDia9();
 
@@ -3417,6 +3438,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia10Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia10Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia10Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia10Fila47)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia10Fila48)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia10Fila49)).setAdapter(mSeguimientoZikaActivity.adapter);
 
                 cargarDatosSintomasDia10();
 
@@ -3475,6 +3499,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia11Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia11Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia11Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia11Fila47)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia11Fila48)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia11Fila49)).setAdapter(mSeguimientoZikaActivity.adapter);
 
                 cargarDatosSintomasDia11();
 
@@ -3533,6 +3560,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia12Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia12Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia12Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia12Fila47)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia12Fila48)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia12Fila49)).setAdapter(mSeguimientoZikaActivity.adapter);
 
                 cargarDatosSintomasDia12();
 
@@ -3591,6 +3621,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia13Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia13Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia13Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia13Fila47)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia13Fila48)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia13Fila49)).setAdapter(mSeguimientoZikaActivity.adapter);
 
                 cargarDatosSintomasDia13();
 
@@ -3649,6 +3682,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia14Fila44)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia14Fila45)).setAdapter(mSeguimientoZikaActivity.adapter);
                 ((Spinner) getActivity().findViewById(R.id.spnDia14Fila46)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia14Fila47)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia14Fila48)).setAdapter(mSeguimientoZikaActivity.adapter);
+                ((Spinner) getActivity().findViewById(R.id.spnDia14Fila49)).setAdapter(mSeguimientoZikaActivity.adapter);
 
                 cargarDatosSintomasDia14();
 
@@ -3724,7 +3760,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia1Fila5)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                       cargarEscalosfrios(position);
+                        cargarEscalosfrios(position);
                     }
 
                     @Override
@@ -3736,7 +3772,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia1Fila6)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                       cargarConvulsiones(position);
+                        cargarConvulsiones(position);
                     }
 
                     @Override
@@ -3748,7 +3784,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia1Fila7)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                       cargarCefalea(position);
+                        cargarCefalea(position);
                     }
 
                     @Override
@@ -3760,7 +3796,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia1Fila8)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                       cargarRigidezCuello(position);
+                        cargarRigidezCuello(position);
                     }
 
                     @Override
@@ -3772,7 +3808,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia1Fila9)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                      cargarDolorRetroocular(position);
+                        cargarDolorRetroocular(position);
                     }
 
                     @Override
@@ -3784,7 +3820,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia1Fila10)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                       cargarPocoApetito(position);
+                        cargarPocoApetito(position);
                     }
 
                     @Override
@@ -3796,7 +3832,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia1Fila11)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                       cargarNauseas(position);
+                        cargarNauseas(position);
                     }
 
                     @Override
@@ -3832,7 +3868,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia1Fila14)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                       cargarDolorAbdominalContinuo(position);
+                        cargarDolorAbdominalContinuo(position);
                     }
 
                     @Override
@@ -3844,7 +3880,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 ((Spinner) getActivity().findViewById(R.id.spnDia1Fila15)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                       cargarArtralgiaProximal(position);
+                        cargarArtralgiaProximal(position);
                     }
 
                     @Override
@@ -4225,7 +4261,41 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     }
                 });
 
+                ((Spinner) getActivity().findViewById(R.id.spnDia1Fila47)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarFotofobia(position);
+                    }
 
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia1Fila48)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarMareos(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia1Fila49)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarSudoracion(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
             }
 
             public void cargarDatosSintomasDia2() {
@@ -4781,6 +4851,41 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     }
                 });
 
+                ((Spinner) getActivity().findViewById(R.id.spnDia2Fila47)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarFotofobia(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia2Fila48)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarMareos(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia2Fila49)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarSudoracion(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
             }
 
             public void cargarDatosSintomasDia3() {
@@ -5336,6 +5441,41 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     }
                 });
 
+                ((Spinner) getActivity().findViewById(R.id.spnDia3Fila47)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarFotofobia(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia3Fila48)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarMareos(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia3Fila49)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarSudoracion(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
 
             }
 
@@ -5892,6 +6032,41 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     }
                 });
 
+                ((Spinner) getActivity().findViewById(R.id.spnDia4Fila47)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarFotofobia(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia4Fila48)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarMareos(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia4Fila49)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarSudoracion(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
 
             }
 
@@ -6440,6 +6615,42 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         cargarPrurito(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia5Fila47)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarFotofobia(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia5Fila48)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarMareos(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia5Fila49)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarSudoracion(position);
                     }
 
                     @Override
@@ -7004,6 +7215,41 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     }
                 });
 
+                ((Spinner) getActivity().findViewById(R.id.spnDia6Fila47)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarFotofobia(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia6Fila48)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarMareos(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia6Fila49)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarSudoracion(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
 
             }
 
@@ -7553,6 +7799,42 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         cargarPrurito(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia7Fila47)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarFotofobia(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia7Fila48)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarMareos(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia7Fila49)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarSudoracion(position);
                     }
 
                     @Override
@@ -8116,6 +8398,42 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                     }
                 });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia8Fila47)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarFotofobia(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia8Fila48)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarMareos(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia8Fila49)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarSudoracion(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
             }
 
             public void cargarDatosSintomasDia9() {
@@ -8663,6 +8981,42 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         cargarPrurito(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia9Fila47)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarFotofobia(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia9Fila48)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarMareos(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia9Fila49)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarSudoracion(position);
                     }
 
                     @Override
@@ -9227,7 +9581,41 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     }
                 });
 
+                ((Spinner) getActivity().findViewById(R.id.spnDia10Fila47)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarFotofobia(position);
+                    }
 
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia10Fila48)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarMareos(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia10Fila49)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarSudoracion(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
             }
 
             public void cargarDatosSintomasDia11() {
@@ -9783,7 +10171,41 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     }
                 });
 
+                ((Spinner) getActivity().findViewById(R.id.spnDia11Fila47)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarFotofobia(position);
+                    }
 
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia11Fila48)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarMareos(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia11Fila49)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarSudoracion(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
             }
 
             public void cargarDatosSintomasDia12() {
@@ -10340,6 +10762,41 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     }
                 });
 
+                ((Spinner) getActivity().findViewById(R.id.spnDia12Fila47)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarFotofobia(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia12Fila48)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarMareos(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia12Fila49)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarSudoracion(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
 
             }
 
@@ -10896,6 +11353,42 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                     }
                 });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia13Fila47)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarFotofobia(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia13Fila48)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarMareos(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia13Fila49)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarSudoracion(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
             }
 
             public void cargarDatosSintomasDia14() {
@@ -11444,6 +11937,42 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         cargarPrurito(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia14Fila47)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarFotofobia(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia14Fila48)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarMareos(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                ((Spinner) getActivity().findViewById(R.id.spnDia14Fila49)).setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        cargarSudoracion(position);
                     }
 
                     @Override
@@ -12053,6 +12582,43 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     seguimientoZika = new SeguimientoZikaDTO();
                     seguimientoZika.setControlDia(mPage);
                     seguimientoZika.setPrurito(mSeguimientoZikaActivity.adapter.getItem(position).toString());
+                    mSeguimientoZikaActivity.nuevaListaSegZika.add(seguimientoZika);
+                }
+            }
+
+            public void cargarFotofobia(int position) {
+                SeguimientoZikaDTO seguimientoZika = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoZikaActivity.adapter != null && seguimientoZika != null) {
+                    seguimientoZika.setFotofobia((mSeguimientoZikaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) ?
+                            mSeguimientoZikaActivity.adapter.getItem(position).toString() : null);
+                } else if(mSeguimientoZikaActivity.adapter != null && mSeguimientoZikaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) {
+                    seguimientoZika = new SeguimientoZikaDTO();
+                    seguimientoZika.setControlDia(mPage);
+                    seguimientoZika.setFotofobia(mSeguimientoZikaActivity.adapter.getItem(position).toString());
+                    mSeguimientoZikaActivity.nuevaListaSegZika.add(seguimientoZika);
+                }
+            }
+            public void cargarMareos(int position) {
+                SeguimientoZikaDTO seguimientoZika = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoZikaActivity.adapter != null && seguimientoZika != null) {
+                    seguimientoZika.setMareos((mSeguimientoZikaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) ?
+                            mSeguimientoZikaActivity.adapter.getItem(position).toString() : null);
+                } else if(mSeguimientoZikaActivity.adapter != null && mSeguimientoZikaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) {
+                    seguimientoZika = new SeguimientoZikaDTO();
+                    seguimientoZika.setControlDia(mPage);
+                    seguimientoZika.setMareos(mSeguimientoZikaActivity.adapter.getItem(position).toString());
+                    mSeguimientoZikaActivity.nuevaListaSegZika.add(seguimientoZika);
+                }
+            }
+            public void cargarSudoracion(int position) {
+                SeguimientoZikaDTO seguimientoZika = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoZikaActivity.adapter != null && seguimientoZika != null) {
+                    seguimientoZika.setSudoracion((mSeguimientoZikaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) ?
+                            mSeguimientoZikaActivity.adapter.getItem(position).toString() : null);
+                } else if(mSeguimientoZikaActivity.adapter != null && mSeguimientoZikaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) {
+                    seguimientoZika = new SeguimientoZikaDTO();
+                    seguimientoZika.setControlDia(mPage);
+                    seguimientoZika.setSudoracion(mSeguimientoZikaActivity.adapter.getItem(position).toString());
                     mSeguimientoZikaActivity.nuevaListaSegZika.add(seguimientoZika);
                 }
             }
@@ -13457,6 +14023,15 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia1Fila46)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getPrurito())) ?
                                 seguimientoZika.getPrurito().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia1Fila46).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila47)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getFotofobia())) ?
+                                seguimientoZika.getFotofobia().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia1Fila47).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila48)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getMareos())) ?
+                                seguimientoZika.getMareos().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia1Fila48).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila49)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getSudoracion())) ?
+                                seguimientoZika.getSudoracion().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia1Fila49).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         setSupervisor(seguimientoZika.getSupervisor());
@@ -13609,8 +14184,17 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                                 seguimientoZika.getDolorGarganta().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia2Fila45).setEnabled(habilitar);
                         ((Spinner) getActivity().findViewById(R.id.spnDia2Fila46)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getPrurito())) ?
-                                seguimientoZika.getPrurito().trim() : "Seleccione"));
+                            seguimientoZika.getPrurito().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia2Fila46).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila47)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getFotofobia())) ?
+                                seguimientoZika.getFotofobia().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia2Fila47).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila48)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getMareos())) ?
+                                seguimientoZika.getMareos().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia2Fila48).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila49)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getSudoracion())) ?
+                                seguimientoZika.getSudoracion().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia2Fila49).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         setSupervisor(seguimientoZika.getSupervisor());
@@ -13765,6 +14349,15 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia3Fila46)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getPrurito())) ?
                                 seguimientoZika.getPrurito().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia3Fila46).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila47)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getFotofobia())) ?
+                                seguimientoZika.getFotofobia().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia3Fila47).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila48)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getMareos())) ?
+                                seguimientoZika.getMareos().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia3Fila48).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila49)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getSudoracion())) ?
+                                seguimientoZika.getSudoracion().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia3Fila49).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         setSupervisor(seguimientoZika.getSupervisor());
@@ -13919,6 +14512,15 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia4Fila46)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getPrurito())) ?
                                 seguimientoZika.getPrurito().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia4Fila46).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila47)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getFotofobia())) ?
+                                seguimientoZika.getFotofobia().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia4Fila47).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila48)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getMareos())) ?
+                                seguimientoZika.getMareos().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia4Fila48).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila49)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getSudoracion())) ?
+                                seguimientoZika.getSudoracion().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia4Fila49).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         setSupervisor(seguimientoZika.getSupervisor());
@@ -14073,6 +14675,15 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia5Fila46)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getPrurito())) ?
                                 seguimientoZika.getPrurito().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia5Fila46).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila47)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getFotofobia())) ?
+                                seguimientoZika.getFotofobia().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia5Fila47).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila48)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getMareos())) ?
+                                seguimientoZika.getMareos().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia5Fila48).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila49)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getSudoracion())) ?
+                                seguimientoZika.getSudoracion().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia5Fila49).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         getActivity().findViewById(R.id.spnMedico5).setEnabled(false);
@@ -14227,6 +14838,15 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia6Fila46)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getPrurito())) ?
                                 seguimientoZika.getPrurito().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia6Fila46).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila47)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getFotofobia())) ?
+                                seguimientoZika.getFotofobia().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia6Fila47).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila48)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getMareos())) ?
+                                seguimientoZika.getMareos().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia6Fila48).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila49)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getSudoracion())) ?
+                                seguimientoZika.getSudoracion().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia6Fila49).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         getActivity().findViewById(R.id.spnMedico6).setEnabled(false);
@@ -14381,6 +15001,15 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia7Fila46)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getPrurito())) ?
                                 seguimientoZika.getPrurito().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia7Fila46).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila47)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getFotofobia())) ?
+                                seguimientoZika.getFotofobia().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia7Fila47).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila48)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getMareos())) ?
+                                seguimientoZika.getMareos().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia7Fila48).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila49)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getSudoracion())) ?
+                                seguimientoZika.getSudoracion().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia7Fila49).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         getActivity().findViewById(R.id.spnMedico7).setEnabled(false);
@@ -14535,6 +15164,15 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia8Fila46)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getPrurito())) ?
                                 seguimientoZika.getPrurito().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia8Fila46).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila47)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getFotofobia())) ?
+                                seguimientoZika.getFotofobia().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia8Fila47).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila48)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getMareos())) ?
+                                seguimientoZika.getMareos().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia8Fila48).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila49)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getSudoracion())) ?
+                                seguimientoZika.getSudoracion().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia8Fila49).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         getActivity().findViewById(R.id.spnMedico8).setEnabled(false);
@@ -14690,6 +15328,15 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia9Fila46)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getPrurito())) ?
                                 seguimientoZika.getPrurito().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia9Fila46).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila47)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getFotofobia())) ?
+                                seguimientoZika.getFotofobia().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia9Fila47).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila48)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getMareos())) ?
+                                seguimientoZika.getMareos().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia9Fila48).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila49)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getSudoracion())) ?
+                                seguimientoZika.getSudoracion().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia9Fila49).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         getActivity().findViewById(R.id.spnMedico9).setEnabled(false);
@@ -14845,6 +15492,15 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia10Fila46)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getPrurito())) ?
                                 seguimientoZika.getPrurito().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia10Fila46).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila47)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getFotofobia())) ?
+                                seguimientoZika.getFotofobia().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia10Fila47).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila48)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getMareos())) ?
+                                seguimientoZika.getMareos().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia10Fila48).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila49)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getSudoracion())) ?
+                                seguimientoZika.getSudoracion().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia10Fila49).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         getActivity().findViewById(R.id.spnMedico10).setEnabled(false);
@@ -15000,6 +15656,15 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia11Fila46)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getPrurito())) ?
                                 seguimientoZika.getPrurito().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia11Fila46).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila47)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getFotofobia())) ?
+                                seguimientoZika.getFotofobia().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia11Fila47).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila48)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getMareos())) ?
+                                seguimientoZika.getMareos().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia11Fila48).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila49)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getSudoracion())) ?
+                                seguimientoZika.getSudoracion().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia11Fila49).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         getActivity().findViewById(R.id.spnMedico11).setEnabled(false);
@@ -15155,6 +15820,15 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia12Fila46)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getPrurito())) ?
                                 seguimientoZika.getPrurito().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia12Fila46).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila47)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getFotofobia())) ?
+                                seguimientoZika.getFotofobia().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia12Fila47).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila48)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getMareos())) ?
+                                seguimientoZika.getMareos().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia12Fila48).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila49)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getSudoracion())) ?
+                                seguimientoZika.getSudoracion().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia12Fila49).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         setSupervisor(seguimientoZika.getSupervisor());
@@ -15311,6 +15985,15 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia13Fila46)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getPrurito())) ?
                                 seguimientoZika.getPrurito().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia13Fila46).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila47)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getFotofobia())) ?
+                                seguimientoZika.getFotofobia().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia13Fila47).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila48)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getMareos())) ?
+                                seguimientoZika.getMareos().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia13Fila48).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila49)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getSudoracion())) ?
+                                seguimientoZika.getSudoracion().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia13Fila49).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         setSupervisor(seguimientoZika.getSupervisor());
@@ -15466,6 +16149,15 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia14Fila46)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getPrurito())) ?
                                 seguimientoZika.getPrurito().trim() : "Seleccione"));
                         getActivity().findViewById(R.id.spnDia14Fila46).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila47)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getFotofobia())) ?
+                                seguimientoZika.getFotofobia().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia14Fila47).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila48)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getMareos())) ?
+                                seguimientoZika.getMareos().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia14Fila48).setEnabled(habilitar);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila49)).setSelection(mSeguimientoZikaActivity.adapter.getPosition((!StringUtils.isNullOrEmpty(seguimientoZika.getSudoracion())) ?
+                                seguimientoZika.getSudoracion().trim() : "Seleccione"));
+                        getActivity().findViewById(R.id.spnDia14Fila49).setEnabled(habilitar);
 
                         setMedico(seguimientoZika.getUsuarioMedico());
                         setSupervisor(seguimientoZika.getSupervisor());
@@ -15587,6 +16279,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia1Fila44)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia1Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia1Fila46)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila47)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila48)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila49)).setSelection(value);
 
                         if (value != 0){
                             loadSpinners(value);
@@ -15644,6 +16339,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia2Fila44)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia2Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia2Fila46)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila47)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila48)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila49)).setSelection(value);
                         if (value != 0){
                            loadSpinners(value);
                         }
@@ -15700,6 +16398,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia3Fila44)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia3Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia3Fila46)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila47)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila48)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila49)).setSelection(value);
                         if (value != 0){
                            loadSpinners(value);
                         }
@@ -15757,6 +16458,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia4Fila44)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia4Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia4Fila46)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila47)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila48)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila49)).setSelection(value);
                         if (value != 0){
                            loadSpinners(value);
                         }
@@ -15813,6 +16517,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia5Fila44)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia5Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia5Fila46)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila47)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila48)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila49)).setSelection(value);
                         if (value != 0){
                            loadSpinners(value);
                         }
@@ -15869,6 +16576,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia6Fila44)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia6Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia6Fila46)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila47)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila48)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila49)).setSelection(value);
                         if (value != 0){
                            loadSpinners(value);
                         }
@@ -15925,6 +16635,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia7Fila44)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia7Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia7Fila46)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila47)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila48)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila49)).setSelection(value);
                         if (value != 0){
                            loadSpinners(value);
                         }
@@ -15981,6 +16694,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia8Fila44)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia8Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia8Fila46)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila47)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila48)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila49)).setSelection(value);
                         if (value != 0){
                            loadSpinners(value);
                         }
@@ -16037,6 +16753,10 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia9Fila44)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia9Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia9Fila46)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila47)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila48)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila49)).setSelection(value);
+
                         if (value != 0){
                            loadSpinners(value);
                         }
@@ -16093,6 +16813,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia10Fila44)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia10Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia10Fila46)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila47)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila48)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila49)).setSelection(value);
                         if (value != 0){
                            loadSpinners(value);
                         }
@@ -16150,6 +16873,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia11Fila44)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia11Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia11Fila46)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila47)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila48)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila49)).setSelection(value);
                         if (value != 0){
                            loadSpinners(value);
                         }
@@ -16206,6 +16932,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia12Fila44)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia12Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia12Fila46)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila47)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila48)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila49)).setSelection(value);
                         if (value != 0){
                            loadSpinners(value);
                         }
@@ -16263,6 +16992,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia13Fila44)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia13Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia13Fila46)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila47)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila48)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia13Fila49)).setSelection(value);
                         if (value != 0){
                             loadSpinners(value);
                         }
@@ -16320,6 +17052,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         ((Spinner) getActivity().findViewById(R.id.spnDia14Fila44)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia14Fila45)).setSelection(value);
                         ((Spinner) getActivity().findViewById(R.id.spnDia14Fila46)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila47)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila48)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia14Fila49)).setSelection(value);
                         if (value != 0){
                           loadSpinners(value);
                         }
@@ -17105,6 +17840,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 cargarRinorrea(value);
                 cargarDolorGarganta(value);
                 cargarPrurito(value);
+                cargarFotofobia(value);
+                cargarMareos(value);
+                cargarSudoracion(value);
             }
 
             public void loadSpinners2(SeguimientoZikaDTO seg){
@@ -17155,6 +17893,9 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 if(seg.getRinorrea() !=null)cargarRinorrea(setValueSpinner(seg.getRinorrea()));
                 if(seg.getDolorGarganta() !=null)cargarDolorGarganta(setValueSpinner(seg.getDolorGarganta()));
                 if(seg.getPrurito() !=null)cargarPrurito(setValueSpinner(seg.getPrurito()));
+                if(seg.getFotofobia() !=null)cargarFotofobia(setValueSpinner(seg.getFotofobia()));
+                if(seg.getMareos() !=null)cargarMareos(setValueSpinner(seg.getMareos()));
+                if(seg.getSudoracion() !=null)cargarSudoracion(setValueSpinner(seg.getSudoracion()));
 
                 if(seg.getFechaSeguimiento() != null)cargarFechaSeguimiento(seg.getFechaSeguimiento());
             }
@@ -18135,15 +18876,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         });
                         break;
                 }
-
-
             }
-
-
         }
-
     }
-
-
-
 }
