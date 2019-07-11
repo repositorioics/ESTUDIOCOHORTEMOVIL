@@ -34,7 +34,15 @@ public class DateUtils {
                 age = today.get(Calendar.DAY_OF_MONTH) - fechaNacimiento.get(Calendar.DAY_OF_MONTH);
                 return new StringBuffer().append(age).append(" dias").toString();
             }else {
-                return new StringBuffer().append(age).append(" meses").toString();
+                int diaFechaActual = today.get(Calendar.DAY_OF_MONTH);
+                int diaFechaNac = fechaNacimiento.get(Calendar.DAY_OF_MONTH);
+                if (diaFechaActual < diaFechaNac) {
+                    age = age - 1;
+                    return new StringBuffer().append(age).append(" meses").toString();
+                } else {
+                    return new StringBuffer().append(age).append(" meses").toString();
+                }
+
             }
         } else if (month > 0 && month < 12) {
             return new StringBuffer().append(month).append(" meses").toString();
