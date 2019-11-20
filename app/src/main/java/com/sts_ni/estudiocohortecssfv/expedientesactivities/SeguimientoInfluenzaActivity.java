@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -38,6 +39,7 @@ import android.widget.Toast;
 import com.sts_ni.estudiocohortecssfv.CssfvApp;
 import com.sts_ni.estudiocohortecssfv.NavigationDrawerFragment;
 import com.sts_ni.estudiocohortecssfv.R;
+import com.sts_ni.estudiocohortecssfv.dto.ErrorDTO;
 import com.sts_ni.estudiocohortecssfv.dto.HojaInfluenzaDTO;
 import com.sts_ni.estudiocohortecssfv.dto.MedicosDTO;
 import com.sts_ni.estudiocohortecssfv.dto.ResultadoListWSDTO;
@@ -815,9 +817,9 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                     getActivity().findViewById(R.id.edtxtFIF).setEnabled(false);
                     ArrayList<SeguimientoInfluenzaDTO> lstSeg = new ArrayList<>();
 
-                    for(SeguimientoInfluenzaDTO seguimientoInfluenza : mSeguimientoInfluenzaActivity.nuevaListaSegInfluenza) {
+                    for (SeguimientoInfluenzaDTO seguimientoInfluenza : mSeguimientoInfluenzaActivity.nuevaListaSegInfluenza) {
                         if (!StringUtils.isNullOrEmpty(seguimientoInfluenza.getFechaSeguimiento())) {
-                            if((seguimientoInfluenza.getUsuarioMedico() > 0) &&
+                            if ((seguimientoInfluenza.getUsuarioMedico() > 0) &&
                                     !StringUtils.isNullOrEmpty(seguimientoInfluenza.getFaltaEscuela()) &&
                                     !StringUtils.isNullOrEmpty(seguimientoInfluenza.getQuedoEnCama()) &&
                                     !StringUtils.isNullOrEmpty(String.valueOf(seguimientoInfluenza.getCongestionNasa())) &&
@@ -843,13 +845,1189 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                             }
                         }
                     }
-                    if (verificarDiasContinuos(lstSeg)) {
+
+                    /*
+                    * Si la lista es vacia nos indica que no hay ningun registro ingresado
+                    **/
+                    if (lstSeg.size() <= 0) {
+                        return;
+                    }
+
+                    /*
+                     * Verificamos que todos los sintamos hayan sido llenados y sean distintos a seleccione
+                     **/
+                    for (SeguimientoInfluenzaDTO seg : lstSeg) {
+                        if (seg.getSecHojaInfluenza() <= 0) {
+                            int usuarioLogeado = ((CssfvApp)getActivity().getApplication()).getInfoSessionWSDTO().getUserId();
+                            if (usuarioLogeado != seg.getUsuarioMedico()) {
+                                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                                        getResources().getString(R.string.msj_usuario_logueado_diferente_a_usuario_medico),
+                                        String.valueOf(seg.getControlDia())),
+                                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                                return;
+                            }
+                            if ((seg.getConsultaInicial() == null || seg.getConsultaInicial().trim().equals("Seleccione")) ||
+                                    (seg.getFiebre() == null || seg.getFiebre().trim().equals("Seleccione")) ||
+                                    (seg.getFiebre() == null || seg.getFiebre().trim().equals("Seleccione")) ||
+                                    (seg.getTos() == null || seg.getTos().trim().equals("Seleccione")) ||
+                                    (seg.getSecrecionNasal() == null || seg.getSecrecionNasal().trim().equals("Seleccione")) ||
+                                    (seg.getDolorGarganta() == null || seg.getDolorGarganta().trim().equals("Seleccione")) ||
+                                    (seg.getCongestionNasa() == null || seg.getCongestionNasa().trim().equals("Seleccione")) ||
+                                    (seg.getDolorCabeza() == null || seg.getDolorCabeza().trim().equals("Seleccione")) ||
+                                    (seg.getFaltaApetito() == null || seg.getFaltaApetito().trim().equals("Seleccione")) ||
+                                    (seg.getDolorMuscular() == null || seg.getDolorMuscular().trim().equals("Seleccione")) ||
+                                    (seg.getDolorArticular() == null || seg.getDolorArticular().trim().equals("Seleccione")) ||
+                                    (seg.getDolorOido() == null || seg.getDolorOido().trim().equals("Seleccione")) ||
+                                    (seg.getRespiracionRapida() == null || seg.getRespiracionRapida().trim().equals("Seleccione")) ||
+                                    (seg.getFaltaEscuela() == null || seg.getFaltaEscuela().trim().equals("Seleccione")) ||
+                                    (seg.getQuedoEnCama() == null || seg.getQuedoEnCama().trim().equals("Seleccione"))) {
+                                MensajesHelper.mostrarMensajeInfo(getActivity(), String.format(
+                                        getResources().getString(R.string.msj_aviso_requerido_dia_seguimiento),
+                                        String.valueOf(seg.getControlDia())),
+                                        getActivity().getResources().getString(R.string.title_estudio_sostenible), null);
+                                return;
+                            }
+                        }
+                    }
+
+                    boolean resultIntesidad = verificarIntensidadSintomas(lstSeg);
+
+                    if (verificarDiasContinuos(lstSeg) && resultIntesidad) {
                         hojaInfluenza.setLstSeguimientoInfluenza(lstSeg);
                         mSeguimientoInfluenzaActivity.mGuardarSeguimientoTask = (GuardarSeguimientoTask) new
                                 GuardarSeguimientoTask(mSeguimientoInfluenzaActivity).execute(hojaInfluenza);
                     }
                 }
             }
+        }
+
+        /**
+         * Metodo para verificar que se marque la intesidad de los sintomas cuando este presente(Fiebre,
+         * Tos, Secrecion Nasal, Dolor de Garganta, Dolor de Cabeza, Dolor Muscular ó Dolor Articular)
+         */
+        public boolean verificarIntensidadSintomas(ArrayList<SeguimientoInfluenzaDTO> lstSeg) {
+            SeguimientoInfluenzaDTO seguimientoInfluenzaByDias = new SeguimientoInfluenzaDTO();
+            for (int i = 0; i < lstSeg.size(); i++) {
+                seguimientoInfluenzaByDias = lstSeg.get(i);
+                if (seguimientoInfluenzaByDias.getControlDia() == 1) {
+                    //Fiebre
+                    if (seguimientoInfluenzaByDias.getFiebre().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getFiebreLeve() == null
+                                && seguimientoInfluenzaByDias.getFiebreModerada() == null
+                                && seguimientoInfluenzaByDias.getFiebreSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_fiebre)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Tos
+                    if (seguimientoInfluenzaByDias.getTos().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getTosLeve() == null
+                                && seguimientoInfluenzaByDias.getTosModerada() == null
+                                && seguimientoInfluenzaByDias.getTosSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_tos)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Secrecion Nasal
+                    if (seguimientoInfluenzaByDias.getSecrecionNasal().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getSecrecionNasalLeve() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalModerada() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_secrecion_nasal)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Garganta
+                    if (seguimientoInfluenzaByDias.getDolorGarganta().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorGargantaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_garganta)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Cabeza
+                    if (seguimientoInfluenzaByDias.getDolorCabeza().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorCabezaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_cabeza)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Muscular
+                    if (seguimientoInfluenzaByDias.getDolorMuscular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorMuscularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_muscular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Articular
+                    if (seguimientoInfluenzaByDias.getDolorArticular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorArticularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_articular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                }
+                if (seguimientoInfluenzaByDias.getControlDia() == 2) {
+                    //Fiebre
+                    if (seguimientoInfluenzaByDias.getFiebre().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getFiebreLeve() == null
+                                && seguimientoInfluenzaByDias.getFiebreModerada() == null
+                                && seguimientoInfluenzaByDias.getFiebreSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_fiebre)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Tos
+                    if (seguimientoInfluenzaByDias.getTos().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getTosLeve() == null
+                                && seguimientoInfluenzaByDias.getTosModerada() == null
+                                && seguimientoInfluenzaByDias.getTosSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_tos)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Secrecion Nasal
+                    if (seguimientoInfluenzaByDias.getSecrecionNasal().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getSecrecionNasalLeve() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalModerada() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_secrecion_nasal)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Garganta
+                    if (seguimientoInfluenzaByDias.getDolorGarganta().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorGargantaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_garganta)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Cabeza
+                    if (seguimientoInfluenzaByDias.getDolorCabeza().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorCabezaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_cabeza)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Muscular
+                    if (seguimientoInfluenzaByDias.getDolorMuscular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorMuscularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_muscular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Articular
+                    if (seguimientoInfluenzaByDias.getDolorArticular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorArticularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_articular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                }
+                if (seguimientoInfluenzaByDias.getControlDia() == 3) {
+                    //Fiebre
+                    if (seguimientoInfluenzaByDias.getFiebre().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getFiebreLeve() == null
+                                && seguimientoInfluenzaByDias.getFiebreModerada() == null
+                                && seguimientoInfluenzaByDias.getFiebreSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_fiebre)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Tos
+                    if (seguimientoInfluenzaByDias.getTos().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getTosLeve() == null
+                                && seguimientoInfluenzaByDias.getTosModerada() == null
+                                && seguimientoInfluenzaByDias.getTosSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_tos)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Secrecion Nasal
+                    if (seguimientoInfluenzaByDias.getSecrecionNasal().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getSecrecionNasalLeve() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalModerada() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_secrecion_nasal)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Garganta
+                    if (seguimientoInfluenzaByDias.getDolorGarganta().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorGargantaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_garganta)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Cabeza
+                    if (seguimientoInfluenzaByDias.getDolorCabeza().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorCabezaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_cabeza)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Muscular
+                    if (seguimientoInfluenzaByDias.getDolorMuscular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorMuscularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_muscular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Articular
+                    if (seguimientoInfluenzaByDias.getDolorArticular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorArticularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_articular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                }
+                if (seguimientoInfluenzaByDias.getControlDia() == 4) {
+                    //Fiebre
+                    if (seguimientoInfluenzaByDias.getFiebre().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getFiebreLeve() == null
+                                && seguimientoInfluenzaByDias.getFiebreModerada() == null
+                                && seguimientoInfluenzaByDias.getFiebreSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_fiebre)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Tos
+                    if (seguimientoInfluenzaByDias.getTos().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getTosLeve() == null
+                                && seguimientoInfluenzaByDias.getTosModerada() == null
+                                && seguimientoInfluenzaByDias.getTosSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_tos)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Secrecion Nasal
+                    if (seguimientoInfluenzaByDias.getSecrecionNasal().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getSecrecionNasalLeve() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalModerada() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_secrecion_nasal)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Garganta
+                    if (seguimientoInfluenzaByDias.getDolorGarganta().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorGargantaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_garganta)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Cabeza
+                    if (seguimientoInfluenzaByDias.getDolorCabeza().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorCabezaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_cabeza)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Muscular
+                    if (seguimientoInfluenzaByDias.getDolorMuscular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorMuscularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_muscular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Articular
+                    if (seguimientoInfluenzaByDias.getDolorArticular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorArticularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_articular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                }
+                if (seguimientoInfluenzaByDias.getControlDia() == 5) {
+                    //Fiebre
+                    if (seguimientoInfluenzaByDias.getFiebre().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getFiebreLeve() == null
+                                && seguimientoInfluenzaByDias.getFiebreModerada() == null
+                                && seguimientoInfluenzaByDias.getFiebreSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_fiebre)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Tos
+                    if (seguimientoInfluenzaByDias.getTos().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getTosLeve() == null
+                                && seguimientoInfluenzaByDias.getTosModerada() == null
+                                && seguimientoInfluenzaByDias.getTosSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_tos)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Secrecion Nasal
+                    if (seguimientoInfluenzaByDias.getSecrecionNasal().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getSecrecionNasalLeve() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalModerada() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_secrecion_nasal)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Garganta
+                    if (seguimientoInfluenzaByDias.getDolorGarganta().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorGargantaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_garganta)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Cabeza
+                    if (seguimientoInfluenzaByDias.getDolorCabeza().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorCabezaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_cabeza)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Muscular
+                    if (seguimientoInfluenzaByDias.getDolorMuscular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorMuscularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_muscular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Articular
+                    if (seguimientoInfluenzaByDias.getDolorArticular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorArticularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_articular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+
+                }
+                if (seguimientoInfluenzaByDias.getControlDia() == 6) {
+                    //Fiebre
+                    if (seguimientoInfluenzaByDias.getFiebre().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getFiebreLeve() == null
+                                && seguimientoInfluenzaByDias.getFiebreModerada() == null
+                                && seguimientoInfluenzaByDias.getFiebreSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_fiebre)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Tos
+                    if (seguimientoInfluenzaByDias.getTos().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getTosLeve() == null
+                                && seguimientoInfluenzaByDias.getTosModerada() == null
+                                && seguimientoInfluenzaByDias.getTosSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_tos)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Secrecion Nasal
+                    if (seguimientoInfluenzaByDias.getSecrecionNasal().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getSecrecionNasalLeve() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalModerada() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_secrecion_nasal)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Garganta
+                    if (seguimientoInfluenzaByDias.getDolorGarganta().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorGargantaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_garganta)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Cabeza
+                    if (seguimientoInfluenzaByDias.getDolorCabeza().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorCabezaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_cabeza)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Muscular
+                    if (seguimientoInfluenzaByDias.getDolorMuscular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorMuscularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_muscular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Articular
+                    if (seguimientoInfluenzaByDias.getDolorArticular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorArticularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_articular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                }
+                if (seguimientoInfluenzaByDias.getControlDia() == 7) {
+                    //Fiebre
+                    if (seguimientoInfluenzaByDias.getFiebre().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getFiebreLeve() == null
+                                && seguimientoInfluenzaByDias.getFiebreModerada() == null
+                                && seguimientoInfluenzaByDias.getFiebreSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_fiebre)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Tos
+                    if (seguimientoInfluenzaByDias.getTos().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getTosLeve() == null
+                                && seguimientoInfluenzaByDias.getTosModerada() == null
+                                && seguimientoInfluenzaByDias.getTosSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_tos)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Secrecion Nasal
+                    if (seguimientoInfluenzaByDias.getSecrecionNasal().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getSecrecionNasalLeve() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalModerada() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_secrecion_nasal)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Garganta
+                    if (seguimientoInfluenzaByDias.getDolorGarganta().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorGargantaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_garganta)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Cabeza
+                    if (seguimientoInfluenzaByDias.getDolorCabeza().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorCabezaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_cabeza)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Muscular
+                    if (seguimientoInfluenzaByDias.getDolorMuscular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorMuscularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_muscular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Articular
+                    if (seguimientoInfluenzaByDias.getDolorArticular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorArticularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_articular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                }
+                if (seguimientoInfluenzaByDias.getControlDia() == 8) {
+                    //Fiebre
+                    if (seguimientoInfluenzaByDias.getFiebre().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getFiebreLeve() == null
+                                && seguimientoInfluenzaByDias.getFiebreModerada() == null
+                                && seguimientoInfluenzaByDias.getFiebreSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_fiebre)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Tos
+                    if (seguimientoInfluenzaByDias.getTos().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getTosLeve() == null
+                                && seguimientoInfluenzaByDias.getTosModerada() == null
+                                && seguimientoInfluenzaByDias.getTosSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_tos)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Secrecion Nasal
+                    if (seguimientoInfluenzaByDias.getSecrecionNasal().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getSecrecionNasalLeve() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalModerada() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_secrecion_nasal)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Garganta
+                    if (seguimientoInfluenzaByDias.getDolorGarganta().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorGargantaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_garganta)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Cabeza
+                    if (seguimientoInfluenzaByDias.getDolorCabeza().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorCabezaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_cabeza)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Muscular
+                    if (seguimientoInfluenzaByDias.getDolorMuscular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorMuscularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_muscular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Articular
+                    if (seguimientoInfluenzaByDias.getDolorArticular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorArticularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_articular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                }
+                if (seguimientoInfluenzaByDias.getControlDia() == 9) {
+                    //Fiebre
+                    if (seguimientoInfluenzaByDias.getFiebre().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getFiebreLeve() == null
+                                && seguimientoInfluenzaByDias.getFiebreModerada() == null
+                                && seguimientoInfluenzaByDias.getFiebreSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_fiebre)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Tos
+                    if (seguimientoInfluenzaByDias.getTos().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getTosLeve() == null
+                                && seguimientoInfluenzaByDias.getTosModerada() == null
+                                && seguimientoInfluenzaByDias.getTosSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_tos)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Secrecion Nasal
+                    if (seguimientoInfluenzaByDias.getSecrecionNasal().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getSecrecionNasalLeve() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalModerada() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_secrecion_nasal)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Garganta
+                    if (seguimientoInfluenzaByDias.getDolorGarganta().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorGargantaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_garganta)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Cabeza
+                    if (seguimientoInfluenzaByDias.getDolorCabeza().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorCabezaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_cabeza)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Muscular
+                    if (seguimientoInfluenzaByDias.getDolorMuscular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorMuscularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_muscular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Articular
+                    if (seguimientoInfluenzaByDias.getDolorArticular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorArticularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_articular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                }
+                if (seguimientoInfluenzaByDias.getControlDia() == 10) {
+                    //Fiebre
+                    if (seguimientoInfluenzaByDias.getFiebre().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getFiebreLeve() == null
+                                && seguimientoInfluenzaByDias.getFiebreModerada() == null
+                                && seguimientoInfluenzaByDias.getFiebreSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_fiebre)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Tos
+                    if (seguimientoInfluenzaByDias.getTos().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getTosLeve() == null
+                                && seguimientoInfluenzaByDias.getTosModerada() == null
+                                && seguimientoInfluenzaByDias.getTosSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_tos)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Secrecion Nasal
+                    if (seguimientoInfluenzaByDias.getSecrecionNasal().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getSecrecionNasalLeve() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalModerada() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_secrecion_nasal)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Garganta
+                    if (seguimientoInfluenzaByDias.getDolorGarganta().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorGargantaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_garganta)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Cabeza
+                    if (seguimientoInfluenzaByDias.getDolorCabeza().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorCabezaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_cabeza)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Muscular
+                    if (seguimientoInfluenzaByDias.getDolorMuscular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorMuscularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_muscular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Articular
+                    if (seguimientoInfluenzaByDias.getDolorArticular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorArticularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_articular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                }
+                if (seguimientoInfluenzaByDias.getControlDia() == 11) {
+                    //Fiebre
+                    if (seguimientoInfluenzaByDias.getFiebre().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getFiebreLeve() == null
+                                && seguimientoInfluenzaByDias.getFiebreModerada() == null
+                                && seguimientoInfluenzaByDias.getFiebreSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_fiebre)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Tos
+                    if (seguimientoInfluenzaByDias.getTos().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getTosLeve() == null
+                                && seguimientoInfluenzaByDias.getTosModerada() == null
+                                && seguimientoInfluenzaByDias.getTosSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_tos)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Secrecion Nasal
+                    if (seguimientoInfluenzaByDias.getSecrecionNasal().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getSecrecionNasalLeve() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalModerada() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_secrecion_nasal)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Garganta
+                    if (seguimientoInfluenzaByDias.getDolorGarganta().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorGargantaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_garganta)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Cabeza
+                    if (seguimientoInfluenzaByDias.getDolorCabeza().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorCabezaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_cabeza)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Muscular
+                    if (seguimientoInfluenzaByDias.getDolorMuscular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorMuscularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_muscular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Articular
+                    if (seguimientoInfluenzaByDias.getDolorArticular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorArticularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_articular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                }
+                if (seguimientoInfluenzaByDias.getControlDia() == 12) {
+                    //Fiebre
+                    if (seguimientoInfluenzaByDias.getFiebre().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getFiebreLeve() == null
+                                && seguimientoInfluenzaByDias.getFiebreModerada() == null
+                                && seguimientoInfluenzaByDias.getFiebreSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_fiebre)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Tos
+                    if (seguimientoInfluenzaByDias.getTos().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getTosLeve() == null
+                                && seguimientoInfluenzaByDias.getTosModerada() == null
+                                && seguimientoInfluenzaByDias.getTosSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_tos)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Secrecion Nasal
+                    if (seguimientoInfluenzaByDias.getSecrecionNasal().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getSecrecionNasalLeve() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalModerada() == null
+                                && seguimientoInfluenzaByDias.getSecrecionNasalSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_secrecion_nasal)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Garganta
+                    if (seguimientoInfluenzaByDias.getDolorGarganta().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorGargantaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorGargantaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_garganta)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Cabeza
+                    if (seguimientoInfluenzaByDias.getDolorCabeza().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorCabezaLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorCabezaSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_cabeza)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Muscular
+                    if (seguimientoInfluenzaByDias.getDolorMuscular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorMuscularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorMuscularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_muscular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                    //Dolor Articular
+                    if (seguimientoInfluenzaByDias.getDolorArticular().trim().equals("S") && seguimientoInfluenzaByDias.getSecHojaInfluenza() <= 0) {
+                        if (seguimientoInfluenzaByDias.getDolorArticularLeve() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularModerada() == null
+                                && seguimientoInfluenzaByDias.getDolorArticularSevera() == null) {
+                            //Retornamos mensaje
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    getResources().getString(R.string.mensaje_dolor_articular)+ " día " + seguimientoInfluenzaByDias.getControlDia(), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    null);
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
         }
 
         /**
@@ -1071,6 +2249,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 private ConnectivityManager CM = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
                 private NetworkInfo NET_INFO = CM.getActiveNetworkInfo();
                 private SeguimientoInfluenzaWS SEGUIMIENTO  = new SeguimientoInfluenzaWS(getResources());
+                private ErrorDTO RESPUESTA = new ErrorDTO();
 
                 @Override
                 protected void onPreExecute() {
@@ -1086,7 +2265,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 protected Void doInBackground(Void... params) {
                     if (NET_INFO != null && NET_INFO.isConnected())
                     {
-                        SEGUIMIENTO.ImprimirHojaSeguimientoPdf(mSeguimientoInfluenzaActivity.mNumSeg);
+                        RESPUESTA = SEGUIMIENTO.ImprimirHojaSeguimientoPdf(mSeguimientoInfluenzaActivity.mNumSeg);
                     }
 
                     return null;
@@ -1096,15 +2275,33 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 protected void onPostExecute(Void result){
                     PD.dismiss();
                     try {
-                        MensajesHelper.mostrarMensajeInfo(getActivity(),
+                        if (RESPUESTA.getCodigoError().intValue() == 0){
+                            MensajesHelper.mostrarMensajeOk(getActivity(),
+                                    RESPUESTA.getMensajeError(),getResources().getString(
+                                            R.string.title_estudio_sostenible), null);
+                        } /*else if (RESPUESTA.getCodigoError().intValue() == 1) {
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    RESPUESTA.getMensajeError(),getResources().getString(
+                                            R.string.title_estudio_sostenible), null);
+                        }*/ else {
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    RESPUESTA.getMensajeError(),getResources().getString(
+                                            R.string.title_estudio_sostenible), null);
+                        }
+                        /*MensajesHelper.mostrarMensajeInfo(getActivity(),
                                 "Se envio la Hoja de seguimiento a impresión", getResources().getString(
-                                        R.string.app_name), null);
+                                        R.string.app_name), null);*/
 
-                    }catch(Exception e){
+                    }catch (IllegalArgumentException iae) {
+                        iae.printStackTrace();
+                    } catch (NullPointerException npe) {
+                        npe.printStackTrace();
+                    }
+                    /*catch(Exception e){
                         MensajesHelper.mostrarMensajeInfo(getActivity(),
                                 "Ocurrio un problema al intentar imprimir", getResources().getString(
                                         R.string.app_name), null);
-                    }
+                    }*/
 
                 }
             };
@@ -1627,6 +2824,321 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 }
             }
 
+            // Funcion para confirmar el cambio de todos los valores del seguimiento influenza
+            public void confirmation(final int value){
+                try{
+                    DialogInterface.OnClickListener questionDialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which){
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    setValuesSintomas(value);
+                                    break;
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    break;
+                            }
+                        }
+                    };
+
+                    switch (value) {
+                        case 1:
+                            MensajesHelper.mostrarMensajeYesNo(CONTEXT,
+                                    String.format(getResources().getString(R.string.msg_change_flu_yes2), mPage), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    questionDialogClickListener);
+                            break;
+
+                        case 2:
+                            MensajesHelper.mostrarMensajeYesNo(CONTEXT,
+                                    String.format(getResources().getString(R.string.msg_change_flu_no2), mPage),  getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    questionDialogClickListener);
+                            break;
+
+                        case 3:
+                            MensajesHelper.mostrarMensajeYesNo(CONTEXT,
+                                    String.format(getResources().getString(R.string.msg_change_flu_desc2), mPage), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    questionDialogClickListener);
+                            break;
+                        case 4:
+                            MensajesHelper.mostrarMensajeYesNo(CONTEXT,
+                                    String.format(getResources().getString(R.string.msg_change_flu_no_aplica2), mPage), getResources().getString(
+                                            R.string.title_estudio_sostenible),
+                                    questionDialogClickListener);
+                            break;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    MensajesHelper.mostrarMensajeError(CONTEXT, e.getMessage(), getString(R.string.title_estudio_sostenible), null);
+                }
+
+            }
+
+            // Funcion para cambiar todos los valores del seguimiento influenza
+            public void setValuesSintomas(int value) {
+                switch (mPage) {
+                    case 1:
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia1Fila15)).setSelection(value);
+                        if (value != 0) {
+                            loadSpinners(value);
+                        }
+                        break;
+                    case 2:
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia2Fila15)).setSelection(value);
+                        if (value != 0){
+                            loadSpinners(value);
+                        }
+                        break;
+                    case 3:
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia3Fila15)).setSelection(value);
+                        if (value != 0){
+                            loadSpinners(value);
+                        }
+                        break;
+                    case 4:
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia4Fila15)).setSelection(value);
+                        if (value != 0){
+                            loadSpinners(value);
+                        }
+                        break;
+                    case 5:
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia5Fila15)).setSelection(value);
+                        if (value != 0){
+                            loadSpinners(value);
+                        }
+                        break;
+                    case 6:
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia6Fila15)).setSelection(value);
+                        if (value != 0){
+                            loadSpinners(value);
+                        }
+                        break;
+                    case 7:
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia7Fila15)).setSelection(value);
+                        if (value != 0){
+                            loadSpinners(value);
+                        }
+                        break;
+                    case 8:
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia8Fila15)).setSelection(value);
+                        if (value != 0){
+                            loadSpinners(value);
+                        }
+                        break;
+                    case 9:
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia9Fila15)).setSelection(value);
+                        if (value != 0){
+                            loadSpinners(value);
+                        }
+                        break;
+                    case 10:
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia10Fila15)).setSelection(value);
+                        if (value != 0){
+                            loadSpinners(value);
+                        }
+                        break;
+                    case 11:
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia11Fila15)).setSelection(value);
+                        if (value != 0){
+                            loadSpinners(value);
+                        }
+                        break;
+                    case 12:
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila1)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila2)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila3)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila4)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila5)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila6)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila7)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila8)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila9)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila10)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila11)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila12)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila13)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila14)).setSelection(value);
+                        ((Spinner) getActivity().findViewById(R.id.spnDia12Fila15)).setSelection(value);
+                        if (value != 0){
+                            loadSpinners(value);
+                        }
+                        break;
+                }
+            }
+
+            public void loadSpinners(int value){
+                cargarConsultaInicial(value);
+                cargarFiebre(value);
+                cargarTos(value);
+                cargarSecrecionNasal(value);
+                cargarDolorGarganta(value);
+                cargarCongestionNasal(value);
+                cargarDolorCabeza(value);
+                cargarFaltaApetito(value);
+                cargarDolorMuscular(value);
+                cargarDolorArticular(value);
+                cargarDolorOido(value);
+                cargarRespiracionRapida(value);
+                cargarDificultadRespirar(value);
+                cargarFaltaEscuela(value);
+                cargarQuedoEnCama(value);
+            }
+
             public void establecerBotones() {
                 //botones para la busqueda de los médicos
                 switch (mPage) {
@@ -1643,6 +3155,39 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                                 DlogBuscar.show(fm, "Buscar");
                             }
                         });
+
+                        TextView txtvPosSegFlu1 = (TextView) getActivity().findViewById(R.id.txtvPosSegFlu1);
+                        TextView txtvNegSegFlu1 = (TextView) getActivity().findViewById(R.id.txtvNegSegFlu1);
+                        TextView txtvDesSegFlu1 = (TextView) getActivity().findViewById(R.id.txtvDesSegFlu1);
+                        TextView txtvNoAplicaSegFlu1 = (TextView) getActivity().findViewById(R.id.txtvNoAplicaSegFlu1);
+
+                        txtvPosSegFlu1.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtvNegSegFlu1.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtvDesSegFlu1.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
+
+                        txtvNoAplicaSegFlu1.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(4);
+                            }
+                        });
                         break;
                     case 2:
                         ImageButton imgBusquedaMedico2 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico2);
@@ -1655,6 +3200,38 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 DlogBuscar.setTargetFragment(mCorrienteFragmento, 0);
                                 DlogBuscar.show(fm, "Buscar");
+                            }
+                        });
+
+                        TextView txtvPosSegFlu2 = (TextView) getActivity().findViewById(R.id.txtvPosSegFlu2);
+                        TextView txtvNegSegFlu2 = (TextView) getActivity().findViewById(R.id.txtvNegSegFlu2);
+                        TextView txtvDesSegFlu2 = (TextView) getActivity().findViewById(R.id.txtvDesSegFlu2);
+                        TextView txtvNoAplicaSegFlu2 = (TextView) getActivity().findViewById(R.id.txtvNoAplicaSegFlu2);
+                        txtvPosSegFlu2.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtvNegSegFlu2.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtvDesSegFlu2.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
+
+                        txtvNoAplicaSegFlu2.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(4);
                             }
                         });
                         break;
@@ -1671,6 +3248,39 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                                 DlogBuscar.show(fm, "Buscar");
                             }
                         });
+
+                        TextView txtvPosSegFlu3 = (TextView) getActivity().findViewById(R.id.txtvPosSegFlu3);
+                        TextView txtvNegSegFlu3 = (TextView) getActivity().findViewById(R.id.txtvNegSegFlu3);
+                        TextView txtvDesSegFlu3 = (TextView) getActivity().findViewById(R.id.txtvDesSegFlu3);
+                        TextView txtvNoAplicaSegFlu3 = (TextView) getActivity().findViewById(R.id.txtvNoAplicaSegFlu3);
+
+                        txtvPosSegFlu3.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtvNegSegFlu3.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtvDesSegFlu3.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
+
+                        txtvNoAplicaSegFlu3.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(4);
+                            }
+                        });
                         break;
                     case 4:
                         ImageButton imgBusquedaMedico4 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico4);
@@ -1683,6 +3293,39 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 DlogBuscar.setTargetFragment(mCorrienteFragmento, 0);
                                 DlogBuscar.show(fm, "Buscar");
+                            }
+                        });
+
+                        TextView txtvPosSegFlu4 = (TextView) getActivity().findViewById(R.id.txtvPosSegFlu4);
+                        TextView txtvNegSegFlu4 = (TextView) getActivity().findViewById(R.id.txtvNegSegFlu4);
+                        TextView txtvDesSegFlu4 = (TextView) getActivity().findViewById(R.id.txtvDesSegFlu4);
+                        TextView txtvNoAplicaSegFlu4 = (TextView) getActivity().findViewById(R.id.txtvNoAplicaSegFlu4);
+
+                        txtvPosSegFlu4.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtvNegSegFlu4.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtvDesSegFlu4.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
+
+                        txtvNoAplicaSegFlu4.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(4);
                             }
                         });
                         break;
@@ -1699,6 +3342,39 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                                 DlogBuscar.show(fm, "Buscar");
                             }
                         });
+
+                        TextView txtvPosSegFlu5 = (TextView) getActivity().findViewById(R.id.txtvPosSegFlu5);
+                        TextView txtvNegSegFlu5 = (TextView) getActivity().findViewById(R.id.txtvNegSegFlu5);
+                        TextView txtvDesSegFlu5 = (TextView) getActivity().findViewById(R.id.txtvDesSegFlu5);
+                        TextView txtvNoAplicaSegFlu5 = (TextView) getActivity().findViewById(R.id.txtvNoAplicaSegFlu5);
+
+                        txtvPosSegFlu5.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtvNegSegFlu5.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtvDesSegFlu5.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
+
+                        txtvNoAplicaSegFlu5.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(4);
+                            }
+                        });
                         break;
                     case 6:
                         ImageButton imgBusquedaMedico6 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico6);
@@ -1711,6 +3387,39 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 DlogBuscar.setTargetFragment(mCorrienteFragmento, 0);
                                 DlogBuscar.show(fm, "Buscar");
+                            }
+                        });
+
+                        TextView txtvPosSegFlu6 = (TextView) getActivity().findViewById(R.id.txtvPosSegFlu6);
+                        TextView txtvNegSegFlu6 = (TextView) getActivity().findViewById(R.id.txtvNegSegFlu6);
+                        TextView txtvDesSegFlu6 = (TextView) getActivity().findViewById(R.id.txtvDesSegFlu6);
+                        TextView txtvNoAplicaSegFlu6 = (TextView) getActivity().findViewById(R.id.txtvNoAplicaSegFlu6);
+
+                        txtvPosSegFlu6.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtvNegSegFlu6.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtvDesSegFlu6.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
+
+                        txtvNoAplicaSegFlu6.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(4);
                             }
                         });
                         break;
@@ -1727,6 +3436,39 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                                 DlogBuscar.show(fm, "Buscar");
                             }
                         });
+
+                        TextView txtvPosSegFlu7 = (TextView) getActivity().findViewById(R.id.txtvPosSegFlu7);
+                        TextView txtvNegSegFlu7 = (TextView) getActivity().findViewById(R.id.txtvNegSegFlu7);
+                        TextView txtvDesSegFlu7 = (TextView) getActivity().findViewById(R.id.txtvDesSegFlu7);
+                        TextView txtvNoAplicaSegFlu7 = (TextView) getActivity().findViewById(R.id.txtvNoAplicaSegFlu7);
+
+                        txtvPosSegFlu7.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtvNegSegFlu7.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtvDesSegFlu7.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
+
+                        txtvNoAplicaSegFlu7.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(4);
+                            }
+                        });
                         break;
                     case 8:
                         ImageButton imgBusquedaMedico8 = (ImageButton) getActivity().findViewById(R.id.imgBusquedaMedico8);
@@ -1739,6 +3481,39 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 DlogBuscar.setTargetFragment(mCorrienteFragmento, 0);
                                 DlogBuscar.show(fm, "Buscar");
+                            }
+                        });
+
+                        TextView txtvPosSegFlu8 = (TextView) getActivity().findViewById(R.id.txtvPosSegFlu8);
+                        TextView txtvNegSegFlu8 = (TextView) getActivity().findViewById(R.id.txtvNegSegFlu8);
+                        TextView txtvDesSegFlu8 = (TextView) getActivity().findViewById(R.id.txtvDesSegFlu8);
+                        TextView txtvNoAplicaSegFlu8 = (TextView) getActivity().findViewById(R.id.txtvNoAplicaSegFlu8);
+
+                        txtvPosSegFlu8.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtvNegSegFlu8.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtvDesSegFlu8.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
+
+                        txtvNoAplicaSegFlu8.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(4);
                             }
                         });
                         break;
@@ -1756,6 +3531,39 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                                 DlogBuscar.show(fm, "Buscar");
                             }
                         });
+
+                        TextView txtvPosSegFlu9 = (TextView) getActivity().findViewById(R.id.txtvPosSegFlu9);
+                        TextView txtvNegSegFlu9 = (TextView) getActivity().findViewById(R.id.txtvNegSegFlu9);
+                        TextView txtvDesSegFlu9 = (TextView) getActivity().findViewById(R.id.txtvDesSegFlu9);
+                        TextView txtvNoAplicaSegFlu9 = (TextView) getActivity().findViewById(R.id.txtvNoAplicaSegFlu9);
+
+                        txtvPosSegFlu9.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtvNegSegFlu9.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtvDesSegFlu9.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
+
+                        txtvNoAplicaSegFlu9.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(4);
+                            }
+                        });
                         break;
 
                     case 10:
@@ -1769,6 +3577,39 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 DlogBuscar.setTargetFragment(mCorrienteFragmento, 0);
                                 DlogBuscar.show(fm, "Buscar");
+                            }
+                        });
+
+                        TextView txtvPosSegFlu10 = (TextView) getActivity().findViewById(R.id.txtvPosSegFlu10);
+                        TextView txtvNegSegFlu10 = (TextView) getActivity().findViewById(R.id.txtvNegSegFlu10);
+                        TextView txtvDesSegFlu10 = (TextView) getActivity().findViewById(R.id.txtvDesSegFlu10);
+                        TextView txtvNoAplicaSegFlu10 = (TextView) getActivity().findViewById(R.id.txtvNoAplicaSegFlu10);
+
+                        txtvPosSegFlu10.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtvNegSegFlu10.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtvDesSegFlu10.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
+
+                        txtvNoAplicaSegFlu10.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(4);
                             }
                         });
                         break;
@@ -1785,6 +3626,39 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                                 DlogBuscar.show(fm, "Buscar");
                             }
                         });
+
+                        TextView txtvPosSegFlu11 = (TextView) getActivity().findViewById(R.id.txtvPosSegFlu11);
+                        TextView txtvNegSegFlu11 = (TextView) getActivity().findViewById(R.id.txtvNegSegFlu11);
+                        TextView txtvDesSegFlu11 = (TextView) getActivity().findViewById(R.id.txtvDesSegFlu11);
+                        TextView txtvNoAplicaSegFlu11 = (TextView) getActivity().findViewById(R.id.txtvNoAplicaSegFlu11);
+
+                        txtvPosSegFlu11.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtvNegSegFlu11.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtvDesSegFlu11.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
+
+                        txtvNoAplicaSegFlu11.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(4);
+                            }
+                        });
                         break;
 
                     case 12:
@@ -1798,6 +3672,39 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                                 FragmentManager fm = getActivity().getSupportFragmentManager();
                                 DlogBuscar.setTargetFragment(mCorrienteFragmento, 0);
                                 DlogBuscar.show(fm, "Buscar");
+                            }
+                        });
+
+                        TextView txtvPosSegFlu12 = (TextView) getActivity().findViewById(R.id.txtvPosSegFlu12);
+                        TextView txtvNegSegFlu12 = (TextView) getActivity().findViewById(R.id.txtvNegSegFlu12);
+                        TextView txtvDesSegFlu12 = (TextView) getActivity().findViewById(R.id.txtvDesSegFlu12);
+                        TextView txtvNoAplicaSegFlu12 = (TextView) getActivity().findViewById(R.id.txtvNoAplicaSegFlu12);
+
+                        txtvPosSegFlu12.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(1);
+                            }
+                        });
+
+                        txtvNegSegFlu12.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(2);
+                            }
+                        });
+
+                        txtvDesSegFlu12.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(3);
+                            }
+                        });
+
+                        txtvNoAplicaSegFlu12.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                confirmation(4);
                             }
                         });
                         break;
@@ -2450,6 +4357,179 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 });
 
 
+                /*FIEBRE DIA 1*/
+                View.OnClickListener onClickChkFiebreLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreLeveDia1).setOnClickListener(onClickChkFiebreLeve);
+
+                View.OnClickListener onClickChkFiebreModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreModeradaDia1).setOnClickListener(onClickChkFiebreModerada);
+
+                View.OnClickListener onClickChkFiebreSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreSeveraDia1).setOnClickListener(onClickChkFiebreSevera);
+                /*-------------------------------*/
+                /*TOS DIA 1*/
+                View.OnClickListener onClickChkTosLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosLeveDia1).setOnClickListener(onClickChkTosLeve);
+
+                View.OnClickListener onClickChkTosModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosModeradaDia1).setOnClickListener(onClickChkTosModerada);
+
+                View.OnClickListener onClickChkTosSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosSeveraDia1).setOnClickListener(onClickChkTosSevera);
+                /*-------------------------------*/
+                /*SECRECION NASAL DIA 1*/
+                View.OnClickListener onClickChkSecrecionNasalLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalLeveDia1).setOnClickListener(onClickChkSecrecionNasalLeve);
+
+                View.OnClickListener onClickChkSecrecionNasalModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia1).setOnClickListener(onClickChkSecrecionNasalModerada);
+
+                View.OnClickListener onClickChkSecrecionNasalSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia1).setOnClickListener(onClickChkSecrecionNasalSevera);
+                /*-------------------------------*/
+                /*DOLOR DE GARGANTA DIA 1*/
+                View.OnClickListener onClickChkDolorGargantaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaLeveDia1).setOnClickListener(onClickChkDolorGargantaLeve);
+
+                View.OnClickListener onClickChkDolorGargantaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaModeradaDia1).setOnClickListener(onClickChkDolorGargantaModerada);
+
+                View.OnClickListener onClickChkDolorGargantaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaSeveraDia1).setOnClickListener(onClickChkDolorGargantaSevera);
+                /*DOLOR DE CABEZA DIA 1*/
+                View.OnClickListener onClickChkDolorCabezaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaLeveDia1).setOnClickListener(onClickChkDolorCabezaLeve);
+
+                View.OnClickListener onClickChkDolorCabezaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaModeradaDia1).setOnClickListener(onClickChkDolorCabezaModerada);
+
+                View.OnClickListener onClickChkDolorCabezaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaSeveraDia1).setOnClickListener(onClickChkDolorCabezaSevera);
+
+                /*DOLOR DOLOR MUSCULAR DIA 1*/
+                View.OnClickListener onClickChkDolorMuscularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularLeveDia1).setOnClickListener(onClickChkDolorMuscularLeve);
+
+                View.OnClickListener onClickChkDolorMuscularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularModeradaDia1).setOnClickListener(onClickChkDolorMuscularModerada);
+
+                View.OnClickListener onClickChkDolorMuscularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularSeveraDia1).setOnClickListener(onClickChkDolorMuscularSevera);
+                /*DOLOR ARTICULAR DIA 1*/
+                View.OnClickListener onClickChkDolorArticularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularLeveDia1).setOnClickListener(onClickChkDolorArticularLeve);
+
+                View.OnClickListener onClickChkDolorArticularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularModeradaDia1).setOnClickListener(onClickChkDolorArticularModerada);
+
+                View.OnClickListener onClickChkDolorArticularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularSeveraDia1).setOnClickListener(onClickChkDolorArticularSevera);
+                /*-----------------------------*/
             }
 
             public void cargarDatosSintomasDia2() {
@@ -2633,7 +4713,179 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                     }
                 });
 
+                /*FIEBRE DIA 2*/
+                View.OnClickListener onClickChkFiebreLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreLeveDia2).setOnClickListener(onClickChkFiebreLeve);
 
+                View.OnClickListener onClickChkFiebreModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreModeradaDia2).setOnClickListener(onClickChkFiebreModerada);
+
+                View.OnClickListener onClickChkFiebreSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreSeveraDia2).setOnClickListener(onClickChkFiebreSevera);
+                /*-------------------------------*/
+                /*TOS DIA 2*/
+                View.OnClickListener onClickChkTosLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosLeveDia2).setOnClickListener(onClickChkTosLeve);
+
+                View.OnClickListener onClickChkTosModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosModeradaDia2).setOnClickListener(onClickChkTosModerada);
+
+                View.OnClickListener onClickChkTosSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosSeveraDia2).setOnClickListener(onClickChkTosSevera);
+                /*-------------------------------*/
+                /*SECRECION NASAL DIA 2*/
+                View.OnClickListener onClickChkSecrecionNasalLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalLeveDia2).setOnClickListener(onClickChkSecrecionNasalLeve);
+
+                View.OnClickListener onClickChkSecrecionNasalModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia2).setOnClickListener(onClickChkSecrecionNasalModerada);
+
+                View.OnClickListener onClickChkSecrecionNasalSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia2).setOnClickListener(onClickChkSecrecionNasalSevera);
+                /*-------------------------------*/
+                /*DOLOR DE GARGANTA DIA 2*/
+                View.OnClickListener onClickChkDolorGargantaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaLeveDia2).setOnClickListener(onClickChkDolorGargantaLeve);
+
+                View.OnClickListener onClickChkDolorGargantaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaModeradaDia2).setOnClickListener(onClickChkDolorGargantaModerada);
+
+                View.OnClickListener onClickChkDolorGargantaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaSeveraDia2).setOnClickListener(onClickChkDolorGargantaSevera);
+                /*DOLOR DE CABEZA DIA 2*/
+                View.OnClickListener onClickChkDolorCabezaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaLeveDia2).setOnClickListener(onClickChkDolorCabezaLeve);
+
+                View.OnClickListener onClickChkDolorCabezaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaModeradaDia2).setOnClickListener(onClickChkDolorCabezaModerada);
+
+                View.OnClickListener onClickChkDolorCabezaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaSeveraDia2).setOnClickListener(onClickChkDolorCabezaSevera);
+
+                /*DOLOR DOLOR MUSCULAR DIA 2*/
+                View.OnClickListener onClickChkDolorMuscularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularLeveDia2).setOnClickListener(onClickChkDolorMuscularLeve);
+
+                View.OnClickListener onClickChkDolorMuscularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularModeradaDia2).setOnClickListener(onClickChkDolorMuscularModerada);
+
+                View.OnClickListener onClickChkDolorMuscularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularSeveraDia2).setOnClickListener(onClickChkDolorMuscularSevera);
+                /*DOLOR ARTICULAR DIA 2*/
+                View.OnClickListener onClickChkDolorArticularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularLeveDia2).setOnClickListener(onClickChkDolorArticularLeve);
+
+                View.OnClickListener onClickChkDolorArticularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularModeradaDia2).setOnClickListener(onClickChkDolorArticularModerada);
+
+                View.OnClickListener onClickChkDolorArticularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularSeveraDia2).setOnClickListener(onClickChkDolorArticularSevera);
+                /*-----------------------------*/
             }
 
             public void cargarDatosSintomasDia3() {
@@ -2817,6 +5069,179 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                     }
                 });
 
+                /*FIEBRE DIA 3*/
+                View.OnClickListener onClickChkFiebreLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreLeveDia3).setOnClickListener(onClickChkFiebreLeve);
+
+                View.OnClickListener onClickChkFiebreModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreModeradaDia3).setOnClickListener(onClickChkFiebreModerada);
+
+                View.OnClickListener onClickChkFiebreSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreSeveraDia3).setOnClickListener(onClickChkFiebreSevera);
+                /*-------------------------------*/
+                /*TOS DIA 3*/
+                View.OnClickListener onClickChkTosLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosLeveDia3).setOnClickListener(onClickChkTosLeve);
+
+                View.OnClickListener onClickChkTosModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosModeradaDia3).setOnClickListener(onClickChkTosModerada);
+
+                View.OnClickListener onClickChkTosSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosSeveraDia3).setOnClickListener(onClickChkTosSevera);
+                /*-------------------------------*/
+                /*SECRECION NASAL DIA 3*/
+                View.OnClickListener onClickChkSecrecionNasalLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalLeveDia3).setOnClickListener(onClickChkSecrecionNasalLeve);
+
+                View.OnClickListener onClickChkSecrecionNasalModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia3).setOnClickListener(onClickChkSecrecionNasalModerada);
+
+                View.OnClickListener onClickChkSecrecionNasalSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia3).setOnClickListener(onClickChkSecrecionNasalSevera);
+                /*-------------------------------*/
+                /*DOLOR DE GARGANTA DIA 3*/
+                View.OnClickListener onClickChkDolorGargantaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaLeveDia3).setOnClickListener(onClickChkDolorGargantaLeve);
+
+                View.OnClickListener onClickChkDolorGargantaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaModeradaDia3).setOnClickListener(onClickChkDolorGargantaModerada);
+
+                View.OnClickListener onClickChkDolorGargantaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaSeveraDia3).setOnClickListener(onClickChkDolorGargantaSevera);
+                /*DOLOR DE CABEZA DIA 3*/
+                View.OnClickListener onClickChkDolorCabezaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaLeveDia3).setOnClickListener(onClickChkDolorCabezaLeve);
+
+                View.OnClickListener onClickChkDolorCabezaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaModeradaDia3).setOnClickListener(onClickChkDolorCabezaModerada);
+
+                View.OnClickListener onClickChkDolorCabezaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaSeveraDia3).setOnClickListener(onClickChkDolorCabezaSevera);
+
+                /*DOLOR DOLOR MUSCULAR DIA 3*/
+                View.OnClickListener onClickChkDolorMuscularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularLeveDia3).setOnClickListener(onClickChkDolorMuscularLeve);
+
+                View.OnClickListener onClickChkDolorMuscularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularModeradaDia3).setOnClickListener(onClickChkDolorMuscularModerada);
+
+                View.OnClickListener onClickChkDolorMuscularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularSeveraDia3).setOnClickListener(onClickChkDolorMuscularSevera);
+                /*DOLOR ARTICULAR DIA 3*/
+                View.OnClickListener onClickChkDolorArticularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularLeveDia3).setOnClickListener(onClickChkDolorArticularLeve);
+
+                View.OnClickListener onClickChkDolorArticularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularModeradaDia3).setOnClickListener(onClickChkDolorArticularModerada);
+
+                View.OnClickListener onClickChkDolorArticularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularSeveraDia3).setOnClickListener(onClickChkDolorArticularSevera);
+                /*-----------------------------*/
 
             }
 
@@ -3001,6 +5426,179 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                     }
                 });
 
+                /*FIEBRE DIA 4*/
+                View.OnClickListener onClickChkFiebreLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreLeveDia4).setOnClickListener(onClickChkFiebreLeve);
+
+                View.OnClickListener onClickChkFiebreModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreModeradaDia4).setOnClickListener(onClickChkFiebreModerada);
+
+                View.OnClickListener onClickChkFiebreSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreSeveraDia4).setOnClickListener(onClickChkFiebreSevera);
+                /*-------------------------------*/
+                /*TOS DIA 4*/
+                View.OnClickListener onClickChkTosLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosLeveDia4).setOnClickListener(onClickChkTosLeve);
+
+                View.OnClickListener onClickChkTosModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosModeradaDia4).setOnClickListener(onClickChkTosModerada);
+
+                View.OnClickListener onClickChkTosSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosSeveraDia4).setOnClickListener(onClickChkTosSevera);
+                /*-------------------------------*/
+                /*SECRECION NASAL DIA 4*/
+                View.OnClickListener onClickChkSecrecionNasalLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalLeveDia4).setOnClickListener(onClickChkSecrecionNasalLeve);
+
+                View.OnClickListener onClickChkSecrecionNasalModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia4).setOnClickListener(onClickChkSecrecionNasalModerada);
+
+                View.OnClickListener onClickChkSecrecionNasalSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia4).setOnClickListener(onClickChkSecrecionNasalSevera);
+                /*-------------------------------*/
+                /*DOLOR DE GARGANTA DIA 4*/
+                View.OnClickListener onClickChkDolorGargantaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaLeveDia4).setOnClickListener(onClickChkDolorGargantaLeve);
+
+                View.OnClickListener onClickChkDolorGargantaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaModeradaDia4).setOnClickListener(onClickChkDolorGargantaModerada);
+
+                View.OnClickListener onClickChkDolorGargantaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaSeveraDia4).setOnClickListener(onClickChkDolorGargantaSevera);
+                /*DOLOR DE CABEZA DIA 4*/
+                View.OnClickListener onClickChkDolorCabezaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaLeveDia4).setOnClickListener(onClickChkDolorCabezaLeve);
+
+                View.OnClickListener onClickChkDolorCabezaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaModeradaDia4).setOnClickListener(onClickChkDolorCabezaModerada);
+
+                View.OnClickListener onClickChkDolorCabezaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaSeveraDia4).setOnClickListener(onClickChkDolorCabezaSevera);
+
+                /*DOLOR DOLOR MUSCULAR DIA 4*/
+                View.OnClickListener onClickChkDolorMuscularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularLeveDia4).setOnClickListener(onClickChkDolorMuscularLeve);
+
+                View.OnClickListener onClickChkDolorMuscularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularModeradaDia4).setOnClickListener(onClickChkDolorMuscularModerada);
+
+                View.OnClickListener onClickChkDolorMuscularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularSeveraDia4).setOnClickListener(onClickChkDolorMuscularSevera);
+                /*DOLOR ARTICULAR DIA 4*/
+                View.OnClickListener onClickChkDolorArticularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularLeveDia4).setOnClickListener(onClickChkDolorArticularLeve);
+
+                View.OnClickListener onClickChkDolorArticularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularModeradaDia4).setOnClickListener(onClickChkDolorArticularModerada);
+
+                View.OnClickListener onClickChkDolorArticularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularSeveraDia4).setOnClickListener(onClickChkDolorArticularSevera);
+                /*-----------------------------*/
 
             }
 
@@ -3185,6 +5783,179 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                     }
                 });
 
+                /*FIEBRE DIA 5*/
+                View.OnClickListener onClickChkFiebreLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreLeveDia5).setOnClickListener(onClickChkFiebreLeve);
+
+                View.OnClickListener onClickChkFiebreModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreModeradaDia5).setOnClickListener(onClickChkFiebreModerada);
+
+                View.OnClickListener onClickChkFiebreSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreSeveraDia5).setOnClickListener(onClickChkFiebreSevera);
+                /*-------------------------------*/
+                /*TOS DIA 5*/
+                View.OnClickListener onClickChkTosLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosLeveDia5).setOnClickListener(onClickChkTosLeve);
+
+                View.OnClickListener onClickChkTosModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosModeradaDia5).setOnClickListener(onClickChkTosModerada);
+
+                View.OnClickListener onClickChkTosSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosSeveraDia5).setOnClickListener(onClickChkTosSevera);
+                /*-------------------------------*/
+                /*SECRECION NASAL DIA 5*/
+                View.OnClickListener onClickChkSecrecionNasalLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalLeveDia5).setOnClickListener(onClickChkSecrecionNasalLeve);
+
+                View.OnClickListener onClickChkSecrecionNasalModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia5).setOnClickListener(onClickChkSecrecionNasalModerada);
+
+                View.OnClickListener onClickChkSecrecionNasalSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia5).setOnClickListener(onClickChkSecrecionNasalSevera);
+                /*-------------------------------*/
+                /*DOLOR DE GARGANTA DIA 5*/
+                View.OnClickListener onClickChkDolorGargantaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaLeveDia5).setOnClickListener(onClickChkDolorGargantaLeve);
+
+                View.OnClickListener onClickChkDolorGargantaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaModeradaDia5).setOnClickListener(onClickChkDolorGargantaModerada);
+
+                View.OnClickListener onClickChkDolorGargantaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaSeveraDia5).setOnClickListener(onClickChkDolorGargantaSevera);
+                /*DOLOR DE CABEZA DIA 5*/
+                View.OnClickListener onClickChkDolorCabezaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaLeveDia5).setOnClickListener(onClickChkDolorCabezaLeve);
+
+                View.OnClickListener onClickChkDolorCabezaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaModeradaDia5).setOnClickListener(onClickChkDolorCabezaModerada);
+
+                View.OnClickListener onClickChkDolorCabezaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaSeveraDia5).setOnClickListener(onClickChkDolorCabezaSevera);
+
+                /*DOLOR DOLOR MUSCULAR DIA 5*/
+                View.OnClickListener onClickChkDolorMuscularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularLeveDia5).setOnClickListener(onClickChkDolorMuscularLeve);
+
+                View.OnClickListener onClickChkDolorMuscularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularModeradaDia5).setOnClickListener(onClickChkDolorMuscularModerada);
+
+                View.OnClickListener onClickChkDolorMuscularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularSeveraDia5).setOnClickListener(onClickChkDolorMuscularSevera);
+                /*DOLOR ARTICULAR DIA 5*/
+                View.OnClickListener onClickChkDolorArticularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularLeveDia5).setOnClickListener(onClickChkDolorArticularLeve);
+
+                View.OnClickListener onClickChkDolorArticularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularModeradaDia5).setOnClickListener(onClickChkDolorArticularModerada);
+
+                View.OnClickListener onClickChkDolorArticularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularSeveraDia5).setOnClickListener(onClickChkDolorArticularSevera);
+                /*-----------------------------*/
 
             }
 
@@ -3369,6 +6140,179 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                     }
                 });
 
+                /*FIEBRE DIA 6*/
+                View.OnClickListener onClickChkFiebreLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreLeveDia6).setOnClickListener(onClickChkFiebreLeve);
+
+                View.OnClickListener onClickChkFiebreModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreModeradaDia6).setOnClickListener(onClickChkFiebreModerada);
+
+                View.OnClickListener onClickChkFiebreSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreSeveraDia6).setOnClickListener(onClickChkFiebreSevera);
+                /*-------------------------------*/
+                /*TOS DIA 6*/
+                View.OnClickListener onClickChkTosLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosLeveDia6).setOnClickListener(onClickChkTosLeve);
+
+                View.OnClickListener onClickChkTosModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosModeradaDia6).setOnClickListener(onClickChkTosModerada);
+
+                View.OnClickListener onClickChkTosSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosSeveraDia6).setOnClickListener(onClickChkTosSevera);
+                /*-------------------------------*/
+                /*SECRECION NASAL DIA 6*/
+                View.OnClickListener onClickChkSecrecionNasalLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalLeveDia6).setOnClickListener(onClickChkSecrecionNasalLeve);
+
+                View.OnClickListener onClickChkSecrecionNasalModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia6).setOnClickListener(onClickChkSecrecionNasalModerada);
+
+                View.OnClickListener onClickChkSecrecionNasalSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia6).setOnClickListener(onClickChkSecrecionNasalSevera);
+                /*-------------------------------*/
+                /*DOLOR DE GARGANTA DIA 6*/
+                View.OnClickListener onClickChkDolorGargantaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaLeveDia6).setOnClickListener(onClickChkDolorGargantaLeve);
+
+                View.OnClickListener onClickChkDolorGargantaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaModeradaDia6).setOnClickListener(onClickChkDolorGargantaModerada);
+
+                View.OnClickListener onClickChkDolorGargantaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaSeveraDia6).setOnClickListener(onClickChkDolorGargantaSevera);
+                /*DOLOR DE CABEZA DIA 6*/
+                View.OnClickListener onClickChkDolorCabezaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaLeveDia6).setOnClickListener(onClickChkDolorCabezaLeve);
+
+                View.OnClickListener onClickChkDolorCabezaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaModeradaDia6).setOnClickListener(onClickChkDolorCabezaModerada);
+
+                View.OnClickListener onClickChkDolorCabezaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaSeveraDia6).setOnClickListener(onClickChkDolorCabezaSevera);
+
+                /*DOLOR DOLOR MUSCULAR DIA 6*/
+                View.OnClickListener onClickChkDolorMuscularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularLeveDia6).setOnClickListener(onClickChkDolorMuscularLeve);
+
+                View.OnClickListener onClickChkDolorMuscularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularModeradaDia6).setOnClickListener(onClickChkDolorMuscularModerada);
+
+                View.OnClickListener onClickChkDolorMuscularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularSeveraDia6).setOnClickListener(onClickChkDolorMuscularSevera);
+                /*DOLOR ARTICULAR DIA 6*/
+                View.OnClickListener onClickChkDolorArticularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularLeveDia6).setOnClickListener(onClickChkDolorArticularLeve);
+
+                View.OnClickListener onClickChkDolorArticularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularModeradaDia6).setOnClickListener(onClickChkDolorArticularModerada);
+
+                View.OnClickListener onClickChkDolorArticularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularSeveraDia6).setOnClickListener(onClickChkDolorArticularSevera);
+                /*-----------------------------*/
 
             }
 
@@ -3553,6 +6497,179 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                     }
                 });
 
+                /*FIEBRE DIA 7*/
+                View.OnClickListener onClickChkFiebreLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreLeveDia7).setOnClickListener(onClickChkFiebreLeve);
+
+                View.OnClickListener onClickChkFiebreModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreModeradaDia7).setOnClickListener(onClickChkFiebreModerada);
+
+                View.OnClickListener onClickChkFiebreSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreSeveraDia7).setOnClickListener(onClickChkFiebreSevera);
+                /*-------------------------------*/
+                /*TOS DIA 7*/
+                View.OnClickListener onClickChkTosLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosLeveDia7).setOnClickListener(onClickChkTosLeve);
+
+                View.OnClickListener onClickChkTosModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosModeradaDia7).setOnClickListener(onClickChkTosModerada);
+
+                View.OnClickListener onClickChkTosSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosSeveraDia7).setOnClickListener(onClickChkTosSevera);
+                /*-------------------------------*/
+                /*SECRECION NASAL DIA 7*/
+                View.OnClickListener onClickChkSecrecionNasalLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalLeveDia7).setOnClickListener(onClickChkSecrecionNasalLeve);
+
+                View.OnClickListener onClickChkSecrecionNasalModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia7).setOnClickListener(onClickChkSecrecionNasalModerada);
+
+                View.OnClickListener onClickChkSecrecionNasalSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia7).setOnClickListener(onClickChkSecrecionNasalSevera);
+                /*-------------------------------*/
+                /*DOLOR DE GARGANTA DIA 7*/
+                View.OnClickListener onClickChkDolorGargantaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaLeveDia7).setOnClickListener(onClickChkDolorGargantaLeve);
+
+                View.OnClickListener onClickChkDolorGargantaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaModeradaDia7).setOnClickListener(onClickChkDolorGargantaModerada);
+
+                View.OnClickListener onClickChkDolorGargantaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaSeveraDia7).setOnClickListener(onClickChkDolorGargantaSevera);
+                /*DOLOR DE CABEZA DIA 7*/
+                View.OnClickListener onClickChkDolorCabezaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaLeveDia7).setOnClickListener(onClickChkDolorCabezaLeve);
+
+                View.OnClickListener onClickChkDolorCabezaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaModeradaDia7).setOnClickListener(onClickChkDolorCabezaModerada);
+
+                View.OnClickListener onClickChkDolorCabezaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaSeveraDia7).setOnClickListener(onClickChkDolorCabezaSevera);
+
+                /*DOLOR DOLOR MUSCULAR DIA 7*/
+                View.OnClickListener onClickChkDolorMuscularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularLeveDia7).setOnClickListener(onClickChkDolorMuscularLeve);
+
+                View.OnClickListener onClickChkDolorMuscularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularModeradaDia7).setOnClickListener(onClickChkDolorMuscularModerada);
+
+                View.OnClickListener onClickChkDolorMuscularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularSeveraDia7).setOnClickListener(onClickChkDolorMuscularSevera);
+                /*DOLOR ARTICULAR DIA 7*/
+                View.OnClickListener onClickChkDolorArticularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularLeveDia7).setOnClickListener(onClickChkDolorArticularLeve);
+
+                View.OnClickListener onClickChkDolorArticularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularModeradaDia7).setOnClickListener(onClickChkDolorArticularModerada);
+
+                View.OnClickListener onClickChkDolorArticularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularSeveraDia7).setOnClickListener(onClickChkDolorArticularSevera);
+                /*-----------------------------*/
 
             }
 
@@ -3737,6 +6854,180 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                     }
                 });
 
+                /*FIEBRE DIA 8*/
+                View.OnClickListener onClickChkFiebreLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreLeveDia8).setOnClickListener(onClickChkFiebreLeve);
+
+                View.OnClickListener onClickChkFiebreModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreModeradaDia8).setOnClickListener(onClickChkFiebreModerada);
+
+                View.OnClickListener onClickChkFiebreSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreSeveraDia8).setOnClickListener(onClickChkFiebreSevera);
+                /*-------------------------------*/
+                /*TOS DIA 8*/
+                View.OnClickListener onClickChkTosLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosLeveDia8).setOnClickListener(onClickChkTosLeve);
+
+                View.OnClickListener onClickChkTosModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosModeradaDia8).setOnClickListener(onClickChkTosModerada);
+
+                View.OnClickListener onClickChkTosSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosSeveraDia8).setOnClickListener(onClickChkTosSevera);
+
+                /*-------------------------------*/
+                /*SECRECION NASAL DIA 8*/
+                View.OnClickListener onClickChkSecrecionNasalLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalLeveDia8).setOnClickListener(onClickChkSecrecionNasalLeve);
+
+                View.OnClickListener onClickChkSecrecionNasalModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia8).setOnClickListener(onClickChkSecrecionNasalModerada);
+
+                View.OnClickListener onClickChkSecrecionNasalSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia8).setOnClickListener(onClickChkSecrecionNasalSevera);
+                /*-------------------------------*/
+                /*DOLOR DE GARGANTA DIA 8*/
+                View.OnClickListener onClickChkDolorGargantaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaLeveDia8).setOnClickListener(onClickChkDolorGargantaLeve);
+
+                View.OnClickListener onClickChkDolorGargantaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaModeradaDia8).setOnClickListener(onClickChkDolorGargantaModerada);
+
+                View.OnClickListener onClickChkDolorGargantaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaSeveraDia8).setOnClickListener(onClickChkDolorGargantaSevera);
+                /*DOLOR DE CABEZA DIA 8*/
+                View.OnClickListener onClickChkDolorCabezaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaLeveDia8).setOnClickListener(onClickChkDolorCabezaLeve);
+
+                View.OnClickListener onClickChkDolorCabezaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaModeradaDia8).setOnClickListener(onClickChkDolorCabezaModerada);
+
+                View.OnClickListener onClickChkDolorCabezaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaSeveraDia8).setOnClickListener(onClickChkDolorCabezaSevera);
+
+                /*DOLOR DOLOR MUSCULAR DIA 8*/
+                View.OnClickListener onClickChkDolorMuscularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularLeveDia8).setOnClickListener(onClickChkDolorMuscularLeve);
+
+                View.OnClickListener onClickChkDolorMuscularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularModeradaDia8).setOnClickListener(onClickChkDolorMuscularModerada);
+
+                View.OnClickListener onClickChkDolorMuscularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularSeveraDia8).setOnClickListener(onClickChkDolorMuscularSevera);
+                /*DOLOR ARTICULAR DIA 8*/
+                View.OnClickListener onClickChkDolorArticularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularLeveDia8).setOnClickListener(onClickChkDolorArticularLeve);
+
+                View.OnClickListener onClickChkDolorArticularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularModeradaDia8).setOnClickListener(onClickChkDolorArticularModerada);
+
+                View.OnClickListener onClickChkDolorArticularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularSeveraDia8).setOnClickListener(onClickChkDolorArticularSevera);
+                /*-----------------------------*/
 
             }
 
@@ -3921,6 +7212,179 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                     }
                 });
 
+                /*FIEBRE DIA 9*/
+                View.OnClickListener onClickChkFiebreLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreLeveDia9).setOnClickListener(onClickChkFiebreLeve);
+
+                View.OnClickListener onClickChkFiebreModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreModeradaDia9).setOnClickListener(onClickChkFiebreModerada);
+
+                View.OnClickListener onClickChkFiebreSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreSeveraDia9).setOnClickListener(onClickChkFiebreSevera);
+                /*-------------------------------*/
+                /*TOS DIA 9*/
+                View.OnClickListener onClickChkTosLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosLeveDia9).setOnClickListener(onClickChkTosLeve);
+
+                View.OnClickListener onClickChkTosModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosModeradaDia9).setOnClickListener(onClickChkTosModerada);
+
+                View.OnClickListener onClickChkTosSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosSeveraDia9).setOnClickListener(onClickChkTosSevera);
+                /*-------------------------------*/
+                /*SECRECION NASAL DIA 9*/
+                View.OnClickListener onClickChkSecrecionNasalLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalLeveDia9).setOnClickListener(onClickChkSecrecionNasalLeve);
+
+                View.OnClickListener onClickChkSecrecionNasalModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia9).setOnClickListener(onClickChkSecrecionNasalModerada);
+
+                View.OnClickListener onClickChkSecrecionNasalSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia9).setOnClickListener(onClickChkSecrecionNasalSevera);
+                /*-------------------------------*/
+                /*DOLOR DE GARGANTA DIA 9*/
+                View.OnClickListener onClickChkDolorGargantaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaLeveDia9).setOnClickListener(onClickChkDolorGargantaLeve);
+
+                View.OnClickListener onClickChkDolorGargantaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaModeradaDia9).setOnClickListener(onClickChkDolorGargantaModerada);
+
+                View.OnClickListener onClickChkDolorGargantaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaSeveraDia9).setOnClickListener(onClickChkDolorGargantaSevera);
+                /*DOLOR DE CABEZA DIA 9*/
+                View.OnClickListener onClickChkDolorCabezaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaLeveDia9).setOnClickListener(onClickChkDolorCabezaLeve);
+
+                View.OnClickListener onClickChkDolorCabezaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaModeradaDia9).setOnClickListener(onClickChkDolorCabezaModerada);
+
+                View.OnClickListener onClickChkDolorCabezaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaSeveraDia9).setOnClickListener(onClickChkDolorCabezaSevera);
+
+                /*DOLOR DOLOR MUSCULAR DIA 9*/
+                View.OnClickListener onClickChkDolorMuscularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularLeveDia9).setOnClickListener(onClickChkDolorMuscularLeve);
+
+                View.OnClickListener onClickChkDolorMuscularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularModeradaDia9).setOnClickListener(onClickChkDolorMuscularModerada);
+
+                View.OnClickListener onClickChkDolorMuscularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularSeveraDia9).setOnClickListener(onClickChkDolorMuscularSevera);
+                /*DOLOR ARTICULAR DIA 9*/
+                View.OnClickListener onClickChkDolorArticularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularLeveDia9).setOnClickListener(onClickChkDolorArticularLeve);
+
+                View.OnClickListener onClickChkDolorArticularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularModeradaDia9).setOnClickListener(onClickChkDolorArticularModerada);
+
+                View.OnClickListener onClickChkDolorArticularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularSeveraDia9).setOnClickListener(onClickChkDolorArticularSevera);
+                /*-----------------------------*/
 
             }
 
@@ -4105,6 +7569,179 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                     }
                 });
 
+                /*FIEBRE DIA 10*/
+                View.OnClickListener onClickChkFiebreLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreLeveDia10).setOnClickListener(onClickChkFiebreLeve);
+
+                View.OnClickListener onClickChkFiebreModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreModeradaDia10).setOnClickListener(onClickChkFiebreModerada);
+
+                View.OnClickListener onClickChkFiebreSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreSeveraDia10).setOnClickListener(onClickChkFiebreSevera);
+                /*-------------------------------*/
+                /*TOS DIA 10*/
+                View.OnClickListener onClickChkTosLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosLeveDia10).setOnClickListener(onClickChkTosLeve);
+
+                View.OnClickListener onClickChkTosModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosModeradaDia10).setOnClickListener(onClickChkTosModerada);
+
+                View.OnClickListener onClickChkTosSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosSeveraDia10).setOnClickListener(onClickChkTosSevera);
+                /*-------------------------------*/
+                /*SECRECION NASAL DIA 10*/
+                View.OnClickListener onClickChkSecrecionNasalLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalLeveDia10).setOnClickListener(onClickChkSecrecionNasalLeve);
+
+                View.OnClickListener onClickChkSecrecionNasalModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia10).setOnClickListener(onClickChkSecrecionNasalModerada);
+
+                View.OnClickListener onClickChkSecrecionNasalSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia10).setOnClickListener(onClickChkSecrecionNasalSevera);
+                /*-------------------------------*/
+                /*DOLOR DE GARGANTA DIA 10*/
+                View.OnClickListener onClickChkDolorGargantaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaLeveDia10).setOnClickListener(onClickChkDolorGargantaLeve);
+
+                View.OnClickListener onClickChkDolorGargantaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaModeradaDia10).setOnClickListener(onClickChkDolorGargantaModerada);
+
+                View.OnClickListener onClickChkDolorGargantaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaSeveraDia10).setOnClickListener(onClickChkDolorGargantaSevera);
+                /*DOLOR DE CABEZA DIA 10*/
+                View.OnClickListener onClickChkDolorCabezaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaLeveDia10).setOnClickListener(onClickChkDolorCabezaLeve);
+
+                View.OnClickListener onClickChkDolorCabezaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaModeradaDia10).setOnClickListener(onClickChkDolorCabezaModerada);
+
+                View.OnClickListener onClickChkDolorCabezaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaSeveraDia10).setOnClickListener(onClickChkDolorCabezaSevera);
+
+                /*DOLOR DOLOR MUSCULAR DIA 10*/
+                View.OnClickListener onClickChkDolorMuscularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularLeveDia10).setOnClickListener(onClickChkDolorMuscularLeve);
+
+                View.OnClickListener onClickChkDolorMuscularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularModeradaDia10).setOnClickListener(onClickChkDolorMuscularModerada);
+
+                View.OnClickListener onClickChkDolorMuscularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularSeveraDia10).setOnClickListener(onClickChkDolorMuscularSevera);
+                /*DOLOR ARTICULAR DIA 10*/
+                View.OnClickListener onClickChkDolorArticularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularLeveDia10).setOnClickListener(onClickChkDolorArticularLeve);
+
+                View.OnClickListener onClickChkDolorArticularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularModeradaDia10).setOnClickListener(onClickChkDolorArticularModerada);
+
+                View.OnClickListener onClickChkDolorArticularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularSeveraDia10).setOnClickListener(onClickChkDolorArticularSevera);
+                /*-----------------------------*/
 
             }
 
@@ -4288,7 +7925,179 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
 
                     }
                 });
+                /*FIEBRE DIA 11*/
+                View.OnClickListener onClickChkFiebreLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreLeveDia11).setOnClickListener(onClickChkFiebreLeve);
 
+                View.OnClickListener onClickChkFiebreModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreModeradaDia11).setOnClickListener(onClickChkFiebreModerada);
+
+                View.OnClickListener onClickChkFiebreSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreSeveraDia11).setOnClickListener(onClickChkFiebreSevera);
+                /*-------------------------------*/
+                /*TOS DIA 11*/
+                View.OnClickListener onClickChkTosLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosLeveDia11).setOnClickListener(onClickChkTosLeve);
+
+                View.OnClickListener onClickChkTosModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosModeradaDia11).setOnClickListener(onClickChkTosModerada);
+
+                View.OnClickListener onClickChkTosSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosSeveraDia11).setOnClickListener(onClickChkTosSevera);
+                /*-------------------------------*/
+                /*SECRECION NASAL DIA 11*/
+                View.OnClickListener onClickChkSecrecionNasalLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalLeveDia11).setOnClickListener(onClickChkSecrecionNasalLeve);
+
+                View.OnClickListener onClickChkSecrecionNasalModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia11).setOnClickListener(onClickChkSecrecionNasalModerada);
+
+                View.OnClickListener onClickChkSecrecionNasalSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia11).setOnClickListener(onClickChkSecrecionNasalSevera);
+                /*-------------------------------*/
+                /*DOLOR DE GARGANTA DIA 11*/
+                View.OnClickListener onClickChkDolorGargantaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaLeveDia11).setOnClickListener(onClickChkDolorGargantaLeve);
+
+                View.OnClickListener onClickChkDolorGargantaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaModeradaDia11).setOnClickListener(onClickChkDolorGargantaModerada);
+
+                View.OnClickListener onClickChkDolorGargantaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaSeveraDia11).setOnClickListener(onClickChkDolorGargantaSevera);
+                /*DOLOR DE CABEZA DIA 11*/
+                View.OnClickListener onClickChkDolorCabezaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaLeveDia11).setOnClickListener(onClickChkDolorCabezaLeve);
+
+                View.OnClickListener onClickChkDolorCabezaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaModeradaDia11).setOnClickListener(onClickChkDolorCabezaModerada);
+
+                View.OnClickListener onClickChkDolorCabezaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaSeveraDia11).setOnClickListener(onClickChkDolorCabezaSevera);
+
+                /*DOLOR DOLOR MUSCULAR DIA 11*/
+                View.OnClickListener onClickChkDolorMuscularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularLeveDia11).setOnClickListener(onClickChkDolorMuscularLeve);
+
+                View.OnClickListener onClickChkDolorMuscularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularModeradaDia11).setOnClickListener(onClickChkDolorMuscularModerada);
+
+                View.OnClickListener onClickChkDolorMuscularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularSeveraDia11).setOnClickListener(onClickChkDolorMuscularSevera);
+                /*DOLOR ARTICULAR DIA 11*/
+                View.OnClickListener onClickChkDolorArticularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularLeveDia11).setOnClickListener(onClickChkDolorArticularLeve);
+
+                View.OnClickListener onClickChkDolorArticularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularModeradaDia11).setOnClickListener(onClickChkDolorArticularModerada);
+
+                View.OnClickListener onClickChkDolorArticularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularSeveraDia11).setOnClickListener(onClickChkDolorArticularSevera);
+                /*-----------------------------*/
 
             }
 
@@ -4473,14 +8282,3894 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                     }
                 });
 
+                /*FIEBRE DIA 12*/
+                View.OnClickListener onClickChkFiebreLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreLeveDia12).setOnClickListener(onClickChkFiebreLeve);
 
+                View.OnClickListener onClickChkFiebreModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreModeradaDia12).setOnClickListener(onClickChkFiebreModerada);
+
+                View.OnClickListener onClickChkFiebreSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkFiebreSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkFiebreSeveraDia12).setOnClickListener(onClickChkFiebreSevera);
+                /*-------------------------------*/
+                /*TOS DIA 12*/
+                View.OnClickListener onClickChkTosLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosLeveDia12).setOnClickListener(onClickChkTosLeve);
+
+                View.OnClickListener onClickChkTosModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosModeradaDia12).setOnClickListener(onClickChkTosModerada);
+
+                View.OnClickListener onClickChkTosSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkTosSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkTosSeveraDia12).setOnClickListener(onClickChkTosSevera);
+                /*-------------------------------*/
+                /*SECRECION NASAL DIA 12*/
+                View.OnClickListener onClickChkSecrecionNasalLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalLeveDia12).setOnClickListener(onClickChkSecrecionNasalLeve);
+
+                View.OnClickListener onClickChkSecrecionNasalModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia12).setOnClickListener(onClickChkSecrecionNasalModerada);
+
+                View.OnClickListener onClickChkSecrecionNasalSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkSecrecionNasalSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia12).setOnClickListener(onClickChkSecrecionNasalSevera);
+                /*-------------------------------*/
+                /*DOLOR DE GARGANTA DIA 12*/
+                View.OnClickListener onClickChkDolorGargantaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaLeveDia12).setOnClickListener(onClickChkDolorGargantaLeve);
+
+                View.OnClickListener onClickChkDolorGargantaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaModeradaDia12).setOnClickListener(onClickChkDolorGargantaModerada);
+
+                View.OnClickListener onClickChkDolorGargantaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorGargantaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorGargantaSeveraDia12).setOnClickListener(onClickChkDolorGargantaSevera);
+                /*DOLOR DE CABEZA DIA 12*/
+                View.OnClickListener onClickChkDolorCabezaLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaLeveDia12).setOnClickListener(onClickChkDolorCabezaLeve);
+
+                View.OnClickListener onClickChkDolorCabezaModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaModeradaDia12).setOnClickListener(onClickChkDolorCabezaModerada);
+
+                View.OnClickListener onClickChkDolorCabezaSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorCabezaSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorCabezaSeveraDia12).setOnClickListener(onClickChkDolorCabezaSevera);
+
+                /*DOLOR DOLOR MUSCULAR DIA 12*/
+                View.OnClickListener onClickChkDolorMuscularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularLeveDia12).setOnClickListener(onClickChkDolorMuscularLeve);
+
+                View.OnClickListener onClickChkDolorMuscularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularModeradaDia12).setOnClickListener(onClickChkDolorMuscularModerada);
+
+                View.OnClickListener onClickChkDolorMuscularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorMuscularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorMuscularSeveraDia12).setOnClickListener(onClickChkDolorMuscularSevera);
+                /*DOLOR ARTICULAR DIA 12*/
+                View.OnClickListener onClickChkDolorArticularLeve = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularLeve(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularLeveDia12).setOnClickListener(onClickChkDolorArticularLeve);
+
+                View.OnClickListener onClickChkDolorArticularModerada = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularModerada(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularModeradaDia12).setOnClickListener(onClickChkDolorArticularModerada);
+
+                View.OnClickListener onClickChkDolorArticularSevera = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onChkDolorArticularSevera(view);
+                    }
+                };
+                getActivity().findViewById(R.id.chkDolorArticularSeveraDia12).setOnClickListener(onClickChkDolorArticularSevera);
+                /*-----------------------------*/
             }
 
+            /*--------FIEBRE-------------------*/
+            public void onChkFiebreLeve(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkFiebreLeveDia1 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia1)).isChecked();
+                            if (chkFiebreLeveDia1) {
+                                seguimientoInfluenza.setFiebreLeve("S");
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia1)).setChecked(!chkFiebreLeveDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia1)).setChecked(!chkFiebreLeveDia1);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkFiebreLeveDia2 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia2)).isChecked();
+                            if (chkFiebreLeveDia2) {
+                                seguimientoInfluenza.setFiebreLeve("S");
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia2)).setChecked(!chkFiebreLeveDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia2)).setChecked(!chkFiebreLeveDia2);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkFiebreLeveDia3 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia3)).isChecked();
+                            if (chkFiebreLeveDia3) {
+                                seguimientoInfluenza.setFiebreLeve("S");
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia3)).setChecked(!chkFiebreLeveDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia3)).setChecked(!chkFiebreLeveDia3);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkFiebreLeveDia4 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia4)).isChecked();
+                            if (chkFiebreLeveDia4) {
+                                seguimientoInfluenza.setFiebreLeve("S");
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia4)).setChecked(!chkFiebreLeveDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia4)).setChecked(!chkFiebreLeveDia4);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkFiebreLeveDia5 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia5)).isChecked();
+                            if (chkFiebreLeveDia5) {
+                                seguimientoInfluenza.setFiebreLeve("S");
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia5)).setChecked(!chkFiebreLeveDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia5)).setChecked(!chkFiebreLeveDia5);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkFiebreLeveDia6 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia6)).isChecked();
+                            if (chkFiebreLeveDia6) {
+                                seguimientoInfluenza.setFiebreLeve("S");
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia6)).setChecked(!chkFiebreLeveDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia6)).setChecked(!chkFiebreLeveDia6);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkFiebreLeveDia7 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia7)).isChecked();
+                            if (chkFiebreLeveDia7) {
+                                seguimientoInfluenza.setFiebreLeve("S");
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia7)).setChecked(!chkFiebreLeveDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia7)).setChecked(!chkFiebreLeveDia7);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkFiebreLeveDia8 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia8)).isChecked();
+                            if (chkFiebreLeveDia8) {
+                                seguimientoInfluenza.setFiebreLeve("S");
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia8)).setChecked(!chkFiebreLeveDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia8)).setChecked(!chkFiebreLeveDia8);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkFiebreLeveDia9 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia9)).isChecked();
+                            if (chkFiebreLeveDia9) {
+                                seguimientoInfluenza.setFiebreLeve("S");
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia9)).setChecked(!chkFiebreLeveDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia9)).setChecked(!chkFiebreLeveDia9);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkFiebreLeveDia10 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia10)).isChecked();
+                            if (chkFiebreLeveDia10) {
+                                seguimientoInfluenza.setFiebreLeve("S");
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia10)).setChecked(!chkFiebreLeveDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia10)).setChecked(!chkFiebreLeveDia10);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkFiebreLeveDia11 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia11)).isChecked();
+                            if (chkFiebreLeveDia11) {
+                                seguimientoInfluenza.setFiebreLeve("S");
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia11)).setChecked(!chkFiebreLeveDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia11)).setChecked(!chkFiebreLeveDia11);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkFiebreLeveDia12 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia12)).isChecked();
+                            if (chkFiebreLeveDia12) {
+                                seguimientoInfluenza.setFiebreLeve("S");
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia12)).setChecked(!chkFiebreLeveDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia12)).setChecked(!chkFiebreLeveDia12);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            public void onChkFiebreModerada(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkFiebreModeradaDia1 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia1)).isChecked();
+                            if (chkFiebreModeradaDia1) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada("S");
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia1)).setChecked(!chkFiebreModeradaDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia1)).setChecked(!chkFiebreModeradaDia1);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkFiebreModeradaDia2 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia2)).isChecked();
+                            if (chkFiebreModeradaDia2) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada("S");
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia2)).setChecked(!chkFiebreModeradaDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia2)).setChecked(!chkFiebreModeradaDia2);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkFiebreModeradaDia3 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia3)).isChecked();
+                            if (chkFiebreModeradaDia3) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada("S");
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia3)).setChecked(!chkFiebreModeradaDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia3)).setChecked(!chkFiebreModeradaDia3);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkFiebreModeradaDia4 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia4)).isChecked();
+                            if (chkFiebreModeradaDia4) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada("S");
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia4)).setChecked(!chkFiebreModeradaDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia4)).setChecked(!chkFiebreModeradaDia4);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkFiebreModeradaDia5 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia5)).isChecked();
+                            if (chkFiebreModeradaDia5) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada("S");
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia5)).setChecked(!chkFiebreModeradaDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia5)).setChecked(!chkFiebreModeradaDia5);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkFiebreModeradaDia6 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia6)).isChecked();
+                            if (chkFiebreModeradaDia6) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada("S");
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia6)).setChecked(!chkFiebreModeradaDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia6)).setChecked(!chkFiebreModeradaDia6);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkFiebreModeradaDia7 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia7)).isChecked();
+                            if (chkFiebreModeradaDia7) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada("S");
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia7)).setChecked(!chkFiebreModeradaDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia7)).setChecked(!chkFiebreModeradaDia7);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkFiebreModeradaDia8 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia8)).isChecked();
+                            if (chkFiebreModeradaDia8) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada("S");
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia8)).setChecked(!chkFiebreModeradaDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia8)).setChecked(!chkFiebreModeradaDia8);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkFiebreModeradaDia9 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia9)).isChecked();
+                            if (chkFiebreModeradaDia9) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada("S");
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia9)).setChecked(!chkFiebreModeradaDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia9)).setChecked(!chkFiebreModeradaDia9);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkFiebreModeradaDia10 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia10)).isChecked();
+                            if (chkFiebreModeradaDia10) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada("S");
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia10)).setChecked(!chkFiebreModeradaDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia10)).setChecked(!chkFiebreModeradaDia10);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkFiebreModeradaDia11 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia11)).isChecked();
+                            if (chkFiebreModeradaDia11) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada("S");
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia11)).setChecked(!chkFiebreModeradaDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia11)).setChecked(!chkFiebreModeradaDia11);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkFiebreModeradaDia12 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia12)).isChecked();
+                            if (chkFiebreModeradaDia12) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada("S");
+                                seguimientoInfluenza.setFiebreSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia12)).setChecked(!chkFiebreModeradaDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia12)).setChecked(!chkFiebreModeradaDia12);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            public void onChkFiebreSevera(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkFiebreSeveraDia1 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia1)).isChecked();
+                            if (chkFiebreSeveraDia1) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia1)).setChecked(!chkFiebreSeveraDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia1)).setChecked(!chkFiebreSeveraDia1);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkFiebreSeveraDia2 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia2)).isChecked();
+                            if (chkFiebreSeveraDia2) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia2)).setChecked(!chkFiebreSeveraDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia2)).setChecked(!chkFiebreSeveraDia2);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkFiebreSeveraDia3 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia3)).isChecked();
+                            if (chkFiebreSeveraDia3) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia3)).setChecked(!chkFiebreSeveraDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia3)).setChecked(!chkFiebreSeveraDia3);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkFiebreSeveraDia4 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia4)).isChecked();
+                            if (chkFiebreSeveraDia4) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia4)).setChecked(!chkFiebreSeveraDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia4)).setChecked(!chkFiebreSeveraDia4);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkFiebreSeveraDia5 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia5)).isChecked();
+                            if (chkFiebreSeveraDia5) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia5)).setChecked(!chkFiebreSeveraDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia5)).setChecked(!chkFiebreSeveraDia5);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkFiebreSeveraDia6 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia6)).isChecked();
+                            if (chkFiebreSeveraDia6) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia6)).setChecked(!chkFiebreSeveraDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia6)).setChecked(!chkFiebreSeveraDia6);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkFiebreSeveraDia7 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia7)).isChecked();
+                            if (chkFiebreSeveraDia7) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia7)).setChecked(!chkFiebreSeveraDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia7)).setChecked(!chkFiebreSeveraDia7);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkFiebreSeveraDia8 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia8)).isChecked();
+                            if (chkFiebreSeveraDia8) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia8)).setChecked(!chkFiebreSeveraDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia8)).setChecked(!chkFiebreSeveraDia8);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkFiebreSeveraDia9 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia9)).isChecked();
+                            if (chkFiebreSeveraDia9) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia9)).setChecked(!chkFiebreSeveraDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia9)).setChecked(!chkFiebreSeveraDia9);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkFiebreSeveraDia10 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia10)).isChecked();
+                            if (chkFiebreSeveraDia10) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia10)).setChecked(!chkFiebreSeveraDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia10)).setChecked(!chkFiebreSeveraDia10);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkFiebreSeveraDia11 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia11)).isChecked();
+                            if (chkFiebreSeveraDia11) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia11)).setChecked(!chkFiebreSeveraDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia11)).setChecked(!chkFiebreSeveraDia11);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkFiebreSeveraDia12 = ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia12)).isChecked();
+                            if (chkFiebreSeveraDia12) {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia12)).setChecked(!chkFiebreSeveraDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia12)).setChecked(!chkFiebreSeveraDia12);
+                            } else {
+                                seguimientoInfluenza.setFiebreLeve(null);
+                                seguimientoInfluenza.setFiebreModerada(null);
+                                seguimientoInfluenza.setFiebreSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+            /*---------------------------*/
+            /*--------TOS-------------------*/
+            public void onChkTosLeve(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkTosLeveDia1 = ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia1)).isChecked();
+                            if (chkTosLeveDia1) {
+                                seguimientoInfluenza.setTosLeve("S");
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia1)).setChecked(!chkTosLeveDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia1)).setChecked(!chkTosLeveDia1);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkTosLeveDia2 = ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia2)).isChecked();
+                            if (chkTosLeveDia2) {
+                                seguimientoInfluenza.setTosLeve("S");
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia2)).setChecked(!chkTosLeveDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia2)).setChecked(!chkTosLeveDia2);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkTosLeveDia3 = ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia3)).isChecked();
+                            if (chkTosLeveDia3) {
+                                seguimientoInfluenza.setTosLeve("S");
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia3)).setChecked(!chkTosLeveDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia3)).setChecked(!chkTosLeveDia3);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkTosLeveDia4 = ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia4)).isChecked();
+                            if (chkTosLeveDia4) {
+                                seguimientoInfluenza.setTosLeve("S");
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia4)).setChecked(!chkTosLeveDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia4)).setChecked(!chkTosLeveDia4);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkTosLeveDia5 = ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia5)).isChecked();
+                            if (chkTosLeveDia5) {
+                                seguimientoInfluenza.setTosLeve("S");
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia5)).setChecked(!chkTosLeveDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia5)).setChecked(!chkTosLeveDia5);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkTosLeveDia6 = ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia6)).isChecked();
+                            if (chkTosLeveDia6) {
+                                seguimientoInfluenza.setTosLeve("S");
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia6)).setChecked(!chkTosLeveDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia6)).setChecked(!chkTosLeveDia6);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkTosLeveDia7 = ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia7)).isChecked();
+                            if (chkTosLeveDia7) {
+                                seguimientoInfluenza.setTosLeve("S");
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia7)).setChecked(!chkTosLeveDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia7)).setChecked(!chkTosLeveDia7);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkTosLeveDia8 = ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia8)).isChecked();
+                            if (chkTosLeveDia8) {
+                                seguimientoInfluenza.setTosLeve("S");
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia8)).setChecked(!chkTosLeveDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia8)).setChecked(!chkTosLeveDia8);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkTosLeveDia9 = ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia9)).isChecked();
+                            if (chkTosLeveDia9) {
+                                seguimientoInfluenza.setTosLeve("S");
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia9)).setChecked(!chkTosLeveDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia9)).setChecked(!chkTosLeveDia9);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkTosLeveDia10 = ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia10)).isChecked();
+                            if (chkTosLeveDia10) {
+                                seguimientoInfluenza.setTosLeve("S");
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia10)).setChecked(!chkTosLeveDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia10)).setChecked(!chkTosLeveDia10);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkTosLeveDia11 = ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia11)).isChecked();
+                            if (chkTosLeveDia11) {
+                                seguimientoInfluenza.setTosLeve("S");
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia11)).setChecked(!chkTosLeveDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia11)).setChecked(!chkTosLeveDia11);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkTosLeveDia12 = ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia12)).isChecked();
+                            if (chkTosLeveDia12) {
+                                seguimientoInfluenza.setTosLeve("S");
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia12)).setChecked(!chkTosLeveDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia12)).setChecked(!chkTosLeveDia12);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            public void onChkTosModerada(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkTosModeradaDia1 = ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia1)).isChecked();
+                            if (chkTosModeradaDia1) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada("S");
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia1)).setChecked(!chkTosModeradaDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia1)).setChecked(!chkTosModeradaDia1);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkTosModeradaDia2 = ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia2)).isChecked();
+                            if (chkTosModeradaDia2) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada("S");
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia2)).setChecked(!chkTosModeradaDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia2)).setChecked(!chkTosModeradaDia2);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkTosModeradaDia3 = ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia3)).isChecked();
+                            if (chkTosModeradaDia3) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada("S");
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia3)).setChecked(!chkTosModeradaDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia3)).setChecked(!chkTosModeradaDia3);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkTosModeradaDia4 = ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia4)).isChecked();
+                            if (chkTosModeradaDia4) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada("S");
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia4)).setChecked(!chkTosModeradaDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia4)).setChecked(!chkTosModeradaDia4);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkTosModeradaDia5 = ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia5)).isChecked();
+                            if (chkTosModeradaDia5) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada("S");
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia5)).setChecked(!chkTosModeradaDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia5)).setChecked(!chkTosModeradaDia5);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkTosModeradaDia6 = ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia6)).isChecked();
+                            if (chkTosModeradaDia6) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada("S");
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia6)).setChecked(!chkTosModeradaDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia6)).setChecked(!chkTosModeradaDia6);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkTosModeradaDia7 = ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia7)).isChecked();
+                            if (chkTosModeradaDia7) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada("S");
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia7)).setChecked(!chkTosModeradaDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia7)).setChecked(!chkTosModeradaDia7);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkTosModeradaDia8 = ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia8)).isChecked();
+                            if (chkTosModeradaDia8) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada("S");
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia8)).setChecked(!chkTosModeradaDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia8)).setChecked(!chkTosModeradaDia8);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkTosModeradaDia9 = ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia9)).isChecked();
+                            if (chkTosModeradaDia9) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada("S");
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia9)).setChecked(!chkTosModeradaDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia9)).setChecked(!chkTosModeradaDia9);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkTosModeradaDia10 = ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia10)).isChecked();
+                            if (chkTosModeradaDia10) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada("S");
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia10)).setChecked(!chkTosModeradaDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia10)).setChecked(!chkTosModeradaDia10);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkTosModeradaDia11 = ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia11)).isChecked();
+                            if (chkTosModeradaDia11) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada("S");
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia11)).setChecked(!chkTosModeradaDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia11)).setChecked(!chkTosModeradaDia11);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkTosModeradaDia12 = ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia12)).isChecked();
+                            if (chkTosModeradaDia12) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada("S");
+                                seguimientoInfluenza.setTosSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia12)).setChecked(!chkTosModeradaDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia12)).setChecked(!chkTosModeradaDia12);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            public void onChkTosSevera(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkTosSeveraDia1 = ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia1)).isChecked();
+                            if (chkTosSeveraDia1) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia1)).setChecked(!chkTosSeveraDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia1)).setChecked(!chkTosSeveraDia1);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkTosSeveraDia2 = ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia2)).isChecked();
+                            if (chkTosSeveraDia2) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia2)).setChecked(!chkTosSeveraDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia2)).setChecked(!chkTosSeveraDia2);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkTosSeveraDia3 = ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia3)).isChecked();
+                            if (chkTosSeveraDia3) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia3)).setChecked(!chkTosSeveraDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia3)).setChecked(!chkTosSeveraDia3);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkTosSeveraDia4 = ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia4)).isChecked();
+                            if (chkTosSeveraDia4) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia4)).setChecked(!chkTosSeveraDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia4)).setChecked(!chkTosSeveraDia4);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkTosSeveraDia5 = ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia5)).isChecked();
+                            if (chkTosSeveraDia5) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia5)).setChecked(!chkTosSeveraDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia5)).setChecked(!chkTosSeveraDia5);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkTosSeveraDia6 = ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia6)).isChecked();
+                            if (chkTosSeveraDia6) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia6)).setChecked(!chkTosSeveraDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia6)).setChecked(!chkTosSeveraDia6);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkTosSeveraDia7 = ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia7)).isChecked();
+                            if (chkTosSeveraDia7) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia7)).setChecked(!chkTosSeveraDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia7)).setChecked(!chkTosSeveraDia7);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkTosSeveraDia8 = ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia8)).isChecked();
+                            if (chkTosSeveraDia8) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia8)).setChecked(!chkTosSeveraDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia8)).setChecked(!chkTosSeveraDia8);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkTosSeveraDia9 = ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia9)).isChecked();
+                            if (chkTosSeveraDia9) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia9)).setChecked(!chkTosSeveraDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia9)).setChecked(!chkTosSeveraDia9);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkTosSeveraDia10 = ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia10)).isChecked();
+                            if (chkTosSeveraDia10) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia10)).setChecked(!chkTosSeveraDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia10)).setChecked(!chkTosSeveraDia10);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkTosSeveraDia11 = ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia11)).isChecked();
+                            if (chkTosSeveraDia11) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia11)).setChecked(!chkTosSeveraDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia11)).setChecked(!chkTosSeveraDia11);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkTosSeveraDia12 = ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia12)).isChecked();
+                            if (chkTosSeveraDia12) {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia12)).setChecked(!chkTosSeveraDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia12)).setChecked(!chkTosSeveraDia12);
+                            } else {
+                                seguimientoInfluenza.setTosLeve(null);
+                                seguimientoInfluenza.setTosModerada(null);
+                                seguimientoInfluenza.setTosSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+            /*---------------------------*/
+            /*--------SECRECION NASAL-------------------*/
+            public void onChkSecrecionNasalLeve(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkSecrecionNasalLeveDia1 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia1)).isChecked();
+                            if (chkSecrecionNasalLeveDia1) {
+                                seguimientoInfluenza.setSecrecionNasalLeve("S");
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia1)).setChecked(!chkSecrecionNasalLeveDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia1)).setChecked(!chkSecrecionNasalLeveDia1);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkSecrecionNasalLeveDia2 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia2)).isChecked();
+                            if (chkSecrecionNasalLeveDia2) {
+                                seguimientoInfluenza.setSecrecionNasalLeve("S");
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia2)).setChecked(!chkSecrecionNasalLeveDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia2)).setChecked(!chkSecrecionNasalLeveDia2);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkSecrecionNasalLeveDia3 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia3)).isChecked();
+                            if (chkSecrecionNasalLeveDia3) {
+                                seguimientoInfluenza.setSecrecionNasalLeve("S");
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia3)).setChecked(!chkSecrecionNasalLeveDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia3)).setChecked(!chkSecrecionNasalLeveDia3);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkSecrecionNasalLeveDia4 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia4)).isChecked();
+                            if (chkSecrecionNasalLeveDia4) {
+                                seguimientoInfluenza.setSecrecionNasalLeve("S");
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia4)).setChecked(!chkSecrecionNasalLeveDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia4)).setChecked(!chkSecrecionNasalLeveDia4);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkSecrecionNasalLeveDia5 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia5)).isChecked();
+                            if (chkSecrecionNasalLeveDia5) {
+                                seguimientoInfluenza.setSecrecionNasalLeve("S");
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia5)).setChecked(!chkSecrecionNasalLeveDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia5)).setChecked(!chkSecrecionNasalLeveDia5);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkSecrecionNasalLeveDia6 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia6)).isChecked();
+                            if (chkSecrecionNasalLeveDia6) {
+                                seguimientoInfluenza.setSecrecionNasalLeve("S");
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia6)).setChecked(!chkSecrecionNasalLeveDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia6)).setChecked(!chkSecrecionNasalLeveDia6);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkSecrecionNasalLeveDia7 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia7)).isChecked();
+                            if (chkSecrecionNasalLeveDia7) {
+                                seguimientoInfluenza.setSecrecionNasalLeve("S");
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia7)).setChecked(!chkSecrecionNasalLeveDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia7)).setChecked(!chkSecrecionNasalLeveDia7);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkSecrecionNasalLeveDia8 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia8)).isChecked();
+                            if (chkSecrecionNasalLeveDia8) {
+                                seguimientoInfluenza.setSecrecionNasalLeve("S");
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia8)).setChecked(!chkSecrecionNasalLeveDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia8)).setChecked(!chkSecrecionNasalLeveDia8);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkSecrecionNasalLeveDia9 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia9)).isChecked();
+                            if (chkSecrecionNasalLeveDia9) {
+                                seguimientoInfluenza.setSecrecionNasalLeve("S");
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia9)).setChecked(!chkSecrecionNasalLeveDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia9)).setChecked(!chkSecrecionNasalLeveDia9);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkSecrecionNasalLeveDia10 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia10)).isChecked();
+                            if (chkSecrecionNasalLeveDia10) {
+                                seguimientoInfluenza.setSecrecionNasalLeve("S");
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia10)).setChecked(!chkSecrecionNasalLeveDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia10)).setChecked(!chkSecrecionNasalLeveDia10);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkSecrecionNasalLeveDia11 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia11)).isChecked();
+                            if (chkSecrecionNasalLeveDia11) {
+                                seguimientoInfluenza.setSecrecionNasalLeve("S");
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia11)).setChecked(!chkSecrecionNasalLeveDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia11)).setChecked(!chkSecrecionNasalLeveDia11);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkSecrecionNasalLeveDia12 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia12)).isChecked();
+                            if (chkSecrecionNasalLeveDia12) {
+                                seguimientoInfluenza.setSecrecionNasalLeve("S");
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia12)).setChecked(!chkSecrecionNasalLeveDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia12)).setChecked(!chkSecrecionNasalLeveDia12);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            public void onChkSecrecionNasalModerada(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkSecrecionNasalModeradaDia1 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia1)).isChecked();
+                            if (chkSecrecionNasalModeradaDia1) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada("S");
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia1)).setChecked(!chkSecrecionNasalModeradaDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia1)).setChecked(!chkSecrecionNasalModeradaDia1);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkSecrecionNasalModeradaDia2 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia2)).isChecked();
+                            if (chkSecrecionNasalModeradaDia2) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada("S");
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia2)).setChecked(!chkSecrecionNasalModeradaDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia2)).setChecked(!chkSecrecionNasalModeradaDia2);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkSecrecionNasalModeradaDia3 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia3)).isChecked();
+                            if (chkSecrecionNasalModeradaDia3) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada("S");
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia3)).setChecked(!chkSecrecionNasalModeradaDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia3)).setChecked(!chkSecrecionNasalModeradaDia3);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkSecrecionNasalModeradaDia4 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia4)).isChecked();
+                            if (chkSecrecionNasalModeradaDia4) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada("S");
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia4)).setChecked(!chkSecrecionNasalModeradaDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia4)).setChecked(!chkSecrecionNasalModeradaDia4);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkSecrecionNasalModeradaDia5 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia5)).isChecked();
+                            if (chkSecrecionNasalModeradaDia5) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada("S");
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia5)).setChecked(!chkSecrecionNasalModeradaDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia5)).setChecked(!chkSecrecionNasalModeradaDia5);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkSecrecionNasalModeradaDia6 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia6)).isChecked();
+                            if (chkSecrecionNasalModeradaDia6) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada("S");
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia6)).setChecked(!chkSecrecionNasalModeradaDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia6)).setChecked(!chkSecrecionNasalModeradaDia6);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkSecrecionNasalModeradaDia7 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia7)).isChecked();
+                            if (chkSecrecionNasalModeradaDia7) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada("S");
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia7)).setChecked(!chkSecrecionNasalModeradaDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia7)).setChecked(!chkSecrecionNasalModeradaDia7);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkSecrecionNasalModeradaDia8 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia8)).isChecked();
+                            if (chkSecrecionNasalModeradaDia8) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada("S");
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia8)).setChecked(!chkSecrecionNasalModeradaDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia8)).setChecked(!chkSecrecionNasalModeradaDia8);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkSecrecionNasalModeradaDia9 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia9)).isChecked();
+                            if (chkSecrecionNasalModeradaDia9) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada("S");
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia9)).setChecked(!chkSecrecionNasalModeradaDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia9)).setChecked(!chkSecrecionNasalModeradaDia9);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkSecrecionNasalModeradaDia10 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia10)).isChecked();
+                            if (chkSecrecionNasalModeradaDia10) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada("S");
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia10)).setChecked(!chkSecrecionNasalModeradaDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia10)).setChecked(!chkSecrecionNasalModeradaDia10);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkSecrecionNasalModeradaDia11 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia11)).isChecked();
+                            if (chkSecrecionNasalModeradaDia11) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada("S");
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia11)).setChecked(!chkSecrecionNasalModeradaDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia11)).setChecked(!chkSecrecionNasalModeradaDia11);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkSecrecionNasalModeradaDia12 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia12)).isChecked();
+                            if (chkSecrecionNasalModeradaDia12) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada("S");
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia12)).setChecked(!chkSecrecionNasalModeradaDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia12)).setChecked(!chkSecrecionNasalModeradaDia12);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            public void onChkSecrecionNasalSevera(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkSecrecionNasalSeveraDia1 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia1)).isChecked();
+                            if (chkSecrecionNasalSeveraDia1) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia1)).setChecked(!chkSecrecionNasalSeveraDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia1)).setChecked(!chkSecrecionNasalSeveraDia1);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkSecrecionNasalSeveraDia2 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia2)).isChecked();
+                            if (chkSecrecionNasalSeveraDia2) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia2)).setChecked(!chkSecrecionNasalSeveraDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia2)).setChecked(!chkSecrecionNasalSeveraDia2);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkSecrecionNasalSeveraDia3 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia3)).isChecked();
+                            if (chkSecrecionNasalSeveraDia3) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia3)).setChecked(!chkSecrecionNasalSeveraDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia3)).setChecked(!chkSecrecionNasalSeveraDia3);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkSecrecionNasalSeveraDia4 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia4)).isChecked();
+                            if (chkSecrecionNasalSeveraDia4) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia4)).setChecked(!chkSecrecionNasalSeveraDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia4)).setChecked(!chkSecrecionNasalSeveraDia4);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkSecrecionNasalSeveraDia5 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia5)).isChecked();
+                            if (chkSecrecionNasalSeveraDia5) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia5)).setChecked(!chkSecrecionNasalSeveraDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia5)).setChecked(!chkSecrecionNasalSeveraDia5);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkSecrecionNasalSeveraDia6 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia6)).isChecked();
+                            if (chkSecrecionNasalSeveraDia6) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia6)).setChecked(!chkSecrecionNasalSeveraDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia6)).setChecked(!chkSecrecionNasalSeveraDia6);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkSecrecionNasalSeveraDia7 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia7)).isChecked();
+                            if (chkSecrecionNasalSeveraDia7) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia7)).setChecked(!chkSecrecionNasalSeveraDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia7)).setChecked(!chkSecrecionNasalSeveraDia7);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkSecrecionNasalSeveraDia8 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia8)).isChecked();
+                            if (chkSecrecionNasalSeveraDia8) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia8)).setChecked(!chkSecrecionNasalSeveraDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia8)).setChecked(!chkSecrecionNasalSeveraDia8);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkSecrecionNasalSeveraDia9 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia9)).isChecked();
+                            if (chkSecrecionNasalSeveraDia9) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia9)).setChecked(!chkSecrecionNasalSeveraDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia9)).setChecked(!chkSecrecionNasalSeveraDia9);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkSecrecionNasalSeveraDia10 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia10)).isChecked();
+                            if (chkSecrecionNasalSeveraDia10) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia10)).setChecked(!chkSecrecionNasalSeveraDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia10)).setChecked(!chkSecrecionNasalSeveraDia10);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkSecrecionNasalSeveraDia11 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia11)).isChecked();
+                            if (chkSecrecionNasalSeveraDia11) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia11)).setChecked(!chkSecrecionNasalSeveraDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia11)).setChecked(!chkSecrecionNasalSeveraDia11);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkSecrecionNasalSeveraDia12 = ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia12)).isChecked();
+                            if (chkSecrecionNasalSeveraDia12) {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia12)).setChecked(!chkSecrecionNasalSeveraDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia12)).setChecked(!chkSecrecionNasalSeveraDia12);
+                            } else {
+                                seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                seguimientoInfluenza.setSecrecionNasalSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+            /*---------------------------*/
+            /*--------DOLOR DE GARGANTA-------------------*/
+            public void onChkDolorGargantaLeve(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkDolorGargantaLeveDia1 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia1)).isChecked();
+                            if (chkDolorGargantaLeveDia1) {
+                                seguimientoInfluenza.setDolorGargantaLeve("S");
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia1)).setChecked(!chkDolorGargantaLeveDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia1)).setChecked(!chkDolorGargantaLeveDia1);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkDolorGargantaLeveDia2 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia2)).isChecked();
+                            if (chkDolorGargantaLeveDia2) {
+                                seguimientoInfluenza.setDolorGargantaLeve("S");
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia2)).setChecked(!chkDolorGargantaLeveDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia2)).setChecked(!chkDolorGargantaLeveDia2);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkDolorGargantaLeveDia3 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia3)).isChecked();
+                            if (chkDolorGargantaLeveDia3) {
+                                seguimientoInfluenza.setDolorGargantaLeve("S");
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia3)).setChecked(!chkDolorGargantaLeveDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia3)).setChecked(!chkDolorGargantaLeveDia3);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkDolorGargantaLeveDia4 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia4)).isChecked();
+                            if (chkDolorGargantaLeveDia4) {
+                                seguimientoInfluenza.setDolorGargantaLeve("S");
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia4)).setChecked(!chkDolorGargantaLeveDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia4)).setChecked(!chkDolorGargantaLeveDia4);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkDolorGargantaLeveDia5 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia5)).isChecked();
+                            if (chkDolorGargantaLeveDia5) {
+                                seguimientoInfluenza.setDolorGargantaLeve("S");
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia5)).setChecked(!chkDolorGargantaLeveDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia5)).setChecked(!chkDolorGargantaLeveDia5);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkDolorGargantaLeveDia6 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia6)).isChecked();
+                            if (chkDolorGargantaLeveDia6) {
+                                seguimientoInfluenza.setDolorGargantaLeve("S");
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia6)).setChecked(!chkDolorGargantaLeveDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia6)).setChecked(!chkDolorGargantaLeveDia6);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkDolorGargantaLeveDia7 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia7)).isChecked();
+                            if (chkDolorGargantaLeveDia7) {
+                                seguimientoInfluenza.setDolorGargantaLeve("S");
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia7)).setChecked(!chkDolorGargantaLeveDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia7)).setChecked(!chkDolorGargantaLeveDia7);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkDolorGargantaLeveDia8 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia8)).isChecked();
+                            if (chkDolorGargantaLeveDia8) {
+                                seguimientoInfluenza.setDolorGargantaLeve("S");
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia8)).setChecked(!chkDolorGargantaLeveDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia8)).setChecked(!chkDolorGargantaLeveDia8);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkDolorGargantaLeveDia9 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia9)).isChecked();
+                            if (chkDolorGargantaLeveDia9) {
+                                seguimientoInfluenza.setDolorGargantaLeve("S");
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia9)).setChecked(!chkDolorGargantaLeveDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia9)).setChecked(!chkDolorGargantaLeveDia9);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkDolorGargantaLeveDia10 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia10)).isChecked();
+                            if (chkDolorGargantaLeveDia10) {
+                                seguimientoInfluenza.setDolorGargantaLeve("S");
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia10)).setChecked(!chkDolorGargantaLeveDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia10)).setChecked(!chkDolorGargantaLeveDia10);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkDolorGargantaLeveDia11 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia11)).isChecked();
+                            if (chkDolorGargantaLeveDia11) {
+                                seguimientoInfluenza.setDolorGargantaLeve("S");
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia11)).setChecked(!chkDolorGargantaLeveDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia11)).setChecked(!chkDolorGargantaLeveDia11);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkDolorGargantaLeveDia12 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia12)).isChecked();
+                            if (chkDolorGargantaLeveDia12) {
+                                seguimientoInfluenza.setDolorGargantaLeve("S");
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia12)).setChecked(!chkDolorGargantaLeveDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia12)).setChecked(!chkDolorGargantaLeveDia12);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            public void onChkDolorGargantaModerada(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkDolorGargantaModeradaDia1 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia1)).isChecked();
+                            if (chkDolorGargantaModeradaDia1) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada("S");
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia1)).setChecked(!chkDolorGargantaModeradaDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia1)).setChecked(!chkDolorGargantaModeradaDia1);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkDolorGargantaModeradaDia2 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia2)).isChecked();
+                            if (chkDolorGargantaModeradaDia2) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada("S");
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia2)).setChecked(!chkDolorGargantaModeradaDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia2)).setChecked(!chkDolorGargantaModeradaDia2);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkDolorGargantaModeradaDia3 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia3)).isChecked();
+                            if (chkDolorGargantaModeradaDia3) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada("S");
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia3)).setChecked(!chkDolorGargantaModeradaDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia3)).setChecked(!chkDolorGargantaModeradaDia3);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkDolorGargantaModeradaDia4 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia4)).isChecked();
+                            if (chkDolorGargantaModeradaDia4) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada("S");
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia4)).setChecked(!chkDolorGargantaModeradaDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia4)).setChecked(!chkDolorGargantaModeradaDia4);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkDolorGargantaModeradaDia5 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia5)).isChecked();
+                            if (chkDolorGargantaModeradaDia5) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada("S");
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia5)).setChecked(!chkDolorGargantaModeradaDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia5)).setChecked(!chkDolorGargantaModeradaDia5);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkDolorGargantaModeradaDia6 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia6)).isChecked();
+                            if (chkDolorGargantaModeradaDia6) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada("S");
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia6)).setChecked(!chkDolorGargantaModeradaDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia6)).setChecked(!chkDolorGargantaModeradaDia6);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkDolorGargantaModeradaDia7 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia7)).isChecked();
+                            if (chkDolorGargantaModeradaDia7) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada("S");
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia7)).setChecked(!chkDolorGargantaModeradaDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia7)).setChecked(!chkDolorGargantaModeradaDia7);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkDolorGargantaModeradaDia8 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia8)).isChecked();
+                            if (chkDolorGargantaModeradaDia8) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada("S");
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia8)).setChecked(!chkDolorGargantaModeradaDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia8)).setChecked(!chkDolorGargantaModeradaDia8);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkDolorGargantaModeradaDia9 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia9)).isChecked();
+                            if (chkDolorGargantaModeradaDia9) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada("S");
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia9)).setChecked(!chkDolorGargantaModeradaDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia9)).setChecked(!chkDolorGargantaModeradaDia9);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkDolorGargantaModeradaDia10 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia10)).isChecked();
+                            if (chkDolorGargantaModeradaDia10) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada("S");
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia10)).setChecked(!chkDolorGargantaModeradaDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia10)).setChecked(!chkDolorGargantaModeradaDia10);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkDolorGargantaModeradaDia11 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia11)).isChecked();
+                            if (chkDolorGargantaModeradaDia11) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada("S");
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia11)).setChecked(!chkDolorGargantaModeradaDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia11)).setChecked(!chkDolorGargantaModeradaDia11);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkDolorGargantaModeradaDia12 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia12)).isChecked();
+                            if (chkDolorGargantaModeradaDia12) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada("S");
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia12)).setChecked(!chkDolorGargantaModeradaDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia12)).setChecked(!chkDolorGargantaModeradaDia12);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            public void onChkDolorGargantaSevera(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkDolorGargantaSeveraDia1 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia1)).isChecked();
+                            if (chkDolorGargantaSeveraDia1) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia1)).setChecked(!chkDolorGargantaSeveraDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia1)).setChecked(!chkDolorGargantaSeveraDia1);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkDolorGargantaSeveraDia2 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia2)).isChecked();
+                            if (chkDolorGargantaSeveraDia2) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia2)).setChecked(!chkDolorGargantaSeveraDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia2)).setChecked(!chkDolorGargantaSeveraDia2);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkDolorGargantaSeveraDia3 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia3)).isChecked();
+                            if (chkDolorGargantaSeveraDia3) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia3)).setChecked(!chkDolorGargantaSeveraDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia3)).setChecked(!chkDolorGargantaSeveraDia3);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkDolorGargantaSeveraDia4 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia4)).isChecked();
+                            if (chkDolorGargantaSeveraDia4) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia4)).setChecked(!chkDolorGargantaSeveraDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia4)).setChecked(!chkDolorGargantaSeveraDia4);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkDolorGargantaSeveraDia5 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia5)).isChecked();
+                            if (chkDolorGargantaSeveraDia5) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia5)).setChecked(!chkDolorGargantaSeveraDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia5)).setChecked(!chkDolorGargantaSeveraDia5);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkDolorGargantaSeveraDia6 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia6)).isChecked();
+                            if (chkDolorGargantaSeveraDia6) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia6)).setChecked(!chkDolorGargantaSeveraDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia6)).setChecked(!chkDolorGargantaSeveraDia6);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkDolorGargantaSeveraDia7 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia7)).isChecked();
+                            if (chkDolorGargantaSeveraDia7) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia7)).setChecked(!chkDolorGargantaSeveraDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia7)).setChecked(!chkDolorGargantaSeveraDia7);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkDolorGargantaSeveraDia8 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia8)).isChecked();
+                            if (chkDolorGargantaSeveraDia8) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia8)).setChecked(!chkDolorGargantaSeveraDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia8)).setChecked(!chkDolorGargantaSeveraDia8);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkDolorGargantaSeveraDia9 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia9)).isChecked();
+                            if (chkDolorGargantaSeveraDia9) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia9)).setChecked(!chkDolorGargantaSeveraDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia9)).setChecked(!chkDolorGargantaSeveraDia9);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkDolorGargantaSeveraDia10 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia10)).isChecked();
+                            if (chkDolorGargantaSeveraDia10) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia10)).setChecked(!chkDolorGargantaSeveraDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia10)).setChecked(!chkDolorGargantaSeveraDia10);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkDolorGargantaSeveraDia11 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia11)).isChecked();
+                            if (chkDolorGargantaSeveraDia11) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia11)).setChecked(!chkDolorGargantaSeveraDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia11)).setChecked(!chkDolorGargantaSeveraDia11);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkDolorGargantaSeveraDia12 = ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia12)).isChecked();
+                            if (chkDolorGargantaSeveraDia12) {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia12)).setChecked(!chkDolorGargantaSeveraDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia12)).setChecked(!chkDolorGargantaSeveraDia12);
+                            } else {
+                                seguimientoInfluenza.setDolorGargantaLeve(null);
+                                seguimientoInfluenza.setDolorGargantaModerada(null);
+                                seguimientoInfluenza.setDolorGargantaSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+            /*---------------------------*/
+            /*--------DOLOR DE CABEZA-------------------*/
+            public void onChkDolorCabezaLeve(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkDolorCabezaLeveDia1 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia1)).isChecked();
+                            if (chkDolorCabezaLeveDia1) {
+                                seguimientoInfluenza.setDolorCabezaLeve("S");
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia1)).setChecked(!chkDolorCabezaLeveDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia1)).setChecked(!chkDolorCabezaLeveDia1);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkDolorCabezaLeveDia2 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia2)).isChecked();
+                            if (chkDolorCabezaLeveDia2) {
+                                seguimientoInfluenza.setDolorCabezaLeve("S");
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia2)).setChecked(!chkDolorCabezaLeveDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia2)).setChecked(!chkDolorCabezaLeveDia2);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkDolorCabezaLeveDia3 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia3)).isChecked();
+                            if (chkDolorCabezaLeveDia3) {
+                                seguimientoInfluenza.setDolorCabezaLeve("S");
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia3)).setChecked(!chkDolorCabezaLeveDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia3)).setChecked(!chkDolorCabezaLeveDia3);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkDolorCabezaLeveDia4 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia4)).isChecked();
+                            if (chkDolorCabezaLeveDia4) {
+                                seguimientoInfluenza.setDolorCabezaLeve("S");
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia4)).setChecked(!chkDolorCabezaLeveDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia4)).setChecked(!chkDolorCabezaLeveDia4);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkDolorCabezaLeveDia5 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia5)).isChecked();
+                            if (chkDolorCabezaLeveDia5) {
+                                seguimientoInfluenza.setDolorCabezaLeve("S");
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia5)).setChecked(!chkDolorCabezaLeveDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia5)).setChecked(!chkDolorCabezaLeveDia5);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkDolorCabezaLeveDia6 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia6)).isChecked();
+                            if (chkDolorCabezaLeveDia6) {
+                                seguimientoInfluenza.setDolorCabezaLeve("S");
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia6)).setChecked(!chkDolorCabezaLeveDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia6)).setChecked(!chkDolorCabezaLeveDia6);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkDolorCabezaLeveDia7 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia7)).isChecked();
+                            if (chkDolorCabezaLeveDia7) {
+                                seguimientoInfluenza.setDolorCabezaLeve("S");
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia7)).setChecked(!chkDolorCabezaLeveDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia7)).setChecked(!chkDolorCabezaLeveDia7);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkDolorCabezaLeveDia8 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia8)).isChecked();
+                            if (chkDolorCabezaLeveDia8) {
+                                seguimientoInfluenza.setDolorCabezaLeve("S");
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia8)).setChecked(!chkDolorCabezaLeveDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia8)).setChecked(!chkDolorCabezaLeveDia8);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkDolorCabezaLeveDia9 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia9)).isChecked();
+                            if (chkDolorCabezaLeveDia9) {
+                                seguimientoInfluenza.setDolorCabezaLeve("S");
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia9)).setChecked(!chkDolorCabezaLeveDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia9)).setChecked(!chkDolorCabezaLeveDia9);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkDolorCabezaLeveDia10 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia10)).isChecked();
+                            if (chkDolorCabezaLeveDia10) {
+                                seguimientoInfluenza.setDolorCabezaLeve("S");
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia10)).setChecked(!chkDolorCabezaLeveDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia10)).setChecked(!chkDolorCabezaLeveDia10);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkDolorCabezaLeveDia11 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia11)).isChecked();
+                            if (chkDolorCabezaLeveDia11) {
+                                seguimientoInfluenza.setDolorCabezaLeve("S");
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia11)).setChecked(!chkDolorCabezaLeveDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia11)).setChecked(!chkDolorCabezaLeveDia11);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkDolorCabezaLeveDia12 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia12)).isChecked();
+                            if (chkDolorCabezaLeveDia12) {
+                                seguimientoInfluenza.setDolorCabezaLeve("S");
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia12)).setChecked(!chkDolorCabezaLeveDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia12)).setChecked(!chkDolorCabezaLeveDia12);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            public void onChkDolorCabezaModerada(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkDolorCabezaModeradaDia1 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia1)).isChecked();
+                            if (chkDolorCabezaModeradaDia1) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada("S");
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia1)).setChecked(!chkDolorCabezaModeradaDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia1)).setChecked(!chkDolorCabezaModeradaDia1);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkDolorCabezaModeradaDia2 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia2)).isChecked();
+                            if (chkDolorCabezaModeradaDia2) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada("S");
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia2)).setChecked(!chkDolorCabezaModeradaDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia2)).setChecked(!chkDolorCabezaModeradaDia2);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkDolorCabezaModeradaDia3 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia3)).isChecked();
+                            if (chkDolorCabezaModeradaDia3) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada("S");
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia3)).setChecked(!chkDolorCabezaModeradaDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia3)).setChecked(!chkDolorCabezaModeradaDia3);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkDolorCabezaModeradaDia4 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia4)).isChecked();
+                            if (chkDolorCabezaModeradaDia4) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada("S");
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia4)).setChecked(!chkDolorCabezaModeradaDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia4)).setChecked(!chkDolorCabezaModeradaDia4);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkDolorCabezaModeradaDia5 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia5)).isChecked();
+                            if (chkDolorCabezaModeradaDia5) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada("S");
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia5)).setChecked(!chkDolorCabezaModeradaDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia5)).setChecked(!chkDolorCabezaModeradaDia5);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkDolorCabezaModeradaDia6 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia6)).isChecked();
+                            if (chkDolorCabezaModeradaDia6) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada("S");
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia6)).setChecked(!chkDolorCabezaModeradaDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia6)).setChecked(!chkDolorCabezaModeradaDia6);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkDolorCabezaModeradaDia7 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia7)).isChecked();
+                            if (chkDolorCabezaModeradaDia7) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada("S");
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia7)).setChecked(!chkDolorCabezaModeradaDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia7)).setChecked(!chkDolorCabezaModeradaDia7);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkDolorCabezaModeradaDia8 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia8)).isChecked();
+                            if (chkDolorCabezaModeradaDia8) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada("S");
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia8)).setChecked(!chkDolorCabezaModeradaDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia8)).setChecked(!chkDolorCabezaModeradaDia8);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkDolorCabezaModeradaDia9 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia9)).isChecked();
+                            if (chkDolorCabezaModeradaDia9) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada("S");
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia9)).setChecked(!chkDolorCabezaModeradaDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia9)).setChecked(!chkDolorCabezaModeradaDia9);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkDolorCabezaModeradaDia10 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia10)).isChecked();
+                            if (chkDolorCabezaModeradaDia10) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada("S");
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia10)).setChecked(!chkDolorCabezaModeradaDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia10)).setChecked(!chkDolorCabezaModeradaDia10);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkDolorCabezaModeradaDia11 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia11)).isChecked();
+                            if (chkDolorCabezaModeradaDia11) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada("S");
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia11)).setChecked(!chkDolorCabezaModeradaDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia11)).setChecked(!chkDolorCabezaModeradaDia11);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkDolorCabezaModeradaDia12 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia12)).isChecked();
+                            if (chkDolorCabezaModeradaDia12) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada("S");
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia12)).setChecked(!chkDolorCabezaModeradaDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia12)).setChecked(!chkDolorCabezaModeradaDia12);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            public void onChkDolorCabezaSevera(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkDolorCabezaSeveraDia1 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia1)).isChecked();
+                            if (chkDolorCabezaSeveraDia1) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia1)).setChecked(!chkDolorCabezaSeveraDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia1)).setChecked(!chkDolorCabezaSeveraDia1);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkDolorCabezaSeveraDia2 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia2)).isChecked();
+                            if (chkDolorCabezaSeveraDia2) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia2)).setChecked(!chkDolorCabezaSeveraDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia2)).setChecked(!chkDolorCabezaSeveraDia2);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkDolorCabezaSeveraDia3 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia3)).isChecked();
+                            if (chkDolorCabezaSeveraDia3) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia3)).setChecked(!chkDolorCabezaSeveraDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia3)).setChecked(!chkDolorCabezaSeveraDia3);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkDolorCabezaSeveraDia4 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia4)).isChecked();
+                            if (chkDolorCabezaSeveraDia4) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia4)).setChecked(!chkDolorCabezaSeveraDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia4)).setChecked(!chkDolorCabezaSeveraDia4);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkDolorCabezaSeveraDia5 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia5)).isChecked();
+                            if (chkDolorCabezaSeveraDia5) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia5)).setChecked(!chkDolorCabezaSeveraDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia5)).setChecked(!chkDolorCabezaSeveraDia5);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkDolorCabezaSeveraDia6 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia6)).isChecked();
+                            if (chkDolorCabezaSeveraDia6) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia6)).setChecked(!chkDolorCabezaSeveraDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia6)).setChecked(!chkDolorCabezaSeveraDia6);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkDolorCabezaSeveraDia7 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia7)).isChecked();
+                            if (chkDolorCabezaSeveraDia7) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia7)).setChecked(!chkDolorCabezaSeveraDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia7)).setChecked(!chkDolorCabezaSeveraDia7);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkDolorCabezaSeveraDia8 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia8)).isChecked();
+                            if (chkDolorCabezaSeveraDia8) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia8)).setChecked(!chkDolorCabezaSeveraDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia8)).setChecked(!chkDolorCabezaSeveraDia8);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkDolorCabezaSeveraDia9 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia9)).isChecked();
+                            if (chkDolorCabezaSeveraDia9) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia9)).setChecked(!chkDolorCabezaSeveraDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia9)).setChecked(!chkDolorCabezaSeveraDia9);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkDolorCabezaSeveraDia10 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia10)).isChecked();
+                            if (chkDolorCabezaSeveraDia10) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia10)).setChecked(!chkDolorCabezaSeveraDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia10)).setChecked(!chkDolorCabezaSeveraDia10);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkDolorCabezaSeveraDia11 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia11)).isChecked();
+                            if (chkDolorCabezaSeveraDia11) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia11)).setChecked(!chkDolorCabezaSeveraDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia11)).setChecked(!chkDolorCabezaSeveraDia11);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkDolorCabezaSeveraDia12 = ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia12)).isChecked();
+                            if (chkDolorCabezaSeveraDia12) {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia12)).setChecked(!chkDolorCabezaSeveraDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia12)).setChecked(!chkDolorCabezaSeveraDia12);
+                            } else {
+                                seguimientoInfluenza.setDolorCabezaLeve(null);
+                                seguimientoInfluenza.setDolorCabezaModerada(null);
+                                seguimientoInfluenza.setDolorCabezaSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+            /*---------------------------*/
+            /*--------DOLOR MUSCULAR-------------------*/
+            public void onChkDolorMuscularLeve(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkDolorMuscularLeveDia1 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia1)).isChecked();
+                            if (chkDolorMuscularLeveDia1) {
+                                seguimientoInfluenza.setDolorMuscularLeve("S");
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia1)).setChecked(!chkDolorMuscularLeveDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia1)).setChecked(!chkDolorMuscularLeveDia1);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkDolorMuscularLeveDia2 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia2)).isChecked();
+                            if (chkDolorMuscularLeveDia2) {
+                                seguimientoInfluenza.setDolorMuscularLeve("S");
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia2)).setChecked(!chkDolorMuscularLeveDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia2)).setChecked(!chkDolorMuscularLeveDia2);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkDolorMuscularLeveDia3 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia3)).isChecked();
+                            if (chkDolorMuscularLeveDia3) {
+                                seguimientoInfluenza.setDolorMuscularLeve("S");
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia3)).setChecked(!chkDolorMuscularLeveDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia3)).setChecked(!chkDolorMuscularLeveDia3);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkDolorMuscularLeveDia4 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia4)).isChecked();
+                            if (chkDolorMuscularLeveDia4) {
+                                seguimientoInfluenza.setDolorMuscularLeve("S");
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia4)).setChecked(!chkDolorMuscularLeveDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia4)).setChecked(!chkDolorMuscularLeveDia4);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkDolorMuscularLeveDia5 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia5)).isChecked();
+                            if (chkDolorMuscularLeveDia5) {
+                                seguimientoInfluenza.setDolorMuscularLeve("S");
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia5)).setChecked(!chkDolorMuscularLeveDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia5)).setChecked(!chkDolorMuscularLeveDia5);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkDolorMuscularLeveDia6 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia6)).isChecked();
+                            if (chkDolorMuscularLeveDia6) {
+                                seguimientoInfluenza.setDolorMuscularLeve("S");
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia6)).setChecked(!chkDolorMuscularLeveDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia6)).setChecked(!chkDolorMuscularLeveDia6);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkDolorMuscularLeveDia7 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia7)).isChecked();
+                            if (chkDolorMuscularLeveDia7) {
+                                seguimientoInfluenza.setDolorMuscularLeve("S");
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia7)).setChecked(!chkDolorMuscularLeveDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia7)).setChecked(!chkDolorMuscularLeveDia7);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkDolorMuscularLeveDia8 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia8)).isChecked();
+                            if (chkDolorMuscularLeveDia8) {
+                                seguimientoInfluenza.setDolorMuscularLeve("S");
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia8)).setChecked(!chkDolorMuscularLeveDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia8)).setChecked(!chkDolorMuscularLeveDia8);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkDolorMuscularLeveDia9 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia9)).isChecked();
+                            if (chkDolorMuscularLeveDia9) {
+                                seguimientoInfluenza.setDolorMuscularLeve("S");
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia9)).setChecked(!chkDolorMuscularLeveDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia9)).setChecked(!chkDolorMuscularLeveDia9);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkDolorMuscularLeveDia10 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia10)).isChecked();
+                            if (chkDolorMuscularLeveDia10) {
+                                seguimientoInfluenza.setDolorMuscularLeve("S");
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia10)).setChecked(!chkDolorMuscularLeveDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia10)).setChecked(!chkDolorMuscularLeveDia10);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkDolorMuscularLeveDia11 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia11)).isChecked();
+                            if (chkDolorMuscularLeveDia11) {
+                                seguimientoInfluenza.setDolorMuscularLeve("S");
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia11)).setChecked(!chkDolorMuscularLeveDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia11)).setChecked(!chkDolorMuscularLeveDia11);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkDolorMuscularLeveDia12 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia12)).isChecked();
+                            if (chkDolorMuscularLeveDia12) {
+                                seguimientoInfluenza.setDolorMuscularLeve("S");
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia12)).setChecked(!chkDolorMuscularLeveDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia12)).setChecked(!chkDolorMuscularLeveDia12);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            public void onChkDolorMuscularModerada(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkDolorMuscularModeradaDia1 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia1)).isChecked();
+                            if (chkDolorMuscularModeradaDia1) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada("S");
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia1)).setChecked(!chkDolorMuscularModeradaDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia1)).setChecked(!chkDolorMuscularModeradaDia1);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkDolorMuscularModeradaDia2 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia2)).isChecked();
+                            if (chkDolorMuscularModeradaDia2) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada("S");
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia2)).setChecked(!chkDolorMuscularModeradaDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia2)).setChecked(!chkDolorMuscularModeradaDia2);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkDolorMuscularModeradaDia3 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia3)).isChecked();
+                            if (chkDolorMuscularModeradaDia3) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada("S");
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia3)).setChecked(!chkDolorMuscularModeradaDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia3)).setChecked(!chkDolorMuscularModeradaDia3);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkDolorMuscularModeradaDia4 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia4)).isChecked();
+                            if (chkDolorMuscularModeradaDia4) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada("S");
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia4)).setChecked(!chkDolorMuscularModeradaDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia4)).setChecked(!chkDolorMuscularModeradaDia4);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkDolorMuscularModeradaDia5 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia5)).isChecked();
+                            if (chkDolorMuscularModeradaDia5) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada("S");
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia5)).setChecked(!chkDolorMuscularModeradaDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia5)).setChecked(!chkDolorMuscularModeradaDia5);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkDolorMuscularModeradaDia6 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia6)).isChecked();
+                            if (chkDolorMuscularModeradaDia6) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada("S");
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia6)).setChecked(!chkDolorMuscularModeradaDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia6)).setChecked(!chkDolorMuscularModeradaDia6);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkDolorMuscularModeradaDia7 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia7)).isChecked();
+                            if (chkDolorMuscularModeradaDia7) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada("S");
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia7)).setChecked(!chkDolorMuscularModeradaDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia7)).setChecked(!chkDolorMuscularModeradaDia7);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkDolorMuscularModeradaDia8 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia8)).isChecked();
+                            if (chkDolorMuscularModeradaDia8) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada("S");
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia8)).setChecked(!chkDolorMuscularModeradaDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia8)).setChecked(!chkDolorMuscularModeradaDia8);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkDolorMuscularModeradaDia9 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia9)).isChecked();
+                            if (chkDolorMuscularModeradaDia9) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada("S");
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia9)).setChecked(!chkDolorMuscularModeradaDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia9)).setChecked(!chkDolorMuscularModeradaDia9);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkDolorMuscularModeradaDia10 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia10)).isChecked();
+                            if (chkDolorMuscularModeradaDia10) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada("S");
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia10)).setChecked(!chkDolorMuscularModeradaDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia10)).setChecked(!chkDolorMuscularModeradaDia10);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkDolorMuscularModeradaDia11 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia11)).isChecked();
+                            if (chkDolorMuscularModeradaDia11) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada("S");
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia11)).setChecked(!chkDolorMuscularModeradaDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia11)).setChecked(!chkDolorMuscularModeradaDia11);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkDolorMuscularModeradaDia12 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia12)).isChecked();
+                            if (chkDolorMuscularModeradaDia12) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada("S");
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia12)).setChecked(!chkDolorMuscularModeradaDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia12)).setChecked(!chkDolorMuscularModeradaDia12);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            public void onChkDolorMuscularSevera(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkDolorMuscularSeveraDia1 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia1)).isChecked();
+                            if (chkDolorMuscularSeveraDia1) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia1)).setChecked(!chkDolorMuscularSeveraDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia1)).setChecked(!chkDolorMuscularSeveraDia1);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkDolorMuscularSeveraDia2 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia2)).isChecked();
+                            if (chkDolorMuscularSeveraDia2) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia2)).setChecked(!chkDolorMuscularSeveraDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia2)).setChecked(!chkDolorMuscularSeveraDia2);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkDolorMuscularSeveraDia3 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia3)).isChecked();
+                            if (chkDolorMuscularSeveraDia3) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia3)).setChecked(!chkDolorMuscularSeveraDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia3)).setChecked(!chkDolorMuscularSeveraDia3);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkDolorMuscularSeveraDia4 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia4)).isChecked();
+                            if (chkDolorMuscularSeveraDia4) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia4)).setChecked(!chkDolorMuscularSeveraDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia4)).setChecked(!chkDolorMuscularSeveraDia4);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkDolorMuscularSeveraDia5 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia5)).isChecked();
+                            if (chkDolorMuscularSeveraDia5) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia5)).setChecked(!chkDolorMuscularSeveraDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia5)).setChecked(!chkDolorMuscularSeveraDia5);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkDolorMuscularSeveraDia6 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia6)).isChecked();
+                            if (chkDolorMuscularSeveraDia6) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia6)).setChecked(!chkDolorMuscularSeveraDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia6)).setChecked(!chkDolorMuscularSeveraDia6);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkDolorMuscularSeveraDia7 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia7)).isChecked();
+                            if (chkDolorMuscularSeveraDia7) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia7)).setChecked(!chkDolorMuscularSeveraDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia7)).setChecked(!chkDolorMuscularSeveraDia7);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkDolorMuscularSeveraDia8 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia8)).isChecked();
+                            if (chkDolorMuscularSeveraDia8) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia8)).setChecked(!chkDolorMuscularSeveraDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia8)).setChecked(!chkDolorMuscularSeveraDia8);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkDolorMuscularSeveraDia9 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia9)).isChecked();
+                            if (chkDolorMuscularSeveraDia9) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia9)).setChecked(!chkDolorMuscularSeveraDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia9)).setChecked(!chkDolorMuscularSeveraDia9);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkDolorMuscularSeveraDia10 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia10)).isChecked();
+                            if (chkDolorMuscularSeveraDia10) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia10)).setChecked(!chkDolorMuscularSeveraDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia10)).setChecked(!chkDolorMuscularSeveraDia10);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkDolorMuscularSeveraDia11 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia11)).isChecked();
+                            if (chkDolorMuscularSeveraDia11) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia11)).setChecked(!chkDolorMuscularSeveraDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia11)).setChecked(!chkDolorMuscularSeveraDia11);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkDolorMuscularSeveraDia12 = ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia12)).isChecked();
+                            if (chkDolorMuscularSeveraDia12) {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia12)).setChecked(!chkDolorMuscularSeveraDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia12)).setChecked(!chkDolorMuscularSeveraDia12);
+                            } else {
+                                seguimientoInfluenza.setDolorMuscularLeve(null);
+                                seguimientoInfluenza.setDolorMuscularModerada(null);
+                                seguimientoInfluenza.setDolorMuscularSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+            /*---------------------------*/
+            /*--------DOLOR ARTICULAR-------------------*/
+            public void onChkDolorArticularLeve(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkDolorArticularLeveDia1 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia1)).isChecked();
+                            if (chkDolorArticularLeveDia1) {
+                                seguimientoInfluenza.setDolorArticularLeve("S");
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia1)).setChecked(!chkDolorArticularLeveDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia1)).setChecked(!chkDolorArticularLeveDia1);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkDolorArticularLeveDia2 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia2)).isChecked();
+                            if (chkDolorArticularLeveDia2) {
+                                seguimientoInfluenza.setDolorArticularLeve("S");
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia2)).setChecked(!chkDolorArticularLeveDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia2)).setChecked(!chkDolorArticularLeveDia2);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkDolorArticularLeveDia3 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia3)).isChecked();
+                            if (chkDolorArticularLeveDia3) {
+                                seguimientoInfluenza.setDolorArticularLeve("S");
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia3)).setChecked(!chkDolorArticularLeveDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia3)).setChecked(!chkDolorArticularLeveDia3);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkDolorArticularLeveDia4 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia4)).isChecked();
+                            if (chkDolorArticularLeveDia4) {
+                                seguimientoInfluenza.setDolorArticularLeve("S");
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia4)).setChecked(!chkDolorArticularLeveDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia4)).setChecked(!chkDolorArticularLeveDia4);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkDolorArticularLeveDia5 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia5)).isChecked();
+                            if (chkDolorArticularLeveDia5) {
+                                seguimientoInfluenza.setDolorArticularLeve("S");
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia5)).setChecked(!chkDolorArticularLeveDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia5)).setChecked(!chkDolorArticularLeveDia5);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkDolorArticularLeveDia6 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia6)).isChecked();
+                            if (chkDolorArticularLeveDia6) {
+                                seguimientoInfluenza.setDolorArticularLeve("S");
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia6)).setChecked(!chkDolorArticularLeveDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia6)).setChecked(!chkDolorArticularLeveDia6);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkDolorArticularLeveDia7 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia7)).isChecked();
+                            if (chkDolorArticularLeveDia7) {
+                                seguimientoInfluenza.setDolorArticularLeve("S");
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia7)).setChecked(!chkDolorArticularLeveDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia7)).setChecked(!chkDolorArticularLeveDia7);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkDolorArticularLeveDia8 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia8)).isChecked();
+                            if (chkDolorArticularLeveDia8) {
+                                seguimientoInfluenza.setDolorArticularLeve("S");
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia8)).setChecked(!chkDolorArticularLeveDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia8)).setChecked(!chkDolorArticularLeveDia8);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkDolorArticularLeveDia9 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia9)).isChecked();
+                            if (chkDolorArticularLeveDia9) {
+                                seguimientoInfluenza.setDolorArticularLeve("S");
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia9)).setChecked(!chkDolorArticularLeveDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia9)).setChecked(!chkDolorArticularLeveDia9);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkDolorArticularLeveDia10 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia10)).isChecked();
+                            if (chkDolorArticularLeveDia10) {
+                                seguimientoInfluenza.setDolorArticularLeve("S");
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia10)).setChecked(!chkDolorArticularLeveDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia10)).setChecked(!chkDolorArticularLeveDia10);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkDolorArticularLeveDia11 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia11)).isChecked();
+                            if (chkDolorArticularLeveDia11) {
+                                seguimientoInfluenza.setDolorArticularLeve("S");
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia11)).setChecked(!chkDolorArticularLeveDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia11)).setChecked(!chkDolorArticularLeveDia11);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkDolorArticularLeveDia12 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia12)).isChecked();
+                            if (chkDolorArticularLeveDia12) {
+                                seguimientoInfluenza.setDolorArticularLeve("S");
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia12)).setChecked(!chkDolorArticularLeveDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia12)).setChecked(!chkDolorArticularLeveDia12);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            public void onChkDolorArticularModerada(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkDolorArticularModeradaDia1 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia1)).isChecked();
+                            if (chkDolorArticularModeradaDia1) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada("S");
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia1)).setChecked(!chkDolorArticularModeradaDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia1)).setChecked(!chkDolorArticularModeradaDia1);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkDolorArticularModeradaDia2 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia2)).isChecked();
+                            if (chkDolorArticularModeradaDia2) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada("S");
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia2)).setChecked(!chkDolorArticularModeradaDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia2)).setChecked(!chkDolorArticularModeradaDia2);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkDolorArticularModeradaDia3 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia3)).isChecked();
+                            if (chkDolorArticularModeradaDia3) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada("S");
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia3)).setChecked(!chkDolorArticularModeradaDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia3)).setChecked(!chkDolorArticularModeradaDia3);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkDolorArticularModeradaDia4 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia4)).isChecked();
+                            if (chkDolorArticularModeradaDia4) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada("S");
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia4)).setChecked(!chkDolorArticularModeradaDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia4)).setChecked(!chkDolorArticularModeradaDia4);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkDolorArticularModeradaDia5 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia5)).isChecked();
+                            if (chkDolorArticularModeradaDia5) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada("S");
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia5)).setChecked(!chkDolorArticularModeradaDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia5)).setChecked(!chkDolorArticularModeradaDia5);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkDolorArticularModeradaDia6 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia6)).isChecked();
+                            if (chkDolorArticularModeradaDia6) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada("S");
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia6)).setChecked(!chkDolorArticularModeradaDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia6)).setChecked(!chkDolorArticularModeradaDia6);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkDolorArticularModeradaDia7 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia7)).isChecked();
+                            if (chkDolorArticularModeradaDia7) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada("S");
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia7)).setChecked(!chkDolorArticularModeradaDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia7)).setChecked(!chkDolorArticularModeradaDia7);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkDolorArticularModeradaDia8 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia8)).isChecked();
+                            if (chkDolorArticularModeradaDia8) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada("S");
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia8)).setChecked(!chkDolorArticularModeradaDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia8)).setChecked(!chkDolorArticularModeradaDia8);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkDolorArticularModeradaDia9 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia9)).isChecked();
+                            if (chkDolorArticularModeradaDia9) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada("S");
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia9)).setChecked(!chkDolorArticularModeradaDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia9)).setChecked(!chkDolorArticularModeradaDia9);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkDolorArticularModeradaDia10 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia10)).isChecked();
+                            if (chkDolorArticularModeradaDia10) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada("S");
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia10)).setChecked(!chkDolorArticularModeradaDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia10)).setChecked(!chkDolorArticularModeradaDia10);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkDolorArticularModeradaDia11 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia11)).isChecked();
+                            if (chkDolorArticularModeradaDia11) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada("S");
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia11)).setChecked(!chkDolorArticularModeradaDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia11)).setChecked(!chkDolorArticularModeradaDia11);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkDolorArticularModeradaDia12 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia12)).isChecked();
+                            if (chkDolorArticularModeradaDia12) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada("S");
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia12)).setChecked(!chkDolorArticularModeradaDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia12)).setChecked(!chkDolorArticularModeradaDia12);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            public void onChkDolorArticularSevera(View view) {
+                SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
+                if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
+                    switch (mPage) {
+                        case 1:
+                            boolean chkDolorArticularSeveraDia1 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia1)).isChecked();
+                            if (chkDolorArticularSeveraDia1) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia1)).setChecked(!chkDolorArticularSeveraDia1);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia1)).setChecked(!chkDolorArticularSeveraDia1);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 2:
+                            boolean chkDolorArticularSeveraDia2 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia2)).isChecked();
+                            if (chkDolorArticularSeveraDia2) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia2)).setChecked(!chkDolorArticularSeveraDia2);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia2)).setChecked(!chkDolorArticularSeveraDia2);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 3:
+                            boolean chkDolorArticularSeveraDia3 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia3)).isChecked();
+                            if (chkDolorArticularSeveraDia3) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia3)).setChecked(!chkDolorArticularSeveraDia3);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia3)).setChecked(!chkDolorArticularSeveraDia3);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 4:
+                            boolean chkDolorArticularSeveraDia4 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia4)).isChecked();
+                            if (chkDolorArticularSeveraDia4) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia4)).setChecked(!chkDolorArticularSeveraDia4);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia4)).setChecked(!chkDolorArticularSeveraDia4);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 5:
+                            boolean chkDolorArticularSeveraDia5 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia5)).isChecked();
+                            if (chkDolorArticularSeveraDia5) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia5)).setChecked(!chkDolorArticularSeveraDia5);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia5)).setChecked(!chkDolorArticularSeveraDia5);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 6:
+                            boolean chkDolorArticularSeveraDia6 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia6)).isChecked();
+                            if (chkDolorArticularSeveraDia6) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia6)).setChecked(!chkDolorArticularSeveraDia6);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia6)).setChecked(!chkDolorArticularSeveraDia6);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 7:
+                            boolean chkDolorArticularSeveraDia7 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia7)).isChecked();
+                            if (chkDolorArticularSeveraDia7) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia7)).setChecked(!chkDolorArticularSeveraDia7);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia7)).setChecked(!chkDolorArticularSeveraDia7);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 8:
+                            boolean chkDolorArticularSeveraDia8 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia8)).isChecked();
+                            if (chkDolorArticularSeveraDia8) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia8)).setChecked(!chkDolorArticularSeveraDia8);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia8)).setChecked(!chkDolorArticularSeveraDia8);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 9:
+                            boolean chkDolorArticularSeveraDia9 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia9)).isChecked();
+                            if (chkDolorArticularSeveraDia9) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia9)).setChecked(!chkDolorArticularSeveraDia9);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia9)).setChecked(!chkDolorArticularSeveraDia9);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 10:
+                            boolean chkDolorArticularSeveraDia10 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia10)).isChecked();
+                            if (chkDolorArticularSeveraDia10) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia10)).setChecked(!chkDolorArticularSeveraDia10);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia10)).setChecked(!chkDolorArticularSeveraDia10);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 11:
+                            boolean chkDolorArticularSeveraDia11 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia11)).isChecked();
+                            if (chkDolorArticularSeveraDia11) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia11)).setChecked(!chkDolorArticularSeveraDia11);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia11)).setChecked(!chkDolorArticularSeveraDia11);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                        case 12:
+                            boolean chkDolorArticularSeveraDia12 = ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia12)).isChecked();
+                            if (chkDolorArticularSeveraDia12) {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera("S");
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia12)).setChecked(!chkDolorArticularSeveraDia12);
+                                ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia12)).setChecked(!chkDolorArticularSeveraDia12);
+                            } else {
+                                seguimientoInfluenza.setDolorArticularLeve(null);
+                                seguimientoInfluenza.setDolorArticularModerada(null);
+                                seguimientoInfluenza.setDolorArticularSevera(null);
+                            }
+                            break;
+                    }
+                }
+            }
+            /*---------------------------*/
             public void cargarConsultaInicial(int position) {
                 SeguimientoInfluenzaDTO seguimientoInfluenza = obtenerNuevoSeguimientoPorDia(mPage);
                 if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
                     seguimientoInfluenza.setConsultaInicial((mSeguimientoInfluenzaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) ?
                             mSeguimientoInfluenzaActivity.adapter.getItem(position).toString() : null);
+                    //El secHojaInfluenza lo trae segFlu
+                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                    if (segFlu != null) {
+                        seguimientoInfluenza.setSecHojaInfluenza(segFlu.getSecHojaInfluenza());
+                    }
                 } else if(mSeguimientoInfluenzaActivity.adapter != null && mSeguimientoInfluenzaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) {
                     seguimientoInfluenza = new SeguimientoInfluenzaDTO();
                     seguimientoInfluenza.setControlDia(mPage);
@@ -4494,6 +12183,467 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
                     seguimientoInfluenza.setFiebre((mSeguimientoInfluenzaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) ?
                             mSeguimientoInfluenzaActivity.adapter.getItem(position).toString() : null);
+                    /*CAMBIO FIEBRE*/
+                    if (seguimientoInfluenza.getFiebre() != null) {
+                        switch (mPage) {
+                            case 1:
+                                if (seguimientoInfluenza.getFiebre().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia1).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia1).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkFiebreLeveDia1).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreModeradaDia1).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreSeveraDia1).setEnabled(false);
+                                        if (segFlu.getFiebreLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreLeve(segFlu.getFiebreLeve());
+                                        }
+                                        if (segFlu.getFiebreModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreModerada(segFlu.getFiebreModerada());
+                                        }
+                                        if (segFlu.getFiebreSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreSevera(segFlu.getFiebreSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setFiebreLeve(null);
+                                    seguimientoInfluenza.setFiebreModerada(null);
+                                    seguimientoInfluenza.setFiebreSevera(null);
+                                    getActivity().findViewById(R.id.layoutFiebreDia1).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia1)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia1)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia1)).setChecked(false);
+                                }
+                                break;
+                            case 2:
+                                if (seguimientoInfluenza.getFiebre().trim().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia2).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia2).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkFiebreLeveDia2).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreModeradaDia2).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreSeveraDia2).setEnabled(false);
+                                        if (segFlu.getFiebreLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreLeve(segFlu.getFiebreLeve());
+                                        }
+                                        if (segFlu.getFiebreModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreModerada(segFlu.getFiebreModerada());
+                                        }
+                                        if (segFlu.getFiebreSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreSevera(segFlu.getFiebreSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setFiebreLeve(null);
+                                    seguimientoInfluenza.setFiebreModerada(null);
+                                    seguimientoInfluenza.setFiebreSevera(null);
+                                    getActivity().findViewById(R.id.layoutFiebreDia2).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia2)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia2)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia2)).setChecked(false);
+                                }
+                                break;
+                            case 3:
+                                if (seguimientoInfluenza.getFiebre().trim().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia3).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia3).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkFiebreLeveDia3).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreModeradaDia3).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreSeveraDia3).setEnabled(false);
+                                        if (segFlu.getFiebreLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreLeve(segFlu.getFiebreLeve());
+                                        }
+                                        if (segFlu.getFiebreModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreModerada(segFlu.getFiebreModerada());
+                                        }
+                                        if (segFlu.getFiebreSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreSevera(segFlu.getFiebreSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setFiebreLeve(null);
+                                    seguimientoInfluenza.setFiebreModerada(null);
+                                    seguimientoInfluenza.setFiebreSevera(null);
+                                    getActivity().findViewById(R.id.layoutFiebreDia3).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia3)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia3)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia3)).setChecked(false);
+                                }
+                                break;
+                            case 4:
+                                if (seguimientoInfluenza.getFiebre().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia4).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia4).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkFiebreLeveDia4).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreModeradaDia4).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreSeveraDia4).setEnabled(false);
+                                        if (segFlu.getFiebreLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreLeve(segFlu.getFiebreLeve());
+                                        }
+                                        if (segFlu.getFiebreModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreModerada(segFlu.getFiebreModerada());
+                                        }
+                                        if (segFlu.getFiebreSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreSevera(segFlu.getFiebreSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setFiebreLeve(null);
+                                    seguimientoInfluenza.setFiebreModerada(null);
+                                    seguimientoInfluenza.setFiebreSevera(null);
+                                    getActivity().findViewById(R.id.layoutFiebreDia4).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia4)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia4)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia4)).setChecked(false);
+                                }
+                                break;
+                            case 5:
+                                if (seguimientoInfluenza.getFiebre().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia5).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia5).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkFiebreLeveDia5).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreModeradaDia5).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreSeveraDia5).setEnabled(false);
+                                        if (segFlu.getFiebreLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreLeve(segFlu.getFiebreLeve());
+                                        }
+                                        if (segFlu.getFiebreModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreModerada(segFlu.getFiebreModerada());
+                                        }
+                                        if (segFlu.getFiebreSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreSevera(segFlu.getFiebreSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setFiebreLeve(null);
+                                    seguimientoInfluenza.setFiebreModerada(null);
+                                    seguimientoInfluenza.setFiebreSevera(null);
+                                    getActivity().findViewById(R.id.layoutFiebreDia5).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia5)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia5)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia5)).setChecked(false);
+                                }
+                                break;
+                            case 6:
+                                if (seguimientoInfluenza.getFiebre().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia6).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia6).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkFiebreLeveDia6).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreModeradaDia6).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreSeveraDia6).setEnabled(false);
+                                        if (segFlu.getFiebreLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreLeve(segFlu.getFiebreLeve());
+                                        }
+                                        if (segFlu.getFiebreModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreModerada(segFlu.getFiebreModerada());
+                                        }
+                                        if (segFlu.getFiebreSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreSevera(segFlu.getFiebreSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setFiebreLeve(null);
+                                    seguimientoInfluenza.setFiebreModerada(null);
+                                    seguimientoInfluenza.setFiebreSevera(null);
+                                    getActivity().findViewById(R.id.layoutFiebreDia6).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia6)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia6)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia6)).setChecked(false);
+                                }
+                                break;
+                            case 7:
+                                if (seguimientoInfluenza.getFiebre().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia7).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia7).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkFiebreLeveDia7).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreModeradaDia7).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreSeveraDia7).setEnabled(false);
+                                        if (segFlu.getFiebreLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreLeve(segFlu.getFiebreLeve());
+                                        }
+                                        if (segFlu.getFiebreModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreModerada(segFlu.getFiebreModerada());
+                                        }
+                                        if (segFlu.getFiebreSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreSevera(segFlu.getFiebreSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setFiebreLeve(null);
+                                    seguimientoInfluenza.setFiebreModerada(null);
+                                    seguimientoInfluenza.setFiebreSevera(null);
+                                    getActivity().findViewById(R.id.layoutFiebreDia7).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia7)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia7)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia7)).setChecked(false);
+                                }
+                                break;
+                            case 8:
+                                if (seguimientoInfluenza.getFiebre().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if(segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia8).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia8).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkFiebreLeveDia8).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreModeradaDia8).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreSeveraDia8).setEnabled(false);
+                                        if (segFlu.getFiebreLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreLeve(segFlu.getFiebreLeve());
+                                        }
+                                        if (segFlu.getFiebreModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreModerada(segFlu.getFiebreModerada());
+                                        }
+                                        if (segFlu.getFiebreSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreSevera(segFlu.getFiebreSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setFiebreLeve(null);
+                                    seguimientoInfluenza.setFiebreModerada(null);
+                                    seguimientoInfluenza.setFiebreSevera(null);
+                                    getActivity().findViewById(R.id.layoutFiebreDia8).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia8)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia8)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia8)).setChecked(false);
+                                }
+                                break;
+                            case 9:
+                                if (seguimientoInfluenza.getFiebre().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia9).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia9).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkFiebreLeveDia9).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreModeradaDia9).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreSeveraDia9).setEnabled(false);
+                                        if (segFlu.getFiebreLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreLeve(segFlu.getFiebreLeve());
+                                        }
+                                        if (segFlu.getFiebreModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreModerada(segFlu.getFiebreModerada());
+                                        }
+                                        if (segFlu.getFiebreSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreSevera(segFlu.getFiebreSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setFiebreLeve(null);
+                                    seguimientoInfluenza.setFiebreModerada(null);
+                                    seguimientoInfluenza.setFiebreSevera(null);
+                                    getActivity().findViewById(R.id.layoutFiebreDia9).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia9)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia9)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia9)).setChecked(false);
+                                }
+                                break;
+                            case 10:
+                                if (seguimientoInfluenza.getFiebre().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia10).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia10).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkFiebreLeveDia10).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreModeradaDia10).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreSeveraDia10).setEnabled(false);
+                                        if (segFlu.getFiebreLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia10)).setChecked(true);
+                                            seguimientoInfluenza.setFiebreLeve(segFlu.getFiebreLeve());
+                                        }
+                                        if (segFlu.getFiebreModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreModerada(segFlu.getFiebreModerada());
+                                        }
+                                        if (segFlu.getFiebreSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreSevera(segFlu.getFiebreSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setFiebreLeve(null);
+                                    seguimientoInfluenza.setFiebreModerada(null);
+                                    seguimientoInfluenza.setFiebreSevera(null);
+                                    getActivity().findViewById(R.id.layoutFiebreDia10).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia10)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia10)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia10)).setChecked(false);
+                                }
+                                break;
+                            case 11:
+                                if (seguimientoInfluenza.getFiebre().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia11).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia11).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkFiebreLeveDia11).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreModeradaDia11).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreSeveraDia11).setEnabled(false);
+                                        if (segFlu.getFiebreLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreLeve(segFlu.getFiebreLeve());
+                                        }
+                                        if (segFlu.getFiebreModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreModerada(segFlu.getFiebreModerada());
+                                        }
+                                        if (segFlu.getFiebreSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreSevera(segFlu.getFiebreSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setFiebreLeve(null);
+                                    seguimientoInfluenza.setFiebreModerada(null);
+                                    seguimientoInfluenza.setFiebreSevera(null);
+                                    getActivity().findViewById(R.id.layoutFiebreDia11).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia11)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia11)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia11)).setChecked(false);
+                                }
+                                break;
+                            case 12:
+                                if (seguimientoInfluenza.getFiebre().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia12).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutFiebreDia12).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkFiebreLeveDia12).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreModeradaDia12).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkFiebreSeveraDia12).setEnabled(false);
+                                        if (segFlu.getFiebreLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreLeve(segFlu.getFiebreLeve());
+                                        }
+                                        if (segFlu.getFiebreModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreModerada(segFlu.getFiebreModerada());
+                                        }
+                                        if (segFlu.getFiebreSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setFiebreSevera(segFlu.getFiebreSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setFiebreLeve(null);
+                                    seguimientoInfluenza.setFiebreModerada(null);
+                                    seguimientoInfluenza.setFiebreSevera(null);
+                                    getActivity().findViewById(R.id.layoutFiebreDia12).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreLeveDia12)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreModeradaDia12)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkFiebreSeveraDia12)).setChecked(false);
+                                }
+                                break;
+                        }
+                    }
                 } else if(mSeguimientoInfluenzaActivity.adapter != null && mSeguimientoInfluenzaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) {
                     seguimientoInfluenza = new SeguimientoInfluenzaDTO();
                     seguimientoInfluenza.setControlDia(mPage);
@@ -4507,6 +12657,467 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
                     seguimientoInfluenza.setTos((mSeguimientoInfluenzaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) ?
                             mSeguimientoInfluenzaActivity.adapter.getItem(position).toString() : null);
+                    /*CAMBIO TOS*/
+                    if (seguimientoInfluenza.getTos() != null) {
+                        switch (mPage) {
+                            case 1:
+                                if (seguimientoInfluenza.getTos().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutTosDia1).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutTosDia1).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkTosLeveDia1).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosModeradaDia1).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosSeveraDia1).setEnabled(false);
+                                        if (segFlu.getTosLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosLeve(segFlu.getTosLeve());
+                                        }
+                                        if (segFlu.getTosModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosModerada(segFlu.getTosModerada());
+                                        }
+                                        if (segFlu.getTosSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosSevera(segFlu.getTosSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setTosLeve(null);
+                                    seguimientoInfluenza.setTosModerada(null);
+                                    seguimientoInfluenza.setTosSevera(null);
+                                    getActivity().findViewById(R.id.layoutTosDia1).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia1)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia1)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia1)).setChecked(false);
+                                }
+                                break;
+                            case 2:
+                                if (seguimientoInfluenza.getTos().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutTosDia2).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutTosDia2).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkTosLeveDia2).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosModeradaDia2).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosSeveraDia2).setEnabled(false);
+                                        if (segFlu.getTosLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosLeve(segFlu.getTosLeve());
+                                        }
+                                        if (segFlu.getTosModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosModerada(segFlu.getTosModerada());
+                                        }
+                                        if (segFlu.getTosSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosSevera(segFlu.getTosSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setTosLeve(null);
+                                    seguimientoInfluenza.setTosModerada(null);
+                                    seguimientoInfluenza.setTosSevera(null);
+                                    getActivity().findViewById(R.id.layoutTosDia2).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia2)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia2)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia2)).setChecked(false);
+                                }
+                                break;
+                            case 3:
+                                if (seguimientoInfluenza.getTos().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutTosDia3).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutTosDia3).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkTosLeveDia3).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosModeradaDia3).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosSeveraDia3).setEnabled(false);
+                                        if (segFlu.getTosLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosLeve(segFlu.getTosLeve());
+                                        }
+                                        if (segFlu.getTosModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosModerada(segFlu.getTosModerada());
+                                        }
+                                        if (segFlu.getTosSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosSevera(segFlu.getTosSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setTosLeve(null);
+                                    seguimientoInfluenza.setTosModerada(null);
+                                    seguimientoInfluenza.setTosSevera(null);
+                                    getActivity().findViewById(R.id.layoutTosDia3).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia3)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia3)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia3)).setChecked(false);
+                                }
+                                break;
+                            case 4:
+                                if (seguimientoInfluenza.getTos().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutTosDia4).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutTosDia4).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkTosLeveDia4).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosModeradaDia4).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosSeveraDia4).setEnabled(false);
+                                        if (segFlu.getTosLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosLeve(segFlu.getTosLeve());
+                                        }
+                                        if (segFlu.getTosModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosModerada(segFlu.getTosModerada());
+                                        }
+                                        if (segFlu.getTosSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosSevera(segFlu.getTosSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setTosLeve(null);
+                                    seguimientoInfluenza.setTosModerada(null);
+                                    seguimientoInfluenza.setTosSevera(null);
+                                    getActivity().findViewById(R.id.layoutTosDia4).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia4)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia4)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia4)).setChecked(false);
+                                }
+                                break;
+                            case 5:
+                                if (seguimientoInfluenza.getTos().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutTosDia5).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutTosDia5).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkTosLeveDia5).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosModeradaDia5).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosSeveraDia5).setEnabled(false);
+                                        if (segFlu.getTosLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosLeve(segFlu.getTosLeve());
+                                        }
+                                        if (segFlu.getTosModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosModerada(segFlu.getTosModerada());
+                                        }
+                                        if (segFlu.getTosSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosSevera(segFlu.getTosSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setTosLeve(null);
+                                    seguimientoInfluenza.setTosModerada(null);
+                                    seguimientoInfluenza.setTosSevera(null);
+                                    getActivity().findViewById(R.id.layoutTosDia5).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia5)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia5)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia5)).setChecked(false);
+                                }
+                                break;
+                            case 6:
+                                if (seguimientoInfluenza.getTos().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutTosDia6).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutTosDia6).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkTosLeveDia6).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosModeradaDia6).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosSeveraDia6).setEnabled(false);
+                                        if (segFlu.getTosLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosLeve(segFlu.getTosLeve());
+                                        }
+                                        if (segFlu.getTosModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosModerada(segFlu.getTosModerada());
+                                        }
+                                        if (segFlu.getTosSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosSevera(segFlu.getTosSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setTosLeve(null);
+                                    seguimientoInfluenza.setTosModerada(null);
+                                    seguimientoInfluenza.setTosSevera(null);
+                                    getActivity().findViewById(R.id.layoutTosDia6).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia6)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia6)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia6)).setChecked(false);
+                                }
+                                break;
+                            case 7:
+                                if (seguimientoInfluenza.getTos().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutTosDia7).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutTosDia7).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkTosLeveDia7).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosModeradaDia7).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosSeveraDia7).setEnabled(false);
+                                        if (segFlu.getTosLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosLeve(segFlu.getTosLeve());
+                                        }
+                                        if (segFlu.getTosModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosModerada(segFlu.getTosModerada());
+                                        }
+                                        if (segFlu.getTosSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosSevera(segFlu.getTosSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setTosLeve(null);
+                                    seguimientoInfluenza.setTosModerada(null);
+                                    seguimientoInfluenza.setTosSevera(null);
+                                    getActivity().findViewById(R.id.layoutTosDia7).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia7)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia7)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia7)).setChecked(false);
+                                }
+                                break;
+                            case 8:
+                                if (seguimientoInfluenza.getTos().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutTosDia8).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutTosDia8).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkTosLeveDia8).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosModeradaDia8).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosSeveraDia8).setEnabled(false);
+                                        if (segFlu.getTosLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosLeve(segFlu.getTosLeve());
+                                        }
+                                        if (segFlu.getTosModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosModerada(segFlu.getTosModerada());
+                                        }
+                                        if (segFlu.getTosSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosSevera(segFlu.getTosSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setTosLeve(null);
+                                    seguimientoInfluenza.setTosModerada(null);
+                                    seguimientoInfluenza.setTosSevera(null);
+                                    getActivity().findViewById(R.id.layoutTosDia8).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia8)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia8)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia8)).setChecked(false);
+                                }
+                                break;
+                            case 9:
+                                if (seguimientoInfluenza.getTos().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutTosDia9).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutTosDia9).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkTosLeveDia9).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosModeradaDia9).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosSeveraDia9).setEnabled(false);
+                                        if (segFlu.getTosLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosLeve(segFlu.getTosLeve());
+                                        }
+                                        if (segFlu.getTosModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosModerada(segFlu.getTosModerada());
+                                        }
+                                        if (segFlu.getTosSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosSevera(segFlu.getTosSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setTosLeve(null);
+                                    seguimientoInfluenza.setTosModerada(null);
+                                    seguimientoInfluenza.setTosSevera(null);
+                                    getActivity().findViewById(R.id.layoutTosDia9).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia9)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia9)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia9)).setChecked(false);
+                                }
+                                break;
+                            case 10:
+                                if (seguimientoInfluenza.getTos().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutTosDia10).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutTosDia10).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkTosLeveDia10).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosModeradaDia10).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosSeveraDia10).setEnabled(false);
+                                        if (segFlu.getTosLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosLeve(segFlu.getTosLeve());
+                                        }
+                                        if (segFlu.getTosModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosModerada(segFlu.getTosModerada());
+                                        }
+                                        if (segFlu.getTosSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosSevera(segFlu.getTosSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setTosLeve(null);
+                                    seguimientoInfluenza.setTosModerada(null);
+                                    seguimientoInfluenza.setTosSevera(null);
+                                    getActivity().findViewById(R.id.layoutTosDia10).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia10)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia10)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia10)).setChecked(false);
+                                }
+                                break;
+                            case 11:
+                                if (seguimientoInfluenza.getTos().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutTosDia11).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutTosDia11).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkTosLeveDia11).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosModeradaDia11).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosSeveraDia11).setEnabled(false);
+                                        if (segFlu.getTosLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosLeve(segFlu.getTosLeve());
+                                        }
+                                        if (segFlu.getTosModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosModerada(segFlu.getTosModerada());
+                                        }
+                                        if (segFlu.getTosSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosSevera(segFlu.getTosSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setTosLeve(null);
+                                    seguimientoInfluenza.setTosModerada(null);
+                                    seguimientoInfluenza.setTosSevera(null);
+                                    getActivity().findViewById(R.id.layoutTosDia11).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia11)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia11)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia11)).setChecked(false);
+                                }
+                                break;
+                            case 12:
+                                if (seguimientoInfluenza.getTos().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutTosDia12).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutTosDia12).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkTosLeveDia12).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosModeradaDia12).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkTosSeveraDia12).setEnabled(false);
+                                        if (segFlu.getTosLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosLeve(segFlu.getTosLeve());
+                                        }
+                                        if (segFlu.getTosModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosModerada(segFlu.getTosModerada());
+                                        }
+                                        if (segFlu.getTosSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setTosSevera(segFlu.getTosSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setTosLeve(null);
+                                    seguimientoInfluenza.setTosModerada(null);
+                                    seguimientoInfluenza.setTosSevera(null);
+                                    getActivity().findViewById(R.id.layoutTosDia12).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosLeveDia12)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosModeradaDia12)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkTosSeveraDia12)).setChecked(false);
+                                }
+                                break;
+                        }
+                    }
                 } else if(mSeguimientoInfluenzaActivity.adapter != null && mSeguimientoInfluenzaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) {
                     seguimientoInfluenza = new SeguimientoInfluenzaDTO();
                     seguimientoInfluenza.setControlDia(mPage);
@@ -4520,6 +13131,467 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
                     seguimientoInfluenza.setSecrecionNasal((mSeguimientoInfluenzaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) ?
                             mSeguimientoInfluenzaActivity.adapter.getItem(position).toString() : null);
+                    /*CAMBIO SECRECION NASAL*/
+                    if (seguimientoInfluenza.getSecrecionNasal() != null) {
+                        switch (mPage) {
+                            case 1:
+                                if (seguimientoInfluenza.getSecrecionNasal().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia1).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia1).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalLeveDia1).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia1).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia1).setEnabled(false);
+                                        if (segFlu.getSecrecionNasalLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalLeve(segFlu.getSecrecionNasalLeve());
+                                        }
+                                        if (segFlu.getSecrecionNasalModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalModerada(segFlu.getSecrecionNasalModerada());
+                                        }
+                                        if (segFlu.getSecrecionNasalSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalSevera(segFlu.getSecrecionNasalSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                    seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                    seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                    getActivity().findViewById(R.id.layoutSecrecionNasalDia1).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia1)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia1)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia1)).setChecked(false);
+                                }
+                                break;
+                            case 2:
+                                if (seguimientoInfluenza.getSecrecionNasal().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia2).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia2).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalLeveDia2).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia2).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia2).setEnabled(false);
+                                        if (segFlu.getSecrecionNasalLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalLeve(segFlu.getSecrecionNasalLeve());
+                                        }
+                                        if (segFlu.getSecrecionNasalModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalModerada(segFlu.getSecrecionNasalModerada());
+                                        }
+                                        if (segFlu.getSecrecionNasalSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalSevera(segFlu.getSecrecionNasalSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                    seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                    seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                    getActivity().findViewById(R.id.layoutSecrecionNasalDia2).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia2)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia2)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia2)).setChecked(false);
+                                }
+                                break;
+                            case 3:
+                                if (seguimientoInfluenza.getSecrecionNasal().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia3).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia3).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalLeveDia3).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia3).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia3).setEnabled(false);
+                                        if (segFlu.getSecrecionNasalLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalLeve(segFlu.getSecrecionNasalLeve());
+                                        }
+                                        if (segFlu.getSecrecionNasalModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalModerada(segFlu.getSecrecionNasalModerada());
+                                        }
+                                        if (segFlu.getSecrecionNasalSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalSevera(segFlu.getSecrecionNasalSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                    seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                    seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                    getActivity().findViewById(R.id.layoutSecrecionNasalDia3).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia3)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia3)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia3)).setChecked(false);
+                                }
+                                break;
+                            case 4:
+                                if (seguimientoInfluenza.getSecrecionNasal().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia4).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia4).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalLeveDia4).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia4).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia4).setEnabled(false);
+                                        if (segFlu.getSecrecionNasalLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalLeve(segFlu.getSecrecionNasalLeve());
+                                        }
+                                        if (segFlu.getSecrecionNasalModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalModerada(segFlu.getSecrecionNasalModerada());
+                                        }
+                                        if (segFlu.getSecrecionNasalSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalSevera(segFlu.getSecrecionNasalSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                    seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                    seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                    getActivity().findViewById(R.id.layoutSecrecionNasalDia4).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia4)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia4)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia4)).setChecked(false);
+                                }
+                                break;
+                            case 5:
+                                if (seguimientoInfluenza.getSecrecionNasal().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia5).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia5).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalLeveDia5).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia5).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia5).setEnabled(false);
+                                        if (segFlu.getSecrecionNasalLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalLeve(segFlu.getSecrecionNasalLeve());
+                                        }
+                                        if (segFlu.getSecrecionNasalModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalModerada(segFlu.getSecrecionNasalModerada());
+                                        }
+                                        if (segFlu.getSecrecionNasalSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalSevera(segFlu.getSecrecionNasalSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                    seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                    seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                    getActivity().findViewById(R.id.layoutSecrecionNasalDia5).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia5)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia5)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia5)).setChecked(false);
+                                }
+                                break;
+                            case 6:
+                                if (seguimientoInfluenza.getSecrecionNasal().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia6).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia6).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalLeveDia6).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia6).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia6).setEnabled(false);
+                                        if (segFlu.getSecrecionNasalLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalLeve(segFlu.getSecrecionNasalLeve());
+                                        }
+                                        if (segFlu.getSecrecionNasalModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalModerada(segFlu.getSecrecionNasalModerada());
+                                        }
+                                        if (segFlu.getSecrecionNasalSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalSevera(segFlu.getSecrecionNasalSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                    seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                    seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                    getActivity().findViewById(R.id.layoutSecrecionNasalDia6).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia6)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia6)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia6)).setChecked(false);
+                                }
+                                break;
+                            case 7:
+                                if (seguimientoInfluenza.getSecrecionNasal().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia7).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia7).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalLeveDia7).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia7).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia7).setEnabled(false);
+                                        if (segFlu.getSecrecionNasalLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalLeve(segFlu.getSecrecionNasalLeve());
+                                        }
+                                        if (segFlu.getSecrecionNasalModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalModerada(segFlu.getSecrecionNasalModerada());
+                                        }
+                                        if (segFlu.getSecrecionNasalSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalSevera(segFlu.getSecrecionNasalSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                    seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                    seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                    getActivity().findViewById(R.id.layoutSecrecionNasalDia7).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia7)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia7)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia7)).setChecked(false);
+                                }
+                                break;
+                            case 8:
+                                if (seguimientoInfluenza.getSecrecionNasal().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia8).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia8).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalLeveDia8).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia8).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia8).setEnabled(false);
+                                        if (segFlu.getSecrecionNasalLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalLeve(segFlu.getSecrecionNasalLeve());
+                                        }
+                                        if (segFlu.getSecrecionNasalModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalModerada(segFlu.getSecrecionNasalModerada());
+                                        }
+                                        if (segFlu.getSecrecionNasalSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalSevera(segFlu.getSecrecionNasalSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                    seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                    seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                    getActivity().findViewById(R.id.layoutSecrecionNasalDia8).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia8)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia8)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia8)).setChecked(false);
+                                }
+                                break;
+                            case 9:
+                                if (seguimientoInfluenza.getSecrecionNasal().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia9).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia9).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalLeveDia9).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia9).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia9).setEnabled(false);
+                                        if (segFlu.getSecrecionNasalLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalLeve(segFlu.getSecrecionNasalLeve());
+                                        }
+                                        if (segFlu.getSecrecionNasalModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalModerada(segFlu.getSecrecionNasalModerada());
+                                        }
+                                        if (segFlu.getSecrecionNasalSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalSevera(segFlu.getSecrecionNasalSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                    seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                    seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                    getActivity().findViewById(R.id.layoutSecrecionNasalDia9).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia9)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia9)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia9)).setChecked(false);
+                                }
+                                break;
+                            case 10:
+                                if (seguimientoInfluenza.getSecrecionNasal().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia10).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia10).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalLeveDia10).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia10).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia10).setEnabled(false);
+                                        if (segFlu.getSecrecionNasalLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalLeve(segFlu.getSecrecionNasalLeve());
+                                        }
+                                        if (segFlu.getSecrecionNasalModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalModerada(segFlu.getSecrecionNasalModerada());
+                                        }
+                                        if (segFlu.getSecrecionNasalSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalSevera(segFlu.getSecrecionNasalSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                    seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                    seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                    getActivity().findViewById(R.id.layoutSecrecionNasalDia10).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia10)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia10)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia10)).setChecked(false);
+                                }
+                                break;
+                            case 11:
+                                if (seguimientoInfluenza.getSecrecionNasal().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia11).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia11).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalLeveDia11).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia11).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia11).setEnabled(false);
+                                        if (segFlu.getSecrecionNasalLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalLeve(segFlu.getSecrecionNasalLeve());
+                                        }
+                                        if (segFlu.getSecrecionNasalModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalModerada(segFlu.getSecrecionNasalModerada());
+                                        }
+                                        if (segFlu.getSecrecionNasalSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalSevera(segFlu.getSecrecionNasalSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                    seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                    seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                    getActivity().findViewById(R.id.layoutSecrecionNasalDia11).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia11)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia11)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia11)).setChecked(false);
+                                }
+                                break;
+                            case 12:
+                                if (seguimientoInfluenza.getSecrecionNasal().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia12).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutSecrecionNasalDia12).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalLeveDia12).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia12).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia12).setEnabled(false);
+                                        if (segFlu.getSecrecionNasalLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalLeve(segFlu.getSecrecionNasalLeve());
+                                        }
+                                        if (segFlu.getSecrecionNasalModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalModerada(segFlu.getSecrecionNasalModerada());
+                                        }
+                                        if (segFlu.getSecrecionNasalSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setSecrecionNasalSevera(segFlu.getSecrecionNasalSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setSecrecionNasalLeve(null);
+                                    seguimientoInfluenza.setSecrecionNasalModerada(null);
+                                    seguimientoInfluenza.setSecrecionNasalSevera(null);
+                                    getActivity().findViewById(R.id.layoutSecrecionNasalDia12).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalLeveDia12)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalModeradaDia12)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkSecrecionNasalSeveraDia12)).setChecked(false);
+                                }
+                                break;
+                        }
+                    }
                 } else if(mSeguimientoInfluenzaActivity.adapter != null && mSeguimientoInfluenzaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) {
                     seguimientoInfluenza = new SeguimientoInfluenzaDTO();
                     seguimientoInfluenza.setControlDia(mPage);
@@ -4533,6 +13605,467 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
                     seguimientoInfluenza.setDolorGarganta((mSeguimientoInfluenzaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) ?
                             mSeguimientoInfluenzaActivity.adapter.getItem(position).toString() : null);
+                    /*CAMBIO DOLOR GARGANTA*/
+                    if (seguimientoInfluenza.getDolorGarganta() != null) {
+                        switch (mPage) {
+                            case 1:
+                                if (seguimientoInfluenza.getDolorGarganta().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia1).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia1).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorGargantaLeveDia1).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaModeradaDia1).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaSeveraDia1).setEnabled(false);
+                                        if (segFlu.getDolorGargantaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaLeve(segFlu.getDolorGargantaLeve());
+                                        }
+                                        if (segFlu.getDolorGargantaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaModerada(segFlu.getDolorGargantaModerada());
+                                        }
+                                        if (segFlu.getDolorGargantaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaSevera(segFlu.getDolorGargantaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorGargantaLeve(null);
+                                    seguimientoInfluenza.setDolorGargantaModerada(null);
+                                    seguimientoInfluenza.setDolorGargantaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorGargantaDia1).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia1)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia1)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia1)).setChecked(false);
+                                }
+                                break;
+                            case 2:
+                                if (seguimientoInfluenza.getDolorGarganta().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia2).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia2).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorGargantaLeveDia2).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaModeradaDia2).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaSeveraDia2).setEnabled(false);
+                                        if (segFlu.getDolorGargantaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaLeve(segFlu.getDolorGargantaLeve());
+                                        }
+                                        if (segFlu.getDolorGargantaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaModerada(segFlu.getDolorGargantaModerada());
+                                        }
+                                        if (segFlu.getDolorGargantaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaSevera(segFlu.getDolorGargantaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorGargantaLeve(null);
+                                    seguimientoInfluenza.setDolorGargantaModerada(null);
+                                    seguimientoInfluenza.setDolorGargantaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorGargantaDia2).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia2)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia2)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia2)).setChecked(false);
+                                }
+                                break;
+                            case 3:
+                                if (seguimientoInfluenza.getDolorGarganta().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia3).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia3).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorGargantaLeveDia3).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaModeradaDia3).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaSeveraDia3).setEnabled(false);
+                                        if (segFlu.getDolorGargantaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaLeve(segFlu.getDolorGargantaLeve());
+                                        }
+                                        if (segFlu.getDolorGargantaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaModerada(segFlu.getDolorGargantaModerada());
+                                        }
+                                        if (segFlu.getDolorGargantaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaSevera(segFlu.getDolorGargantaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorGargantaLeve(null);
+                                    seguimientoInfluenza.setDolorGargantaModerada(null);
+                                    seguimientoInfluenza.setDolorGargantaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorGargantaDia3).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia3)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia3)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia3)).setChecked(false);
+                                }
+                                break;
+                            case 4:
+                                if (seguimientoInfluenza.getDolorGarganta().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia4).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia4).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorGargantaLeveDia4).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaModeradaDia4).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaSeveraDia4).setEnabled(false);
+                                        if (segFlu.getDolorGargantaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaLeve(segFlu.getDolorGargantaLeve());
+                                        }
+                                        if (segFlu.getDolorGargantaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaModerada(segFlu.getDolorGargantaModerada());
+                                        }
+                                        if (segFlu.getDolorGargantaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaSevera(segFlu.getDolorGargantaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorGargantaLeve(null);
+                                    seguimientoInfluenza.setDolorGargantaModerada(null);
+                                    seguimientoInfluenza.setDolorGargantaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorGargantaDia4).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia4)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia4)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia4)).setChecked(false);
+                                }
+                                break;
+                            case 5:
+                                if (seguimientoInfluenza.getDolorGarganta().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia5).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia5).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorGargantaLeveDia5).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaModeradaDia5).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaSeveraDia5).setEnabled(false);
+                                        if (segFlu.getDolorGargantaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaLeve(segFlu.getDolorGargantaLeve());
+                                        }
+                                        if (segFlu.getDolorGargantaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaModerada(segFlu.getDolorGargantaModerada());
+                                        }
+                                        if (segFlu.getDolorGargantaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaSevera(segFlu.getDolorGargantaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorGargantaLeve(null);
+                                    seguimientoInfluenza.setDolorGargantaModerada(null);
+                                    seguimientoInfluenza.setDolorGargantaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorGargantaDia5).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia5)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia5)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia5)).setChecked(false);
+                                }
+                                break;
+                            case 6:
+                                if (seguimientoInfluenza.getDolorGarganta().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia6).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia6).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorGargantaLeveDia6).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaModeradaDia6).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaSeveraDia6).setEnabled(false);
+                                        if (segFlu.getDolorGargantaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaLeve(segFlu.getDolorGargantaLeve());
+                                        }
+                                        if (segFlu.getDolorGargantaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaModerada(segFlu.getDolorGargantaModerada());
+                                        }
+                                        if (segFlu.getDolorGargantaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaSevera(segFlu.getDolorGargantaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorGargantaLeve(null);
+                                    seguimientoInfluenza.setDolorGargantaModerada(null);
+                                    seguimientoInfluenza.setDolorGargantaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorGargantaDia6).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia6)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia6)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia6)).setChecked(false);
+                                }
+                                break;
+                            case 7:
+                                if (seguimientoInfluenza.getDolorGarganta().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia7).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia7).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorGargantaLeveDia7).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaModeradaDia7).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaSeveraDia7).setEnabled(false);
+                                        if (segFlu.getDolorGargantaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaLeve(segFlu.getDolorGargantaLeve());
+                                        }
+                                        if (segFlu.getDolorGargantaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaModerada(segFlu.getDolorGargantaModerada());
+                                        }
+                                        if (segFlu.getDolorGargantaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaSevera(segFlu.getDolorGargantaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorGargantaLeve(null);
+                                    seguimientoInfluenza.setDolorGargantaModerada(null);
+                                    seguimientoInfluenza.setDolorGargantaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorGargantaDia7).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia7)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia7)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia7)).setChecked(false);
+                                }
+                                break;
+                            case 8:
+                                if (seguimientoInfluenza.getDolorGarganta().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia8).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia8).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorGargantaLeveDia8).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaModeradaDia8).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaSeveraDia8).setEnabled(false);
+                                        if (segFlu.getDolorGargantaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaLeve(segFlu.getDolorGargantaLeve());
+                                        }
+                                        if (segFlu.getDolorGargantaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaModerada(segFlu.getDolorGargantaModerada());
+                                        }
+                                        if (segFlu.getDolorGargantaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaSevera(segFlu.getDolorGargantaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorGargantaLeve(null);
+                                    seguimientoInfluenza.setDolorGargantaModerada(null);
+                                    seguimientoInfluenza.setDolorGargantaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorGargantaDia8).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia8)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia8)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia8)).setChecked(false);
+                                }
+                                break;
+                            case 9:
+                                if (seguimientoInfluenza.getDolorGarganta().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia9).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia9).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorGargantaLeveDia9).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaModeradaDia9).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaSeveraDia9).setEnabled(false);
+                                        if (segFlu.getDolorGargantaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaLeve(segFlu.getDolorGargantaLeve());
+                                        }
+                                        if (segFlu.getDolorGargantaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaModerada(segFlu.getDolorGargantaModerada());
+                                        }
+                                        if (segFlu.getDolorGargantaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaSevera(segFlu.getDolorGargantaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorGargantaLeve(null);
+                                    seguimientoInfluenza.setDolorGargantaModerada(null);
+                                    seguimientoInfluenza.setDolorGargantaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorGargantaDia9).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia9)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia9)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia9)).setChecked(false);
+                                }
+                                break;
+                            case 10:
+                                if (seguimientoInfluenza.getDolorGarganta().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia10).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia10).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorGargantaLeveDia10).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaModeradaDia10).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaSeveraDia10).setEnabled(false);
+                                        if (segFlu.getDolorGargantaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaLeve(segFlu.getDolorGargantaLeve());
+                                        }
+                                        if (segFlu.getDolorGargantaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaModerada(segFlu.getDolorGargantaModerada());
+                                        }
+                                        if (segFlu.getDolorGargantaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaSevera(segFlu.getDolorGargantaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorGargantaLeve(null);
+                                    seguimientoInfluenza.setDolorGargantaModerada(null);
+                                    seguimientoInfluenza.setDolorGargantaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorGargantaDia10).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia10)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia10)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia10)).setChecked(false);
+                                }
+                                break;
+                            case 11:
+                                if (seguimientoInfluenza.getDolorGarganta().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia11).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia11).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorGargantaLeveDia11).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaModeradaDia11).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaSeveraDia11).setEnabled(false);
+                                        if (segFlu.getDolorGargantaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaLeve(segFlu.getDolorGargantaLeve());
+                                        }
+                                        if (segFlu.getDolorGargantaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaModerada(segFlu.getDolorGargantaModerada());
+                                        }
+                                        if (segFlu.getDolorGargantaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaSevera(segFlu.getDolorGargantaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorGargantaLeve(null);
+                                    seguimientoInfluenza.setDolorGargantaModerada(null);
+                                    seguimientoInfluenza.setDolorGargantaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorGargantaDia11).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia11)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia11)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia11)).setChecked(false);
+                                }
+                                break;
+                            case 12:
+                                if (seguimientoInfluenza.getDolorGarganta().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia12).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorGargantaDia12).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorGargantaLeveDia12).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaModeradaDia12).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorGargantaSeveraDia12).setEnabled(false);
+                                        if (segFlu.getDolorGargantaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaLeve(segFlu.getDolorGargantaLeve());
+                                        }
+                                        if (segFlu.getDolorGargantaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaModerada(segFlu.getDolorGargantaModerada());
+                                        }
+                                        if (segFlu.getDolorGargantaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorGargantaSevera(segFlu.getDolorGargantaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorGargantaLeve(null);
+                                    seguimientoInfluenza.setDolorGargantaModerada(null);
+                                    seguimientoInfluenza.setDolorGargantaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorGargantaDia12).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaLeveDia12)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaModeradaDia12)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorGargantaSeveraDia12)).setChecked(false);
+                                }
+                                break;
+                        }
+                    }
                 } else if(mSeguimientoInfluenzaActivity.adapter != null && mSeguimientoInfluenzaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) {
                     seguimientoInfluenza = new SeguimientoInfluenzaDTO();
                     seguimientoInfluenza.setControlDia(mPage);
@@ -4559,11 +14092,468 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
                     seguimientoInfluenza.setDolorCabeza((mSeguimientoInfluenzaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) ?
                             mSeguimientoInfluenzaActivity.adapter.getItem(position).toString() : null);
+                    /*CAMBIO DOLOR CABEZA*/
+                    if (seguimientoInfluenza.getDolorCabeza() != null) {
+                        switch (mPage) {
+                            case 1:
+                                if (seguimientoInfluenza.getDolorCabeza().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia1).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia1).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorCabezaLeveDia1).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaModeradaDia1).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaSeveraDia1).setEnabled(false);
+                                        if (segFlu.getDolorCabezaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaLeve(segFlu.getDolorCabezaLeve());
+                                        }
+                                        if (segFlu.getDolorCabezaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaModerada(segFlu.getDolorCabezaModerada());
+                                        }
+                                        if (segFlu.getDolorCabezaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaSevera(segFlu.getDolorCabezaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorCabezaLeve(null);
+                                    seguimientoInfluenza.setDolorCabezaModerada(null);
+                                    seguimientoInfluenza.setDolorCabezaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorCabezaDia1).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia1)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia1)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia1)).setChecked(false);
+                                }
+                                break;
+                            case 2:
+                                if (seguimientoInfluenza.getDolorCabeza().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia2).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia2).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorCabezaLeveDia2).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaModeradaDia2).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaSeveraDia2).setEnabled(false);
+                                        if (segFlu.getDolorCabezaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaLeve(segFlu.getDolorCabezaLeve());
+                                        }
+                                        if (segFlu.getDolorCabezaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaModerada(segFlu.getDolorCabezaModerada());
+                                        }
+                                        if (segFlu.getDolorCabezaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaSevera(segFlu.getDolorCabezaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorCabezaLeve(null);
+                                    seguimientoInfluenza.setDolorCabezaModerada(null);
+                                    seguimientoInfluenza.setDolorCabezaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorCabezaDia2).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia2)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia2)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia2)).setChecked(false);
+                                }
+                                break;
+                            case 3:
+                                if (seguimientoInfluenza.getDolorCabeza().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia3).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia3).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorCabezaLeveDia3).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaModeradaDia3).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaSeveraDia3).setEnabled(false);
+                                        if (segFlu.getDolorCabezaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaLeve(segFlu.getDolorCabezaLeve());
+                                        }
+                                        if (segFlu.getDolorCabezaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaModerada(segFlu.getDolorCabezaModerada());
+                                        }
+                                        if (segFlu.getDolorCabezaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaSevera(segFlu.getDolorCabezaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorCabezaLeve(null);
+                                    seguimientoInfluenza.setDolorCabezaModerada(null);
+                                    seguimientoInfluenza.setDolorCabezaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorCabezaDia3).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia3)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia3)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia3)).setChecked(false);
+                                }
+                                break;
+                            case 4:
+                                if (seguimientoInfluenza.getDolorCabeza().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia4).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia4).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorCabezaLeveDia4).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaModeradaDia4).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaSeveraDia4).setEnabled(false);
+                                        if (segFlu.getDolorCabezaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaLeve(segFlu.getDolorCabezaLeve());
+                                        }
+                                        if (segFlu.getDolorCabezaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaModerada(segFlu.getDolorCabezaModerada());
+                                        }
+                                        if (segFlu.getDolorCabezaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaSevera(segFlu.getDolorCabezaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorCabezaLeve(null);
+                                    seguimientoInfluenza.setDolorCabezaModerada(null);
+                                    seguimientoInfluenza.setDolorCabezaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorCabezaDia4).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia4)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia4)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia4)).setChecked(false);
+                                }
+                                break;
+                            case 5:
+                                if (seguimientoInfluenza.getDolorCabeza().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia5).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia5).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorCabezaLeveDia5).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaModeradaDia5).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaSeveraDia5).setEnabled(false);
+                                        if (segFlu.getDolorCabezaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaLeve(segFlu.getDolorCabezaLeve());
+                                        }
+                                        if (segFlu.getDolorCabezaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaModerada(segFlu.getDolorCabezaModerada());
+                                        }
+                                        if (segFlu.getDolorCabezaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaSevera(segFlu.getDolorCabezaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorCabezaLeve(null);
+                                    seguimientoInfluenza.setDolorCabezaModerada(null);
+                                    seguimientoInfluenza.setDolorCabezaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorCabezaDia5).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia5)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia5)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia5)).setChecked(false);
+                                }
+                                break;
+                            case 6:
+                                if (seguimientoInfluenza.getDolorCabeza().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia6).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia6).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorCabezaLeveDia6).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaModeradaDia6).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaSeveraDia6).setEnabled(false);
+                                        if (segFlu.getDolorCabezaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaLeve(segFlu.getDolorCabezaLeve());
+                                        }
+                                        if (segFlu.getDolorCabezaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaModerada(segFlu.getDolorCabezaModerada());
+                                        }
+                                        if (segFlu.getDolorCabezaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaSevera(segFlu.getDolorCabezaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorCabezaLeve(null);
+                                    seguimientoInfluenza.setDolorCabezaModerada(null);
+                                    seguimientoInfluenza.setDolorCabezaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorCabezaDia6).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia6)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia6)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia6)).setChecked(false);
+                                }
+                                break;
+                            case 7:
+                                if (seguimientoInfluenza.getDolorCabeza().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia7).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia7).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorCabezaLeveDia7).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaModeradaDia7).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaSeveraDia7).setEnabled(false);
+                                        if (segFlu.getDolorCabezaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaLeve(segFlu.getDolorCabezaLeve());
+                                        }
+                                        if (segFlu.getDolorCabezaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaModerada(segFlu.getDolorCabezaModerada());
+                                        }
+                                        if (segFlu.getDolorCabezaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaSevera(segFlu.getDolorCabezaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorCabezaLeve(null);
+                                    seguimientoInfluenza.setDolorCabezaModerada(null);
+                                    seguimientoInfluenza.setDolorCabezaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorCabezaDia7).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia7)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia7)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia7)).setChecked(false);
+                                }
+                                break;
+                            case 8:
+                                if (seguimientoInfluenza.getDolorCabeza().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia8).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia8).setVisibility(View.VISIBLE);
+                                        if (segFlu.getDolorCabezaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaLeve(segFlu.getDolorCabezaLeve());
+                                        }
+                                        if (segFlu.getDolorCabezaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaModerada(segFlu.getDolorCabezaModerada());
+                                        }
+                                        if (segFlu.getDolorCabezaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaSevera(segFlu.getDolorCabezaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorCabezaLeve(null);
+                                    seguimientoInfluenza.setDolorCabezaModerada(null);
+                                    seguimientoInfluenza.setDolorCabezaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorCabezaDia8).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia8)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia8)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia8)).setChecked(false);
+                                }
+                                break;
+                            case 9:
+                                if (seguimientoInfluenza.getDolorCabeza().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia9).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia9).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorCabezaLeveDia9).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaModeradaDia9).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaSeveraDia9).setEnabled(false);
+                                        if (segFlu.getDolorCabezaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaLeve(segFlu.getDolorCabezaLeve());
+                                        }
+                                        if (segFlu.getDolorCabezaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaModerada(segFlu.getDolorCabezaModerada());
+                                        }
+                                        if (segFlu.getDolorCabezaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaSevera(segFlu.getDolorCabezaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorCabezaLeve(null);
+                                    seguimientoInfluenza.setDolorCabezaModerada(null);
+                                    seguimientoInfluenza.setDolorCabezaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorCabezaDia9).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia9)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia9)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia9)).setChecked(false);
+                                }
+                                break;
+                            case 10:
+                                if (seguimientoInfluenza.getDolorCabeza().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia10).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia10).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorCabezaLeveDia10).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaModeradaDia10).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaSeveraDia10).setEnabled(false);
+                                        if (segFlu.getDolorCabezaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaLeve(segFlu.getDolorCabezaLeve());
+                                        }
+                                        if (segFlu.getDolorCabezaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaModerada(segFlu.getDolorCabezaModerada());
+                                        }
+                                        if (segFlu.getDolorCabezaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaSevera(segFlu.getDolorCabezaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorCabezaLeve(null);
+                                    seguimientoInfluenza.setDolorCabezaModerada(null);
+                                    seguimientoInfluenza.setDolorCabezaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorCabezaDia10).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia10)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia10)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia10)).setChecked(false);
+                                }
+                                break;
+                            case 11:
+                                if (seguimientoInfluenza.getDolorCabeza().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia11).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia11).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorCabezaLeveDia11).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaModeradaDia11).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaSeveraDia11).setEnabled(false);
+                                        if (segFlu.getDolorCabezaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaLeve(segFlu.getDolorCabezaLeve());
+                                        }
+                                        if (segFlu.getDolorCabezaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaModerada(segFlu.getDolorCabezaModerada());
+                                        }
+                                        if (segFlu.getDolorCabezaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaSevera(segFlu.getDolorCabezaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorCabezaLeve(null);
+                                    seguimientoInfluenza.setDolorCabezaModerada(null);
+                                    seguimientoInfluenza.setDolorCabezaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorCabezaDia11).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia11)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia11)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia11)).setChecked(false);
+                                }
+                                break;
+                            case 12:
+                                if (seguimientoInfluenza.getDolorCabeza().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia12).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorCabezaDia12).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorCabezaLeveDia12).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaModeradaDia12).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorCabezaSeveraDia12).setEnabled(false);
+                                        if (segFlu.getDolorCabezaLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaLeve(segFlu.getDolorCabezaLeve());
+                                        }
+                                        if (segFlu.getDolorCabezaModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaModerada(segFlu.getDolorCabezaModerada());
+                                        }
+                                        if (segFlu.getDolorCabezaSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorCabezaSevera(segFlu.getDolorCabezaSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorCabezaLeve(null);
+                                    seguimientoInfluenza.setDolorCabezaModerada(null);
+                                    seguimientoInfluenza.setDolorCabezaSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorCabezaDia12).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaLeveDia12)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaModeradaDia12)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorCabezaSeveraDia12)).setChecked(false);
+                                }
+                                break;
+                        }
+                    }
                 } else if(mSeguimientoInfluenzaActivity.adapter != null && mSeguimientoInfluenzaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) {
                     seguimientoInfluenza = new SeguimientoInfluenzaDTO();
                     seguimientoInfluenza.setControlDia(mPage);
-                    seguimientoInfluenza.setDolorCabeza(mSeguimientoInfluenzaActivity.adapter.getItem(position).toString()
-                    );
+                    seguimientoInfluenza.setDolorCabeza(mSeguimientoInfluenzaActivity.adapter.getItem(position).toString());
                     mSeguimientoInfluenzaActivity.nuevaListaSegInfluenza.add(seguimientoInfluenza);
                 }
             }
@@ -4586,6 +14576,467 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
                     seguimientoInfluenza.setDolorMuscular((mSeguimientoInfluenzaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) ?
                             mSeguimientoInfluenzaActivity.adapter.getItem(position).toString() : null);
+                    /*CAMBIO DOLOR MUSCULAR*/
+                    if (seguimientoInfluenza.getDolorMuscular() != null) {
+                        switch (mPage) {
+                            case 1:
+                                if (seguimientoInfluenza.getDolorMuscular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia1).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia1).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorMuscularLeveDia1).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularModeradaDia1).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularSeveraDia1).setEnabled(false);
+                                        if (segFlu.getDolorMuscularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularLeve(segFlu.getDolorMuscularLeve());
+                                        }
+                                        if (segFlu.getDolorMuscularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularModerada(segFlu.getDolorMuscularModerada());
+                                        }
+                                        if (segFlu.getDolorMuscularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularSevera(segFlu.getDolorMuscularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorMuscularLeve(null);
+                                    seguimientoInfluenza.setDolorMuscularModerada(null);
+                                    seguimientoInfluenza.setDolorMuscularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorMuscularDia1).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia1)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia1)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia1)).setChecked(false);
+                                }
+                                break;
+                            case 2:
+                                if (seguimientoInfluenza.getDolorMuscular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia2).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia2).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorMuscularLeveDia2).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularModeradaDia2).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularSeveraDia2).setEnabled(false);
+                                        if (segFlu.getDolorMuscularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularLeve(segFlu.getDolorMuscularLeve());
+                                        }
+                                        if (segFlu.getDolorMuscularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularModerada(segFlu.getDolorMuscularModerada());
+                                        }
+                                        if (segFlu.getDolorMuscularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularSevera(segFlu.getDolorMuscularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorMuscularLeve(null);
+                                    seguimientoInfluenza.setDolorMuscularModerada(null);
+                                    seguimientoInfluenza.setDolorMuscularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorMuscularDia2).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia2)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia2)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia2)).setChecked(false);
+                                }
+                                break;
+                            case 3:
+                                if (seguimientoInfluenza.getDolorMuscular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia3).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia3).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorMuscularLeveDia3).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularModeradaDia3).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularSeveraDia3).setEnabled(false);
+                                        if (segFlu.getDolorMuscularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularLeve(segFlu.getDolorMuscularLeve());
+                                        }
+                                        if (segFlu.getDolorMuscularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularModerada(segFlu.getDolorMuscularModerada());
+                                        }
+                                        if (segFlu.getDolorMuscularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularSevera(segFlu.getDolorMuscularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorMuscularLeve(null);
+                                    seguimientoInfluenza.setDolorMuscularModerada(null);
+                                    seguimientoInfluenza.setDolorMuscularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorMuscularDia3).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia3)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia3)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia3)).setChecked(false);
+                                }
+                                break;
+                            case 4:
+                                if (seguimientoInfluenza.getDolorMuscular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia4).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia4).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorMuscularLeveDia4).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularModeradaDia4).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularSeveraDia4).setEnabled(false);
+                                        if (segFlu.getDolorMuscularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularLeve(segFlu.getDolorMuscularLeve());
+                                        }
+                                        if (segFlu.getDolorMuscularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularModerada(segFlu.getDolorMuscularModerada());
+                                        }
+                                        if (segFlu.getDolorMuscularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularSevera(segFlu.getDolorMuscularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorMuscularLeve(null);
+                                    seguimientoInfluenza.setDolorMuscularModerada(null);
+                                    seguimientoInfluenza.setDolorMuscularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorMuscularDia4).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia4)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia4)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia4)).setChecked(false);
+                                }
+                                break;
+                            case 5:
+                                if (seguimientoInfluenza.getDolorMuscular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia5).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia5).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorMuscularLeveDia5).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularModeradaDia5).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularSeveraDia5).setEnabled(false);
+                                        if (segFlu.getDolorMuscularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularLeve(segFlu.getDolorMuscularLeve());
+                                        }
+                                        if (segFlu.getDolorMuscularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularModerada(segFlu.getDolorMuscularModerada());
+                                        }
+                                        if (segFlu.getDolorMuscularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularSevera(segFlu.getDolorMuscularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorMuscularLeve(null);
+                                    seguimientoInfluenza.setDolorMuscularModerada(null);
+                                    seguimientoInfluenza.setDolorMuscularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorMuscularDia5).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia5)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia5)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia5)).setChecked(false);
+                                }
+                                break;
+                            case 6:
+                                if (seguimientoInfluenza.getDolorMuscular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia6).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia6).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorMuscularLeveDia6).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularModeradaDia6).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularSeveraDia6).setEnabled(false);
+                                        if (segFlu.getDolorMuscularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularLeve(segFlu.getDolorMuscularLeve());
+                                        }
+                                        if (segFlu.getDolorMuscularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularModerada(segFlu.getDolorMuscularModerada());
+                                        }
+                                        if (segFlu.getDolorMuscularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularSevera(segFlu.getDolorMuscularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorMuscularLeve(null);
+                                    seguimientoInfluenza.setDolorMuscularModerada(null);
+                                    seguimientoInfluenza.setDolorMuscularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorMuscularDia6).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia6)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia6)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia6)).setChecked(false);
+                                }
+                                break;
+                            case 7:
+                                if (seguimientoInfluenza.getDolorMuscular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia7).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia7).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorMuscularLeveDia7).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularModeradaDia7).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularSeveraDia7).setEnabled(false);
+                                        if (segFlu.getDolorMuscularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularLeve(segFlu.getDolorMuscularLeve());
+                                        }
+                                        if (segFlu.getDolorMuscularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularModerada(segFlu.getDolorMuscularModerada());
+                                        }
+                                        if (segFlu.getDolorMuscularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularSevera(segFlu.getDolorMuscularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorMuscularLeve(null);
+                                    seguimientoInfluenza.setDolorMuscularModerada(null);
+                                    seguimientoInfluenza.setDolorMuscularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorMuscularDia7).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia7)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia7)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia7)).setChecked(false);
+                                }
+                                break;
+                            case 8:
+                                if (seguimientoInfluenza.getDolorMuscular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia8).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia8).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorMuscularLeveDia8).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularModeradaDia8).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularSeveraDia8).setEnabled(false);
+                                        if (segFlu.getDolorMuscularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularLeve(segFlu.getDolorMuscularLeve());
+                                        }
+                                        if (segFlu.getDolorMuscularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularModerada(segFlu.getDolorMuscularModerada());
+                                        }
+                                        if (segFlu.getDolorMuscularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularSevera(segFlu.getDolorMuscularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorMuscularLeve(null);
+                                    seguimientoInfluenza.setDolorMuscularModerada(null);
+                                    seguimientoInfluenza.setDolorMuscularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorMuscularDia8).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia8)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia8)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia8)).setChecked(false);
+                                }
+                                break;
+                            case 9:
+                                if (seguimientoInfluenza.getDolorMuscular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia9).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia9).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorMuscularLeveDia9).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularModeradaDia9).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularSeveraDia9).setEnabled(false);
+                                        if (segFlu.getDolorMuscularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularLeve(segFlu.getDolorMuscularLeve());
+                                        }
+                                        if (segFlu.getDolorMuscularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularModerada(segFlu.getDolorMuscularModerada());
+                                        }
+                                        if (segFlu.getDolorMuscularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularSevera(segFlu.getDolorMuscularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorMuscularLeve(null);
+                                    seguimientoInfluenza.setDolorMuscularModerada(null);
+                                    seguimientoInfluenza.setDolorMuscularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorMuscularDia9).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia9)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia9)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia9)).setChecked(false);
+                                }
+                                break;
+                            case 10:
+                                if (seguimientoInfluenza.getDolorMuscular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia10).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia10).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorMuscularLeveDia10).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularModeradaDia10).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularSeveraDia10).setEnabled(false);
+                                        if (segFlu.getDolorMuscularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularLeve(segFlu.getDolorMuscularLeve());
+                                        }
+                                        if (segFlu.getDolorMuscularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularModerada(segFlu.getDolorMuscularModerada());
+                                        }
+                                        if (segFlu.getDolorMuscularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularSevera(segFlu.getDolorMuscularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorMuscularLeve(null);
+                                    seguimientoInfluenza.setDolorMuscularModerada(null);
+                                    seguimientoInfluenza.setDolorMuscularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorMuscularDia10).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia10)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia10)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia10)).setChecked(false);
+                                }
+                                break;
+                            case 11:
+                                if (seguimientoInfluenza.getDolorMuscular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia11).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia11).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorMuscularLeveDia11).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularModeradaDia11).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularSeveraDia11).setEnabled(false);
+                                        if (segFlu.getDolorMuscularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularLeve(segFlu.getDolorMuscularLeve());
+                                        }
+                                        if (segFlu.getDolorMuscularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularModerada(segFlu.getDolorMuscularModerada());
+                                        }
+                                        if (segFlu.getDolorMuscularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularSevera(segFlu.getDolorMuscularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorMuscularLeve(null);
+                                    seguimientoInfluenza.setDolorMuscularModerada(null);
+                                    seguimientoInfluenza.setDolorMuscularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorMuscularDia11).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia11)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia11)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia11)).setChecked(false);
+                                }
+                                break;
+                            case 12:
+                                if (seguimientoInfluenza.getDolorMuscular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia12).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorMuscularDia12).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorMuscularLeveDia12).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularModeradaDia12).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorMuscularSeveraDia12).setEnabled(false);
+                                        if (segFlu.getDolorMuscularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularLeve(segFlu.getDolorMuscularLeve());
+                                        }
+                                        if (segFlu.getDolorMuscularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularModerada(segFlu.getDolorMuscularModerada());
+                                        }
+                                        if (segFlu.getDolorMuscularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorMuscularSevera(segFlu.getDolorMuscularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorMuscularLeve(null);
+                                    seguimientoInfluenza.setDolorMuscularModerada(null);
+                                    seguimientoInfluenza.setDolorMuscularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorMuscularDia12).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularLeveDia12)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularModeradaDia12)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorMuscularSeveraDia12)).setChecked(false);
+                                }
+                                break;
+                        }
+                    }
                 } else if(mSeguimientoInfluenzaActivity.adapter != null && mSeguimientoInfluenzaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) {
                     seguimientoInfluenza = new SeguimientoInfluenzaDTO();
                     seguimientoInfluenza.setControlDia(mPage);
@@ -4599,6 +15050,466 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 if (mSeguimientoInfluenzaActivity.adapter != null && seguimientoInfluenza != null) {
                     seguimientoInfluenza.setDolorArticular((mSeguimientoInfluenzaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) ?
                             mSeguimientoInfluenzaActivity.adapter.getItem(position).toString() : null);
+                    /*CAMBIO DOLOR ARTICULAR*/
+                    if (seguimientoInfluenza.getDolorArticular() != null) {
+                        switch (mPage) {
+                            case 1:
+                                if (seguimientoInfluenza.getDolorArticular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia1).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia1).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorArticularLeveDia1).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularModeradaDia1).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularSeveraDia1).setEnabled(false);
+                                        if (segFlu.getDolorArticularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularLeve(segFlu.getDolorArticularLeve());
+                                        }
+                                        if (segFlu.getDolorArticularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularModerada(segFlu.getDolorArticularModerada());
+                                        }
+                                        if (segFlu.getDolorArticularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia1)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia1)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularSevera(segFlu.getDolorArticularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorArticularLeve(null);
+                                    seguimientoInfluenza.setDolorArticularModerada(null);
+                                    seguimientoInfluenza.setDolorArticularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorArticularDia1).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia1)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia1)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia1)).setChecked(false);
+                                }
+                                break;
+                            case 2:
+                                if (seguimientoInfluenza.getDolorArticular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia2).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia2).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorArticularLeveDia2).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularModeradaDia2).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularSeveraDia2).setEnabled(false);
+                                        if (segFlu.getDolorArticularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularLeve(segFlu.getDolorArticularLeve());
+                                        }
+                                        if (segFlu.getDolorArticularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularModerada(segFlu.getDolorArticularModerada());
+                                        }
+                                        if (segFlu.getDolorArticularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia2)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia2)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularSevera(segFlu.getDolorArticularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorArticularLeve(null);
+                                    seguimientoInfluenza.setDolorArticularModerada(null);
+                                    seguimientoInfluenza.setDolorArticularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorArticularDia2).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia2)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia2)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia2)).setChecked(false);
+                                }
+                                break;
+                            case 3:
+                                if (seguimientoInfluenza.getDolorArticular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia3).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia3).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorArticularLeveDia3).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularModeradaDia3).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularSeveraDia3).setEnabled(false);
+                                        if (segFlu.getDolorArticularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularLeve(segFlu.getDolorArticularLeve());
+                                        }
+                                        if (segFlu.getDolorArticularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularModerada(segFlu.getDolorArticularModerada());
+                                        }
+                                        if (segFlu.getDolorArticularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia3)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia3)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularSevera(segFlu.getDolorArticularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorArticularLeve(null);
+                                    seguimientoInfluenza.setDolorArticularModerada(null);
+                                    seguimientoInfluenza.setDolorArticularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorArticularDia3).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia3)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia3)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia3)).setChecked(false);
+                                }
+                                break;
+                            case 4:
+                                if (seguimientoInfluenza.getDolorArticular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia4).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia4).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorArticularLeveDia4).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularModeradaDia4).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularSeveraDia4).setEnabled(false);
+                                        if (segFlu.getDolorArticularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularLeve(segFlu.getDolorArticularLeve());
+                                        }
+                                        if (segFlu.getDolorArticularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularModerada(segFlu.getDolorArticularModerada());
+                                        }
+                                        if (segFlu.getDolorArticularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia4)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia4)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularSevera(segFlu.getDolorArticularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorArticularLeve(null);
+                                    seguimientoInfluenza.setDolorArticularModerada(null);
+                                    seguimientoInfluenza.setDolorArticularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorArticularDia4).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia4)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia4)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia4)).setChecked(false);
+                                }
+                                break;
+                            case 5:
+                                if (seguimientoInfluenza.getDolorArticular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia5).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia5).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorArticularLeveDia5).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularModeradaDia5).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularSeveraDia5).setEnabled(false);
+                                        if (segFlu.getDolorArticularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularLeve(segFlu.getDolorArticularLeve());
+                                        }
+                                        if (segFlu.getDolorArticularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularModerada(segFlu.getDolorArticularModerada());
+                                        }
+                                        if (segFlu.getDolorArticularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia5)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia5)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularSevera(segFlu.getDolorArticularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorArticularLeve(null);
+                                    seguimientoInfluenza.setDolorArticularModerada(null);
+                                    seguimientoInfluenza.setDolorArticularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorArticularDia5).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia5)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia5)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia5)).setChecked(false);
+                                }
+                                break;
+                            case 6:
+                                if (seguimientoInfluenza.getDolorArticular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia6).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia6).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorArticularLeveDia6).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularModeradaDia6).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularSeveraDia6).setEnabled(false);
+                                        if (segFlu.getDolorArticularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularLeve(segFlu.getDolorArticularLeve());
+                                        }
+                                        if (segFlu.getDolorArticularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularModerada(segFlu.getDolorArticularModerada());
+                                        }
+                                        if (segFlu.getDolorArticularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia6)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia6)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularSevera(segFlu.getDolorArticularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorArticularLeve(null);
+                                    seguimientoInfluenza.setDolorArticularModerada(null);
+                                    seguimientoInfluenza.setDolorArticularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorArticularDia6).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia6)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia6)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia6)).setChecked(false);
+                                }
+                                break;
+                            case 7:
+                                if (seguimientoInfluenza.getDolorArticular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia7).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia7).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorArticularLeveDia7).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularModeradaDia7).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularSeveraDia7).setEnabled(false);
+                                        if (segFlu.getDolorArticularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularLeve(segFlu.getDolorArticularLeve());
+                                        }
+                                        if (segFlu.getDolorArticularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularModerada(segFlu.getDolorArticularModerada());
+                                        }
+                                        if (segFlu.getDolorArticularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia7)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia7)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularSevera(segFlu.getDolorArticularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorArticularLeve(null);
+                                    seguimientoInfluenza.setDolorArticularModerada(null);
+                                    seguimientoInfluenza.setDolorArticularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorArticularDia7).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia7)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia7)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia7)).setChecked(false);
+                                }
+                                break;
+                            case 8:
+                                if (seguimientoInfluenza.getDolorArticular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia8).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia8).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorArticularLeveDia8).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularModeradaDia8).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularSeveraDia8).setEnabled(false);
+                                        if (segFlu.getDolorArticularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularLeve(segFlu.getDolorArticularLeve());
+                                        }
+                                        if (segFlu.getDolorArticularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularModerada(segFlu.getDolorArticularModerada());
+                                        }
+                                        if (segFlu.getDolorArticularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia8)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia8)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularSevera(segFlu.getDolorArticularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorArticularLeve(null);
+                                    seguimientoInfluenza.setDolorArticularModerada(null);
+                                    seguimientoInfluenza.setDolorArticularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorArticularDia8).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia8)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia8)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia8)).setChecked(false);
+                                }
+                                break;
+                            case 9:
+                                if (seguimientoInfluenza.getDolorArticular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia9).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia9).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorArticularLeveDia9).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularModeradaDia9).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularSeveraDia9).setEnabled(false);
+                                        if (segFlu.getDolorArticularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularLeve(segFlu.getDolorArticularLeve());
+                                        }
+                                        if (segFlu.getDolorArticularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularModerada(segFlu.getDolorArticularModerada());
+                                        }
+                                        if (segFlu.getDolorArticularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia9)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia9)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularSevera(segFlu.getDolorArticularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorArticularLeve(null);
+                                    seguimientoInfluenza.setDolorArticularModerada(null);
+                                    seguimientoInfluenza.setDolorArticularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorArticularDia9).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia9)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia9)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia9)).setChecked(false);
+                                }
+                                break;
+                            case 10:
+                                if (seguimientoInfluenza.getDolorArticular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia10).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia10).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorArticularLeveDia10).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularModeradaDia10).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularSeveraDia10).setEnabled(false);
+                                        if (segFlu.getDolorArticularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularLeve(segFlu.getDolorArticularLeve());
+                                        }
+                                        if (segFlu.getDolorArticularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularModerada(segFlu.getDolorArticularModerada());
+                                        }
+                                        if (segFlu.getDolorArticularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia10)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia10)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularSevera(segFlu.getDolorArticularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorArticularLeve(null);
+                                    seguimientoInfluenza.setDolorArticularModerada(null);
+                                    seguimientoInfluenza.setDolorArticularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorArticularDia10).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia10)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia10)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia10)).setChecked(false);
+                                }
+                                break;
+                            case 11:
+                                if (seguimientoInfluenza.getDolorArticular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia11).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia11).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorArticularLeveDia11).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularModeradaDia11).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularSeveraDia11).setEnabled(false);
+                                        if (segFlu.getDolorArticularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularLeve(segFlu.getDolorArticularLeve());
+                                        }
+                                        if (segFlu.getDolorArticularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularModerada(segFlu.getDolorArticularModerada());
+                                        }
+                                        if (segFlu.getDolorArticularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia11)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia11)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularSevera(segFlu.getDolorArticularSevera());
+                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorArticularLeve(null);
+                                    seguimientoInfluenza.setDolorArticularModerada(null);
+                                    seguimientoInfluenza.setDolorArticularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorArticularDia11).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia11)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia11)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia11)).setChecked(false);
+                                }
+                                break;
+                            case 12:
+                                if (seguimientoInfluenza.getDolorArticular().equals("S")) {
+
+                                    SeguimientoInfluenzaDTO segFlu = obtenerSeguimientoPorDia(mPage);
+                                    if (segFlu == null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia12).setVisibility(View.VISIBLE);
+                                    }
+                                    if (segFlu != null) {
+                                        getActivity().findViewById(R.id.layoutDolorArticularDia12).setVisibility(View.VISIBLE);
+                                        getActivity().findViewById(R.id.chkDolorArticularLeveDia12).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularModeradaDia12).setEnabled(false);
+                                        getActivity().findViewById(R.id.chkDolorArticularSeveraDia12).setEnabled(false);
+                                        if (segFlu.getDolorArticularLeve() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularLeve(segFlu.getDolorArticularLeve());
+                                        }
+                                        if (segFlu.getDolorArticularModerada() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularModerada(segFlu.getDolorArticularModerada());
+                                        }
+                                        if (segFlu.getDolorArticularSevera() != null) {
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia12)).setChecked(true);
+                                            ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia12)).jumpDrawablesToCurrentState();
+                                            seguimientoInfluenza.setDolorArticularSevera(segFlu.getDolorArticularSevera());                                        }
+                                    }
+                                } else {
+                                    seguimientoInfluenza.setDolorArticularLeve(null);
+                                    seguimientoInfluenza.setDolorArticularModerada(null);
+                                    seguimientoInfluenza.setDolorArticularSevera(null);
+                                    getActivity().findViewById(R.id.layoutDolorArticularDia12).setVisibility(View.GONE);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularLeveDia12)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularModeradaDia12)).setChecked(false);
+                                    ((CheckBox) getActivity().findViewById(R.id.chkDolorArticularSeveraDia12)).setChecked(false);
+                                }
+                                break;
+                        }
+                    }
                 } else if(mSeguimientoInfluenzaActivity.adapter != null && mSeguimientoInfluenzaActivity.adapter.getItem(position).toString().compareTo("Seleccione") != 0) {
                     seguimientoInfluenza = new SeguimientoInfluenzaDTO();
                     seguimientoInfluenza.setControlDia(mPage);
@@ -5102,7 +16013,6 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                                 }
                             });
                             break;
-
                         case 2:
                             Spinner spnMedico2 = (Spinner) getActivity().findViewById(R.id.spnMedico2);
                             spnMedico2.setEnabled(false);
@@ -5432,6 +16342,11 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnMedico1).setEnabled(false);
                         getActivity().findViewById(R.id.imgBusquedaMedico1).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento1).setEnabled(habilitar);
+
+                        getActivity().findViewById(R.id.txtvPosSegFlu1).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSegFlu1).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSegFlu1).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNoAplicaSegFlu1).setEnabled(habilitar);
                         break;
                     case 2:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento2)).setText(seguimientoInfluenza.getFechaSeguimiento());
@@ -5490,6 +16405,11 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnMedico2).setEnabled(false);
                         getActivity().findViewById(R.id.imgBusquedaMedico2).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento2).setEnabled(habilitar);
+
+                        getActivity().findViewById(R.id.txtvPosSegFlu2).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSegFlu2).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSegFlu2).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNoAplicaSegFlu2).setEnabled(habilitar);
                         break;
                     case 3:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento3)).setText(seguimientoInfluenza.getFechaSeguimiento());
@@ -5548,6 +16468,11 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnMedico3).setEnabled(false);
                         getActivity().findViewById(R.id.imgBusquedaMedico3).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento3).setEnabled(habilitar);
+
+                        getActivity().findViewById(R.id.txtvPosSegFlu3).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSegFlu3).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSegFlu3).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNoAplicaSegFlu3).setEnabled(habilitar);
                         break;
                     case 4:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento4)).setText(seguimientoInfluenza.getFechaSeguimiento());
@@ -5607,6 +16532,11 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnMedico4).setEnabled(false);
                         getActivity().findViewById(R.id.imgBusquedaMedico4).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento4).setEnabled(habilitar);
+
+                        getActivity().findViewById(R.id.txtvPosSegFlu4).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSegFlu4).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSegFlu4).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNoAplicaSegFlu4).setEnabled(habilitar);
                         break;
                     case 5:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento5)).setText(seguimientoInfluenza.getFechaSeguimiento());
@@ -5666,6 +16596,11 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnMedico5).setEnabled(false);
                         getActivity().findViewById(R.id.imgBusquedaMedico5).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento5).setEnabled(habilitar);
+
+                        getActivity().findViewById(R.id.txtvPosSegFlu5).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSegFlu5).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSegFlu5).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNoAplicaSegFlu5).setEnabled(habilitar);
                         break;
                     case 6:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento6)).setText(seguimientoInfluenza.getFechaSeguimiento());
@@ -5725,6 +16660,11 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnMedico6).setEnabled(false);
                         getActivity().findViewById(R.id.imgBusquedaMedico6).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento6).setEnabled(habilitar);
+
+                        getActivity().findViewById(R.id.txtvPosSegFlu6).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSegFlu6).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSegFlu6).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNoAplicaSegFlu6).setEnabled(habilitar);
                         break;
                     case 7:
                         ((EditText) getActivity().findViewById(R.id.edtxtFechaSeguimiento7)).setText(seguimientoInfluenza.getFechaSeguimiento());
@@ -5784,6 +16724,11 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnMedico7).setEnabled(false);
                         getActivity().findViewById(R.id.imgBusquedaMedico7).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento7).setEnabled(habilitar);
+
+                        getActivity().findViewById(R.id.txtvPosSegFlu7).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSegFlu7).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSegFlu7).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNoAplicaSegFlu7).setEnabled(habilitar);
                         break;
 
                     case 8:
@@ -5838,6 +16783,11 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnMedico8).setEnabled(false);
                         getActivity().findViewById(R.id.imgBusquedaMedico8).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento8).setEnabled(habilitar);
+
+                        getActivity().findViewById(R.id.txtvPosSegFlu8).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSegFlu8).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSegFlu8).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNoAplicaSegFlu8).setEnabled(habilitar);
                         break;
 
                     case 9:
@@ -5892,6 +16842,11 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnMedico9).setEnabled(false);
                         getActivity().findViewById(R.id.imgBusquedaMedico9).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento9).setEnabled(habilitar);
+
+                        getActivity().findViewById(R.id.txtvPosSegFlu9).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSegFlu9).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSegFlu9).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNoAplicaSegFlu9).setEnabled(habilitar);
                         break;
 
                     case 10:
@@ -5946,6 +16901,11 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnMedico10).setEnabled(false);
                         getActivity().findViewById(R.id.imgBusquedaMedico10).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento10).setEnabled(habilitar);
+
+                        getActivity().findViewById(R.id.txtvPosSegFlu10).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSegFlu10).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSegFlu10).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNoAplicaSegFlu10).setEnabled(habilitar);
                         break;
 
                     case 11:
@@ -6000,6 +16960,11 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnMedico11).setEnabled(false);
                         getActivity().findViewById(R.id.imgBusquedaMedico11).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento11).setEnabled(habilitar);
+
+                        getActivity().findViewById(R.id.txtvPosSegFlu11).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSegFlu11).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSegFlu11).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNoAplicaSegFlu11).setEnabled(habilitar);
                         break;
 
                     case 12:
@@ -6054,6 +17019,11 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         getActivity().findViewById(R.id.spnMedico12).setEnabled(false);
                         getActivity().findViewById(R.id.imgBusquedaMedico12).setEnabled(false);
                         getActivity().findViewById(R.id.imgLimpiarSeguimiento12).setEnabled(habilitar);
+
+                        getActivity().findViewById(R.id.txtvPosSegFlu12).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNegSegFlu12).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvDesSegFlu12).setEnabled(habilitar);
+                        getActivity().findViewById(R.id.txtvNoAplicaSegFlu12).setEnabled(habilitar);
                         break;
                 }
             }

@@ -365,7 +365,7 @@
             android:text="@string/boton_diagnostico_HistoriaExamenFisico"
             android:id="@+id/btndianosticoHistExamenFisico"
             android:layout_alignTop="@+id/edtxtTempCSintomaD"
-android:drawableRight="@drawable/expandir"/>
+            android:drawableRight="@drawable/expandir"/>
 
         <Button
             android:layout_width="match_parent"
@@ -394,6 +394,7 @@ android:drawableRight="@drawable/expandir"/>
             android:id="@+id/btndianosticodiag"
             android:layout_alignTop="@+id/btndianosticotratamiento"
             android:drawableRight="@drawable/expandir"
+            android:enabled="false"
             />
 
         <Button

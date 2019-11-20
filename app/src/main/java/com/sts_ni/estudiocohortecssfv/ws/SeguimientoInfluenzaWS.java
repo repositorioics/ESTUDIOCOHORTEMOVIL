@@ -15,6 +15,7 @@ import com.sts_ni.estudiocohortecssfv.utils.StringUtils;
 
 import org.apache.http.client.HttpResponseException;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
@@ -434,6 +435,7 @@ public class SeguimientoInfluenzaWS extends EstudioCohorteCssfvWS {
             objenvio.put("codExpediente", hojaInfluenza.getCodExpediente());
             objenvio.put("fif", hojaInfluenza.getFif());
             objenvio.put("fis", hojaInfluenza.getFis());
+            objenvio.put("secHojaConsulta", hojaInfluenza.getSecHojaConsulta());
             if (hojaInfluenza.getFechaCierre() != null)
                 objenvio.put("fechaCierre",new SimpleDateFormat("dd/MM/yyyy").format(hojaInfluenza.getFechaCierre().getTime()).toString());
             objenvio.put("cerrado",String.valueOf(hojaInfluenza.getCerrado()));
@@ -465,6 +467,29 @@ public class SeguimientoInfluenzaWS extends EstudioCohorteCssfvWS {
                     objenvioSeg.put("dificultadRespirar", String.valueOf(seg.getDificultadRespirar()));
                     objenvioSeg.put("faltaEscuela", seg.getFaltaEscuela());
                     objenvioSeg.put("quedoEnCama", seg.getQuedoEnCama());
+                    /*NUEVOS CAMPOS AGREGADOS*/
+                    objenvioSeg.put("fiebreLeve", seg.getFiebreLeve());
+                    objenvioSeg.put("fiebreModerada", seg.getFiebreModerada());
+                    objenvioSeg.put("fiebreSevera", seg.getFiebreSevera());
+                    objenvioSeg.put("tosLeve", seg.getTosLeve());
+                    objenvioSeg.put("tosModerada", seg.getTosModerada());
+                    objenvioSeg.put("tosSevera", seg.getTosSevera());
+                    objenvioSeg.put("secrecionNasalLeve", seg.getSecrecionNasalLeve());
+                    objenvioSeg.put("secrecionNasalModerada", seg.getSecrecionNasalModerada());
+                    objenvioSeg.put("secrecionNasalSevera", seg.getSecrecionNasalSevera());
+                    objenvioSeg.put("dolorGargantaLeve", seg.getDolorGargantaLeve());
+                    objenvioSeg.put("dolorGargantaModerada", seg.getDolorGargantaModerada());
+                    objenvioSeg.put("dolorGargantaSevera", seg.getDolorGargantaSevera());
+                    objenvioSeg.put("dolorCabezaLeve", seg.getDolorCabezaLeve());
+                    objenvioSeg.put("dolorCabezaModerada", seg.getDolorCabezaModerada());
+                    objenvioSeg.put("dolorCabezaSevera", seg.getDolorCabezaSevera());
+                    objenvioSeg.put("dolorMuscularLeve", seg.getDolorMuscularLeve());
+                    objenvioSeg.put("dolorMuscularModerada", seg.getDolorMuscularModerada());
+                    objenvioSeg.put("dolorMuscularSevera", seg.getDolorMuscularSevera());
+                    objenvioSeg.put("dolorArticularLeve", seg.getDolorArticularLeve());
+                    objenvioSeg.put("dolorArticularModerada", seg.getDolorArticularModerada());
+                    objenvioSeg.put("dolorArticularSevera", seg.getDolorArticularSevera());
+                    objenvioSeg.put("secHojaInfluenza", seg.getSecHojaInfluenza());
 
                     jsonArray.put(objenvioSeg.toString());
                 }
@@ -634,8 +659,9 @@ public class SeguimientoInfluenzaWS extends EstudioCohorteCssfvWS {
     }
 
 
-    public void ImprimirHojaSeguimientoPdf(int numHojaSeguimiento){
+    public ErrorDTO ImprimirHojaSeguimientoPdf(int numHojaSeguimiento){
 
+        ErrorDTO retorno = new ErrorDTO();
         try {
             SoapObject request = new SoapObject(NAMESPACE, METODO_IMPRIMIROJASEGUIMIENTO_PDF);
             SoapSerializationEnvelope sobre = new SoapSerializationEnvelope(SoapEnvelope.VER11);
@@ -646,23 +672,44 @@ public class SeguimientoInfluenzaWS extends EstudioCohorteCssfvWS {
             paramWS.setName("paramNumHojaSeguimiento");
             paramWS.setNamespace("");
             paramWS.setType(Integer.class);
+
             request.addProperty(paramWS);
+
             sobre.setOutputSoapObject(request);
+
             HttpTransportSE transporte = new HttpTransportSE(URL, this.TIME_OUT);
             transporte.call(ACCIOSOAP_IMPRIMIRHOJASEGUIMIENTO_PDF, sobre, this.HEADER_PROPERTY);
 
+            String resultado = sobre.getResponse().toString();
+
+            if (resultado != null && !resultado.isEmpty()) {
+
+                JSONObject jObj = new JSONObject(resultado);
+
+                JSONObject mensaje = (JSONObject) jObj.get("mensaje");
+
+                retorno.setCodigoError((long) mensaje.getInt("codigo"));
+                retorno.setMensajeError(mensaje.getString("texto"));
+
+            } else {
+                retorno.setCodigoError(Long.parseLong("3"));
+                retorno.setMensajeError(RES.getString(R.string.msj_servicio_no_envia_respuesta));
+            }
+
         }catch (ConnectException ce){
             ce.printStackTrace();
-
-        } catch (XmlPullParserException e) {
+            retorno.setCodigoError(Long.parseLong("2"));
+            retorno.setMensajeError(RES.getString(R.string.msj_servicio_no_dispon));
+        }catch (SocketTimeoutException et) {
+            et.printStackTrace();
+            retorno.setCodigoError(Long.parseLong("2"));
+            retorno.setMensajeError(RES.getString(R.string.msj_tiempo_espera_servicio_agotado));
+        }catch (Exception e) {
             e.printStackTrace();
-        } catch (SoapFault soapFault) {
-            soapFault.printStackTrace();
-        } catch (HttpResponseException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            retorno.setCodigoError(Long.parseLong("999"));
+            retorno.setMensajeError(RES.getString(R.string.msj_error_no_controlado)+ " " + e.getMessage());
         }
+        return retorno;
     }
 
     public byte[] getSeguimientoInfluenzaPdf(int numHojaSeguimiento){

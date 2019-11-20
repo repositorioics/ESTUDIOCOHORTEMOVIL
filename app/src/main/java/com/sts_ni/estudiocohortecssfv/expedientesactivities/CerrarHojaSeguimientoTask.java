@@ -51,7 +51,6 @@ public class CerrarHojaSeguimientoTask extends UserTask<Object, Void, ErrorDTO> 
             resultado.setCodigoError(Long.parseLong("3"));
             resultado.setMensajeError(this.seguimientoInfluenzaActivity.getResources().getString(R.string.msj_no_tiene_conexion));
         }
-
         return resultado;
     }
 

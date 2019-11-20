@@ -326,4 +326,8 @@ public class EstudioCohorteCssfvWS {
     public static final String METODO_IMPRIMIR_FICHA_PDF = "imprimirFichaPdf";
     public static final String ACCIOSOAP_METODO_IMPRIMIR_FICHA_PDF = NAMESPACE + METODO_IMPRIMIR_FICHA_PDF;
 
+    //
+    public static final String METODO_ACTIVAR_DIAGNOSTICO = "procesoActivarDiagnostico";
+    public static final String ACCIOSOAP_METODO_ACTIVAR_DIAGNOSTICO = NAMESPACE + METODO_ACTIVAR_DIAGNOSTICO;
+
 }

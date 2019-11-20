@@ -877,9 +877,20 @@ public class CategoriaSintomaActivity extends ActionBarActivity {
                 PD_CREATE.dismiss();
                 if(this.RESPUESTA_CARGA != null) {
                     CategoriaSintomasDTO categoriaSintomasDTO = this.RESPUESTA_CARGA.getObjecRespuesta();
-                    cargarCabezeraPiesDatos(categoriaSintomasDTO);
-                    cargarCategoiraAB(categoriaSintomasDTO);
-                    mCorrienteCategoriaSintomas = this.RESPUESTA_CARGA.getObjecRespuesta();
+                    if (categoriaSintomasDTO != null) {
+                        cargarCabezeraPiesDatos(categoriaSintomasDTO);
+                        cargarCategoiraAB(categoriaSintomasDTO);
+                        mCorrienteCategoriaSintomas = this.RESPUESTA_CARGA.getObjecRespuesta();
+                    } else if (this.RESPUESTA_CARGA.getCodigoError().intValue() != 999){
+                        MensajesHelper.mostrarMensajeInfo(CONTEXT,
+                                RESPUESTA_CARGA.getMensajeError(),getResources().getString(
+                                        R.string.title_estudio_sostenible), null);
+
+                    }else{
+                        MensajesHelper.mostrarMensajeError(CONTEXT,
+                                RESPUESTA_CARGA.getMensajeError(), getResources().getString(
+                                        R.string.title_estudio_sostenible), null);
+                    }
                 }
             }
 

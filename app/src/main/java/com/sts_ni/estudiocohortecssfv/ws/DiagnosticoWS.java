@@ -329,6 +329,59 @@ public class DiagnosticoWS extends EstudioCohorteCssfvWS {
         return retorno;
     }
 
+    public ErrorDTO activarDiagnostico(int secHojaConsulta) {
+        ErrorDTO retorno = new ErrorDTO();
+        try {
+            SoapObject request = new SoapObject(NAMESPACE, METODO_ACTIVAR_DIAGNOSTICO);
+            SoapSerializationEnvelope sobre = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            sobre.dotNet = false;
+
+            //Seteando parametros
+            PropertyInfo paramEviar = new PropertyInfo();
+            paramEviar.setValue(secHojaConsulta);
+            paramEviar.setName("secHojaConsulta");
+            paramEviar.setNamespace("");
+            paramEviar.setType(String.class);
+
+            request.addProperty(paramEviar);
+
+            sobre.setOutputSoapObject(request);
+
+            HttpTransportSE transporte = new HttpTransportSE(URL, this.TIME_OUT);
+            transporte.call(ACCIOSOAP_METODO_ACTIVAR_DIAGNOSTICO, sobre, HEADER_PROPERTY);
+
+            String resultado = sobre.getResponse() != null ? sobre.getResponse().toString() : null;
+
+            if (resultado != null && !resultado.isEmpty()) {
+
+                JSONObject jObj = new JSONObject(resultado);
+
+                JSONObject mensaje = (JSONObject) jObj.get("mensaje");
+
+                retorno.setCodigoError((long) mensaje.getInt("codigo"));
+                retorno.setMensajeError(mensaje.getString("texto"));
+
+            } else {
+                retorno.setCodigoError(Long.parseLong("3"));
+                retorno.setMensajeError(RES.getString(R.string.msj_servicio_no_envia_respuesta));
+            }
+
+        } catch (ConnectException ce){
+            ce.printStackTrace();
+            retorno.setCodigoError(Long.parseLong("2"));
+            retorno.setMensajeError(RES.getString(R.string.msj_servicio_no_dispon));
+        }catch (SocketTimeoutException et) {
+            et.printStackTrace();
+            retorno.setCodigoError(Long.parseLong("2"));
+            retorno.setMensajeError(RES.getString(R.string.msj_tiempo_espera_servicio_agotado));
+        }catch (Exception e) {
+            e.printStackTrace();
+            retorno.setCodigoError(Long.parseLong("999"));
+            retorno.setMensajeError(RES.getString(R.string.msj_error_no_controlado)+ " " + e.getMessage());
+        }
+        return retorno;
+    }
+
     //Funcion para guardar Proxima Cita
     public ErrorDTO guardarDiagnostico(HojaConsultaDTO hojaConsulta, String usuarioLogiado){
 

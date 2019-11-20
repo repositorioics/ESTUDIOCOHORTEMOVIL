@@ -17,6 +17,7 @@ public class HojaInfluenzaDTO {
     private int codExpediente;
     private char cerrado;
     private String estudioPaciente;
+    private Integer secHojaConsulta;
     private List<SeguimientoInfluenzaDTO> lstSeguimientoInfluenza;
 
     public int getNumHojaSeguimiento() {
@@ -107,5 +108,13 @@ public class HojaInfluenzaDTO {
 
     public void setLstSeguimientoInfluenza(List<SeguimientoInfluenzaDTO> lstSeguimientoInfluenza) {
         this.lstSeguimientoInfluenza = lstSeguimientoInfluenza;
+    }
+
+    public Integer getSecHojaConsulta() {
+        return secHojaConsulta;
+    }
+
+    public void setSecHojaConsulta(Integer secHojaConsulta) {
+        this.secHojaConsulta = secHojaConsulta;
     }
 }

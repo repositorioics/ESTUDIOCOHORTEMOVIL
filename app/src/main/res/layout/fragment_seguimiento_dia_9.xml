@@ -99,6 +99,57 @@
             android:textColor="#fff"
             android:textSize="20dp"
             />
+        <TextView
+            android:id="@+id/txtvPosSegFlu9"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="30dp"
+            android:gravity="center"
+            android:background="@drawable/bg_textview_rectangulo2"
+            android:text="@string/label_s"
+            android:textColor="#fff"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/txtvNegSegFlu9"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="5dp"
+            android:gravity="center"
+            android:background="@drawable/bg_textview_rectangulo2"
+            android:text="@string/label_n"
+            android:textColor="#fff"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/txtvDesSegFlu9"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="5dp"
+            android:gravity="center"
+            android:background="@drawable/bg_textview_rectangulo2"
+            android:text="@string/label_d"
+            android:textColor="#fff"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/txtvNoAplicaSegFlu9"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="5dp"
+            android:gravity="center"
+            android:background="@drawable/bg_textview_rectangulo2"
+            android:text="@string/label_no_aplica"
+            android:textColor="#fff"
+            android:textStyle="bold"
+            />
     </LinearLayout>
 
     <LinearLayout
@@ -155,6 +206,80 @@
 
     </LinearLayout>
 
+    <!--FIEBRE-->
+    <LinearLayout
+        android:id="@+id/layoutFiebreDia9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="14dp"
+        android:paddingLeft="10dp"
+        android:visibility="gone"
+        android:layout_marginLeft="30dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:text="@string/label_leve"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkFiebreLeveDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila2"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:layout_marginLeft="30dp"
+            android:text="@string/label_moderada"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkFiebreModeradaDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila2"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:layout_marginLeft="30dp"
+            android:text="@string/label_severa"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkFiebreSeveraDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila2"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -166,11 +291,10 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_weight="0.15"
             android:text="@string/label_tos"
-            android:layout_gravity="center"
-            android:textAppearance="@style/TextViewEstiloSeguimiento"
-            />
+            android:textAppearance="@style/TextViewEstiloSeguimiento" />
 
         <Spinner
             android:id="@+id/spnDia9Fila3"
@@ -180,6 +304,80 @@
             android:background="@drawable/rounded_spinner"
             />
 
+    </LinearLayout>
+
+    <!--TOS-->
+    <LinearLayout
+        android:id="@+id/layoutTosDia9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="14dp"
+        android:paddingLeft="10dp"
+        android:visibility="gone"
+        android:layout_marginLeft="30dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:text="@string/label_leve"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkTosLeveDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila3"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:layout_marginLeft="30dp"
+            android:text="@string/label_moderada"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkTosModeradaDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila3"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:layout_marginLeft="30dp"
+            android:text="@string/label_severa"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkTosSeveraDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila3"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
     </LinearLayout>
 
     <LinearLayout
@@ -209,6 +407,80 @@
 
     </LinearLayout>
 
+    <!--SECRECION NASAL-->
+    <LinearLayout
+        android:id="@+id/layoutSecrecionNasalDia9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="14dp"
+        android:paddingLeft="10dp"
+        android:visibility="gone"
+        android:layout_marginLeft="30dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:text="@string/label_leve"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkSecrecionNasalLeveDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila4"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:layout_marginLeft="30dp"
+            android:text="@string/label_moderada"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkSecrecionNasalModeradaDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila4"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:layout_marginLeft="30dp"
+            android:text="@string/label_severa"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkSecrecionNasalSeveraDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila4"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -234,6 +506,80 @@
             android:background="@drawable/rounded_spinner"
             />
 
+    </LinearLayout>
+
+    <!--DOLOR GARGANTA-->
+    <LinearLayout
+        android:id="@+id/layoutDolorGargantaDia9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="14dp"
+        android:paddingLeft="10dp"
+        android:visibility="gone"
+        android:layout_marginLeft="30dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:text="@string/label_leve"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkDolorGargantaLeveDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila5"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:layout_marginLeft="30dp"
+            android:text="@string/label_moderado"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkDolorGargantaModeradaDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila5"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:layout_marginLeft="30dp"
+            android:text="@string/label_severo"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkDolorGargantaSeveraDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila5"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
     </LinearLayout>
 
     <LinearLayout
@@ -290,6 +636,80 @@
 
     </LinearLayout>
 
+    <!--DOLOR CABEZA-->
+    <LinearLayout
+        android:id="@+id/layoutDolorCabezaDia9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="14dp"
+        android:paddingLeft="10dp"
+        android:visibility="gone"
+        android:layout_marginLeft="30dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:text="@string/label_leve"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkDolorCabezaLeveDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila7"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:layout_marginLeft="30dp"
+            android:text="@string/label_moderado"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkDolorCabezaModeradaDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila7"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:layout_marginLeft="30dp"
+            android:text="@string/label_severo"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkDolorCabezaSeveraDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila7"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -344,6 +764,80 @@
 
     </LinearLayout>
 
+    <!--DOLOR MUSCULAR-->
+    <LinearLayout
+        android:id="@+id/layoutDolorMuscularDia9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="14dp"
+        android:paddingLeft="10dp"
+        android:visibility="gone"
+        android:layout_marginLeft="30dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:text="@string/label_leve"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkDolorMuscularLeveDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila9"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:layout_marginLeft="30dp"
+            android:text="@string/label_moderado"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkDolorMuscularModeradaDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila9"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:layout_marginLeft="30dp"
+            android:text="@string/label_severo"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkDolorMuscularSeveraDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila9"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -369,6 +863,80 @@
             android:background="@drawable/rounded_spinner"
             />
 
+    </LinearLayout>
+
+    <!--DOLOR ARTICULAR-->
+    <LinearLayout
+        android:id="@+id/layoutDolorArticularDia9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="14dp"
+        android:paddingLeft="10dp"
+        android:visibility="gone"
+        android:layout_marginLeft="30dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:text="@string/label_leve"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkDolorArticularLeveDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila10"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:layout_marginLeft="30dp"
+            android:text="@string/label_moderado"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkDolorArticularModeradaDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila10"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:layout_marginLeft="30dp"
+            android:text="@string/label_severo"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <CheckBox
+            android:id="@+id/chkDolorArticularSeveraDia9"
+            android:layout_width="0dp"
+            android:layout_weight="0.15"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/spnDia9Fila10"
+            android:layout_marginTop="0dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
     </LinearLayout>
 
     <LinearLayout

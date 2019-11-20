@@ -98,6 +98,7 @@
     <string name="label_s">S</string>
     <string name="label_n">N</string>
     <string name="label_d">D</string>
+    <string name="label_no_aplica">NA</string>
     <string name="label_fiebre">Fiebre</string>
     <string name="label_astenia">Astenia</string>
     <string name="label_anormalmente_somnoliento">Anormalmente Somnoliento</string>
@@ -498,6 +499,11 @@
     <string name="msg_change_no2">Cambiar a No todos los campos del día %1s del Seguimiento de Zika?</string>
     <string name="msg_change_desc2">Cambiar a Desconocido todos los campos del día %1s del Seguimiento de Zika?</string>
 
+    <string name="msg_change_flu_yes2">Cambiar a Si todos los campos del día %1s del Seguimiento de Influenza?</string>
+    <string name="msg_change_flu_no2">Cambiar a No todos los campos del día %1s del Seguimiento de Influenza?</string>
+    <string name="msg_change_flu_desc2">Cambiar a Desconocido todos los campos del día %1s del Seguimiento de Influenza?</string>
+    <string name="msg_change_flu_no_aplica2">Cambiar a No Aplica todos los campos del día %1s del Seguimiento de Influenza?</string>
+
     <!--Diagnostico tratamiento !-->
 
     <string name="label_Acetamenofen">Acetamenofén</string>
@@ -742,4 +748,21 @@
     <string name="msj_telefono_no_valido">El número de teléfono no es valido</string>
     <string name="msj_fecha_fif_mayor_hoy">Fecha Seleccionada no puede ser mayor a la fecha de hoy.</string>
     <string name="msj_fif_menor_que_fis">La FIF no puede ser menor que la FIS</string>
+
+    <string name="msj_esta_seguro_cerrar_hoja">Hará Referencia por Dengue ó Referencia por otra causa ?</string>
+
+    <string name="label_leve">Leve</string>
+    <string name="label_moderada">Moderada</string>
+    <string name="label_moderado">Moderado</string>
+    <string name="label_severa">Severa</string>
+    <string name="label_severo">Severo</string>
+    <string name="mensaje_fiebre">Debe indicar la intesidad de la Fiebre</string>
+    <string name="mensaje_tos">Debe indicar la intesidad de la Tos</string>
+    <string name="mensaje_secrecion_nasal">Debe indicar la intesidad de la Secreción Nasal</string>
+    <string name="mensaje_dolor_garganta">Debe indicar la intesidad del Dolor de Garganta</string>
+    <string name="mensaje_dolor_cabeza">Debe indicar la intesidad del Dolor de Cabeza</string>
+    <string name="mensaje_dolor_muscular">Debe indicar la intesidad del Dolor Muscular</string>
+    <string name="mensaje_dolor_articular">Debe indicar la intesidad del Dolor Articular</string>
+
+    <string name="msj_usuario_logueado_diferente_a_usuario_medico">El Usuario Logueado no coincide con el Usuario Medico del Día %1s favor revisar.</string>
 </resources>

@@ -231,6 +231,8 @@ public class HojaConsultaDTO {
 
     private Character otro;
 
+    private String estudiosParticipantes;
+
     public int getSecHojaConsulta() {
         return secHojaConsulta;
     }
@@ -1935,5 +1937,13 @@ public class HojaConsultaDTO {
 
     public void setHorasv(String horasv) {
         this.horasv = horasv;
+    }
+
+    public String getEstudiosParticipantes() {
+        return estudiosParticipantes;
+    }
+
+    public void setEstudiosParticipantes(String estudiosParticipantes) {
+        this.estudiosParticipantes = estudiosParticipantes;
     }
 }

@@ -116,13 +116,39 @@ public class CCierreTabFragment extends Fragment implements CancelacionDialog.Di
         rootView.findViewById(R.id.imgBtnCerrarHoja).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                rootView.findViewById(R.id.imgBtnCambioTurno).setEnabled(false);
-                rootView.findViewById(R.id.btnCancelarCierre).setEnabled(false);
-                rootView.findViewById(R.id.btnNoAtiendeLlamadoCierre).setEnabled(false);
-                llamarProcesoCierre(rootView);
+                DialogInterface.OnClickListener preguntaDialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                //llamarProcesoAgregarHoja();
+                                /*rootView.findViewById(R.id.imgBtnCerrarHoja).setEnabled(false);
+                                rootView.findViewById(R.id.btnCancelarCierre).setEnabled(false);
+                                rootView.findViewById(R.id.btnNoAtiendeLlamadoCierre).setEnabled(false);
+                                rootView.findViewById(R.id.imgBtnCambioTurno).setEnabled(false);*/
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                rootView.findViewById(R.id.imgBtnCambioTurno).setEnabled(false);
+                                rootView.findViewById(R.id.btnCancelarCierre).setEnabled(false);
+                                rootView.findViewById(R.id.btnNoAtiendeLlamadoCierre).setEnabled(false);
+                                llamarProcesoCierre(rootView);
+                                break;
+                        }
+                    }
+                };
+                MensajesHelper.mostrarMensajeYesNo(getActivity(),
+                        getResources().getString(
+                                R.string.msj_esta_seguro_cerrar_hoja), getResources().getString(
+                                R.string.title_estudio_sostenible), preguntaDialogClickListener);
+            }
+
+
+
+
                 //Desabilitar el boton cambio turno cuando se cerro la hoja de consulta
 
-            }
+            //}
         });
 
         rootView.findViewById(R.id.btnSalirCierre).setOnClickListener(new View.OnClickListener() {
@@ -386,6 +412,11 @@ public class CCierreTabFragment extends Fragment implements CancelacionDialog.Di
                         rootView.findViewById(R.id.imgBtnCerrarHoja).setEnabled(false);
                         mPacienteSeleccionado.setCodigoEstado('7');
 
+                        //*--------------------NUEVO CAMBIO 10/10/2019----------------------*/
+                    } else if (RESPUESTA.getCodigoError().intValue() == 4) {
+                        MensajesHelper.mostrarMensajeError(getActivity(),
+                                RESPUESTA.getMensajeError(),getResources().getString(
+                                        R.string.title_estudio_sostenible), null);
                     } else {
                         MensajesHelper.mostrarMensajeError(getActivity(),
                                 RESPUESTA.getMensajeError(),getResources().getString(

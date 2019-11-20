@@ -38,6 +38,7 @@ import android.widget.Toast;
 import com.sts_ni.estudiocohortecssfv.CssfvApp;
 import com.sts_ni.estudiocohortecssfv.NavigationDrawerFragment;
 import com.sts_ni.estudiocohortecssfv.R;
+import com.sts_ni.estudiocohortecssfv.dto.ErrorDTO;
 import com.sts_ni.estudiocohortecssfv.dto.HojaZikaDTO;
 import com.sts_ni.estudiocohortecssfv.dto.MedicosDTO;
 import com.sts_ni.estudiocohortecssfv.dto.ResultadoListWSDTO;
@@ -1212,6 +1213,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 private ConnectivityManager CM = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
                 private NetworkInfo NET_INFO = CM.getActiveNetworkInfo();
                 private SeguimientoZikaWS SEGUIMIENTO  = new SeguimientoZikaWS(getResources());
+                private ErrorDTO RESPUESTA = new ErrorDTO();
 
                 @Override
                 protected void onPreExecute() {
@@ -1227,7 +1229,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 protected Void doInBackground(Void... params) {
                     if (NET_INFO != null && NET_INFO.isConnected())
                     {
-                        SEGUIMIENTO.ImprimirHojaSeguimientoPdf(mSeguimientoZikaActivity.mNumSeg);
+                        RESPUESTA = SEGUIMIENTO.ImprimirHojaSeguimientoPdf(mSeguimientoZikaActivity.mNumSeg);
                     }
 
                     return null;
@@ -1237,6 +1239,21 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 protected void onPostExecute(Void result){
                     PD.dismiss();
                     try {
+                        if (RESPUESTA.getCodigoError().intValue() == 0){
+                            MensajesHelper.mostrarMensajeOk(getActivity(),
+                                    RESPUESTA.getMensajeError(),getResources().getString(
+                                            R.string.title_estudio_sostenible), null);
+                        } else {
+                            MensajesHelper.mostrarMensajeError(getActivity(),
+                                    RESPUESTA.getMensajeError(),getResources().getString(
+                                            R.string.title_estudio_sostenible), null);
+                        }
+                    }catch (IllegalArgumentException iae) {
+                        iae.printStackTrace();
+                    } catch (NullPointerException npe) {
+                        npe.printStackTrace();
+                    }
+                    /*try {
                         MensajesHelper.mostrarMensajeInfo(getActivity(),
                                 "Se envio la Hoja de seguimiento a impresión", getResources().getString(
                                         R.string.app_name), null);
@@ -1245,7 +1262,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         MensajesHelper.mostrarMensajeInfo(getActivity(),
                                 "Ocurrio un problema al intentar imprimir", getResources().getString(
                                         R.string.app_name), null);
-                    }
+                    }*/
 
                 }
             };

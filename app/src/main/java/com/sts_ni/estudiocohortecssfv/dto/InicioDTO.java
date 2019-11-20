@@ -28,6 +28,7 @@ public class InicioDTO implements Serializable {
     private String nombreMedico;
     private String usuarioEnfermeria;
     private String horasv;
+    private String estudiosParticipantes;
 
     public int getIdObjeto() {
         return idObjeto;
@@ -154,5 +155,13 @@ public class InicioDTO implements Serializable {
 
     public void setHorasv(String horasv) {
         this.horasv = horasv;
+    }
+
+    public String getEstudiosParticipantes() {
+        return estudiosParticipantes;
+    }
+
+    public void setEstudiosParticipantes(String estudiosParticipantes) {
+        this.estudiosParticipantes = estudiosParticipantes;
     }
 }

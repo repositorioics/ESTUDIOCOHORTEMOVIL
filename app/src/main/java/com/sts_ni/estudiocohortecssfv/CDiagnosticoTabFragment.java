@@ -24,6 +24,7 @@ import com.sts_ni.estudiocohortecssfv.diagnostiscoactivities.DiagnosticoProximaC
 import com.sts_ni.estudiocohortecssfv.diagnostiscoactivities.DiagnosticoTratamientoActivity;
 import com.sts_ni.estudiocohortecssfv.diagnostiscoactivities.SeccionesDiagnosticoTask;
 import com.sts_ni.estudiocohortecssfv.dto.CabeceraSintomaDTO;
+import com.sts_ni.estudiocohortecssfv.dto.ErrorDTO;
 import com.sts_ni.estudiocohortecssfv.dto.InicioDTO;
 import com.sts_ni.estudiocohortecssfv.dto.ResultadoObjectWSDTO;
 import com.sts_ni.estudiocohortecssfv.dto.SeccionesDiagnosticoDTO;
@@ -31,6 +32,7 @@ import com.sts_ni.estudiocohortecssfv.helper.MensajesHelper;
 import com.sts_ni.estudiocohortecssfv.utils.DateUtils;
 import com.sts_ni.estudiocohortecssfv.utils.UserTask;
 import com.sts_ni.estudiocohortecssfv.ws.ConsultaWS;
+import com.sts_ni.estudiocohortecssfv.ws.DiagnosticoWS;
 import com.sts_ni.estudiocohortecssfv.ws.SintomasWS;
 
 import java.io.File;
@@ -139,6 +141,7 @@ public class CDiagnosticoTabFragment extends Fragment  {
                 });
 
         llamarServicioSeccionesCompletadas();
+        llamarProcesoActivarDiagnostico();
         return rootView;
     }
 
@@ -176,6 +179,59 @@ public class CDiagnosticoTabFragment extends Fragment  {
         }
     }
 
+    /***
+     * Cambio 07/11/2019 SC
+     * Metodo para activar el boton Diagnostico***/
+    private void llamarProcesoActivarDiagnostico(){
+        /*Creando una tarea asincrona*/
+        AsyncTask<Void, Void, Void> procesoActivarDiagnosticoTask = new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog PD;
+            private ConnectivityManager CM = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+            private NetworkInfo NET_INFO = CM.getActiveNetworkInfo();
+            private ErrorDTO RESPUESTA = new ErrorDTO();
+            private DiagnosticoWS DIAGNOSTICOWS = new DiagnosticoWS(getResources());
+
+            @Override
+            protected void onPreExecute() {
+                PD = new ProgressDialog(getActivity());
+                PD.setTitle(getResources().getString(R.string.title_obteniendo));
+                PD.setMessage(getResources().getString(R.string.msj_espere_por_favor));
+                PD.setCancelable(false);
+                PD.setIndeterminate(true);
+                PD.show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                if (NET_INFO != null && NET_INFO.isConnected())
+                {
+                    RESPUESTA = DIAGNOSTICOWS.activarDiagnostico(SEC_HOJA_CONSULTA);
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result){
+                try {
+                    PD.dismiss();
+                    if (RESPUESTA.getCodigoError().intValue() == 0){
+                        /*MensajesHelper.mostrarMensajeOk(getActivity(),
+                                getResources().getString(R.string.msj_cerrado_exitosamente).concat(" ").concat(
+                                        getResources().getString(R.string.msj_se_ejecuto_la_impresion)),
+                                getResources().getString(
+                                        R.string.title_estudio_sostenible), null);*/
+                        getActivity().findViewById(R.id.btndianosticodiag).setEnabled(true);
+                    }
+                } catch (IllegalArgumentException iae) {
+                    iae.printStackTrace();
+                } catch (NullPointerException npe) {
+                    npe.printStackTrace();
+                }
+            }
+        };
+        procesoActivarDiagnosticoTask.execute((Void[])null);
+    }
     /***
      * Metodo para llamar el servicio que obtiene la Hoja consulta PDF.
      */
