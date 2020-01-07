@@ -156,6 +156,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name="com.sts_ni.estudiocohortecssfv.expedientesactivities.FichaEpiSindromesFebrilesActivity"
+            android:label="@string/title_ficha_epi_sindromes_febriles" android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="com.sts_ni.estudiocohortecssfv.ficha_epi_sindromes_febriles_action" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

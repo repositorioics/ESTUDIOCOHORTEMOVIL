@@ -284,6 +284,7 @@ public class OsteomuscularSintomasActivity extends ActionBarActivity {
     public void onClick_btnOsteomuscular(View view) {
         try{
             validarCampos();
+            validarArtralgia();
             mHojaConsulta = cargarHojaConsulta();
             if (mPacienteSeleccionado.getCodigoEstado() == '7') {
                 if(mCorrienteOsteomuscularSintomas != null) {
@@ -359,6 +360,28 @@ public class OsteomuscularSintomasActivity extends ActionBarActivity {
         } else if (AndroidUtils.esChkboxsFalse(findViewById(R.id.chkbEDTSOTSintoma), findViewById(R.id.chkbEDTNOTSintoma),
                 findViewById(R.id.chkbEDTDOTSintoma))) {
             throw new Exception(getString(R.string.msj_completar_informacion));
+        }
+    }
+
+    /*Metodo que verifica si ARTRALGIA = S, se debera de indicar que debe de marcar
+    * Artralgia distal o Proximal
+    * Fecha Creacion 13/12/2019 - SC
+    * */
+    public void validarArtralgia() throws Exception {
+        boolean existeArtralgia = ((CheckBox) findViewById(R.id.chkbARTSOTSintoma)).isChecked();
+        boolean artralgiaProximal = ((CheckBox) findViewById(R.id.chkbARPSOTSintoma)).isChecked();
+        boolean artralgiaDistal = ((CheckBox) findViewById(R.id.chkbARDSOTSintoma)).isChecked();
+        if (existeArtralgia) {
+            if (!artralgiaProximal && !artralgiaDistal) {
+                throw new Exception("Tiene que marcar Artralgia Proximal ó Artralgia Distal, " +
+                        " debido a que el paciente presenta una Artralgia");
+            }
+        }
+        if (artralgiaProximal || artralgiaDistal) {
+            if (!existeArtralgia) {
+                throw new Exception("Para poder guardar Artralgia Proximal ó Artralgia Distal, " +
+                        " tiene que marcar Artralgia Si");
+            }
         }
     }
 

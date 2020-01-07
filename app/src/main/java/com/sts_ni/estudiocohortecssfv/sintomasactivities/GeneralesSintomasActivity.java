@@ -50,6 +50,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -106,6 +107,13 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
             this.PD_CREATE.dismiss();
     }
 
+  /*  @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ((EditText) findViewById(R.id.dpFis)).setText("");
+        ((EditText) findViewById(R.id.dpFif)).setText("");
+    }
+*/
     /***
      * Metodo para inicializar todos los controles de interfaz de la pantalla.
      */
@@ -190,12 +198,15 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
                 if (checked){
                     ((CheckBox) findViewById(R.id.chkbConsultaConvGeneralesSint)).setChecked(false);
                     ((CheckBox) findViewById(R.id.chkbConsultaSeguimGeneralesSint)).setChecked(false);
+                    ((EditText) findViewById(R.id.dpFis)).setText("");
+                    ((EditText) findViewById(R.id.dpFif)).setText("");
                 }
                 else
                     ((CheckBox) view).setChecked(true);
                 break;
             case R.id.chkbConsultaConvGeneralesSint:
                 if (checked){
+                    getFisAndFifByCodExpediente();
                     ((CheckBox) findViewById(R.id.chkbConsultaInicialGeneralesSint)).setChecked(false);
                     ((CheckBox) findViewById(R.id.chkbConsultaSeguimGeneralesSint)).setChecked(false);
                 } else
@@ -203,6 +214,7 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
                 break;
             case R.id.chkbConsultaSeguimGeneralesSint:
                 if (checked){
+                    getFisAndFifByCodExpediente();
                     ((CheckBox) findViewById(R.id.chkbConsultaInicialGeneralesSint)).setChecked(false);
                     ((CheckBox) findViewById(R.id.chkbConsultaConvGeneralesSint)).setChecked(false);
                 } else
@@ -479,6 +491,7 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
 
         try {
             validarCampoRequerido(controlCambios);
+            validarUltDosisAntipiretico();
             if( controlCambios.size() > 0){
                 genControlCambios = new GeneralesControlCambiosDTO();
                 genControlCambios.setUsuario(((CssfvApp) this.getApplication()).getInfoSessionWSDTO().getUser());
@@ -548,6 +561,20 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
             }
         } else {
             guardarGeneralesServicio();
+        }
+    }
+
+    /*Validacion para ultimo dia antipiretico cuando la consulta es de seguimiento y se ingresa la fif
+    * Fecha Creacion: 16/12/2019 - SC*/
+    public void validarUltDosisAntipiretico() throws Exception {
+        boolean esConsultaSeguimiento = ((CheckBox) findViewById(R.id.chkbConsultaSeguimGeneralesSint)).isChecked();
+        if (esConsultaSeguimiento && !StringUtils.isNullOrEmpty(((EditText) findViewById(R.id.dpFif)).getText().toString())) {
+            if (StringUtils.isNullOrEmpty(((EditText) findViewById(R.id.dpUltmDosGeneralesSint)).getText().toString())) {
+                throw new Exception("Debe ingresar la Última dosis antipirético");
+            }
+            if (StringUtils.isNullOrEmpty(((EditText) findViewById(R.id.edtxtHoraGeneralesSint)).getText().toString())) {
+                throw new Exception(getString(R.string.msj_hora_vacia));
+            }
         }
     }
 
@@ -1105,5 +1132,85 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
             }
         };
         guardarGeneralesTask.execute((Void[])null);
+    }
+
+    /* Metodo para obtener la fis y la fif cuando la consulta es de seguimiento o convaleciente
+    * Fecha creacion = 17/12/2019 - SC
+    * */
+    private void getFisAndFifByCodExpediente(){
+        AsyncTask<Void, Void, Void> getFisAndFif = new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog PD;
+            private ConnectivityManager CM = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            private NetworkInfo NET_INFO = CM.getActiveNetworkInfo();
+            private ResultadoObjectWSDTO<HojaConsultaDTO> RESPUESTA = new ResultadoObjectWSDTO<HojaConsultaDTO>();
+            private SintomasWS SINTOMASWS = new SintomasWS(getResources());
+
+            @Override
+            protected void onPreExecute() {
+                PD = new ProgressDialog(CONTEXT);
+                PD.setTitle(getResources().getString(R.string.tittle_actualizando));
+                PD.setMessage(getResources().getString(R.string.msj_espere_por_favor));
+                PD.setCancelable(false);
+                PD.setIndeterminate(true);
+                PD.show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                if (NET_INFO != null && NET_INFO.isConnected()){
+                    InicioDTO pacienteSeleccionado = (InicioDTO) getIntent().getSerializableExtra("pacienteSeleccionado");
+                    RESPUESTA = SINTOMASWS.getFisFifConsultaInicial(pacienteSeleccionado.getCodExpediente());
+                }else{
+                    RESPUESTA.setCodigoError(Long.parseLong("3"));
+                    RESPUESTA.setMensajeError(getResources().getString(R.string.msj_no_tiene_conexion));
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result){
+                PD.dismiss();
+                if (RESPUESTA.getCodigoError().intValue() == 0){
+
+                    if (!StringUtils.isNullOrEmpty(RESPUESTA.getObjecRespuesta().getFis())) {
+                        //((EditText) findViewById(R.id.dpFis)).setText(RESPUESTA.getObjecRespuesta().getFis());
+                        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
+                        try {
+                            Date date = inputFormat.parse(RESPUESTA.getObjecRespuesta().getFis());
+                            String outputDateStr = outputFormat.format(date);
+                            ((EditText) findViewById(R.id.dpFis)).setText(outputDateStr);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    if(!StringUtils.isNullOrEmpty(RESPUESTA.getObjecRespuesta().getFif())) {
+                        //((EditText) findViewById(R.id.dpFif)).setText(RESPUESTA.getObjecRespuesta().getFis());
+                        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+                        try {
+                            Date date = inputFormat.parse(RESPUESTA.getObjecRespuesta().getFif());
+                            String outputDateStr = outputFormat.format(date);
+                            ((EditText) findViewById(R.id.dpFif)).setText(outputDateStr);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }else if (RESPUESTA.getCodigoError().intValue() != 999){
+                    MensajesHelper.mostrarMensajeInfo(CONTEXT,
+                            RESPUESTA.getMensajeError(),getResources().getString(
+                                    R.string.title_estudio_sostenible), null);
+
+                }else{
+                    MensajesHelper.mostrarMensajeError(CONTEXT,
+                            RESPUESTA.getMensajeError(), getResources().getString(
+                                    R.string.title_estudio_sostenible), null);
+                }
+            }
+        };
+        getFisAndFif.execute((Void[])null);
     }
 }

@@ -130,6 +130,41 @@ public class SintomasWS extends EstudioCohorteCssfvWS {
                         retorno.getObjecRespuesta().setHoraConsulta(((JSONObject)resultadoJson.get(0)).getString("horaConsulta"));
                     }
 
+                    /*Nuevo Campo categoria agregado */
+                    if(StringUtils.isNullOrEmpty(((JSONObject)resultadoJson.get(0)).getString("categoria")) ||
+                            ((JSONObject)resultadoJson.get(0)).getString("categoria").compareTo("null") == 0) {
+                        retorno.getObjecRespuesta().setCategoria(((JSONObject)resultadoJson.get(0)).getString("categoria"));
+                    } else {
+                        retorno.getObjecRespuesta().setCategoria(((JSONObject)resultadoJson.get(0)).getString("categoria"));
+                    }
+                    /*Nuevo Campo fif agregado */
+                    if(StringUtils.isNullOrEmpty(((JSONObject)resultadoJson.get(0)).getString("fif")) ||
+                            ((JSONObject)resultadoJson.get(0)).getString("fif").compareTo("null") == 0) {
+                        retorno.getObjecRespuesta().setFif(((JSONObject)resultadoJson.get(0)).getString("fif"));
+                    } else {
+                        retorno.getObjecRespuesta().setFif(((JSONObject)resultadoJson.get(0)).getString("fif"));
+                    }
+                    /*Nuevo Campo consulta agregado */
+                    if(StringUtils.isNullOrEmpty(((JSONObject)resultadoJson.get(0)).getString("consulta")) ||
+                            ((JSONObject)resultadoJson.get(0)).getString("consulta").compareTo("null") == 0) {
+                        retorno.getObjecRespuesta().setConsulta(((JSONObject)resultadoJson.get(0)).getString("consulta"));
+                    } else {
+                        retorno.getObjecRespuesta().setConsulta(((JSONObject)resultadoJson.get(0)).getString("consulta"));
+                    }
+                    /*Nuevo Campo temperatura medico agregado */
+                    if(StringUtils.isNullOrEmpty(((JSONObject)resultadoJson.get(0)).getString("temMedc")) ||
+                            ((JSONObject)resultadoJson.get(0)).getString("temMedc").compareTo("null") == 0) {
+                        retorno.getObjecRespuesta().setTemMedc(((JSONObject)resultadoJson.get(0)).getString("temMedc"));
+                    } else {
+                        retorno.getObjecRespuesta().setTemMedc(((JSONObject)resultadoJson.get(0)).getString("temMedc"));
+                    }
+                    /*Nuevo Campo eritrocitis agregado */
+                    if(StringUtils.isNullOrEmpty(((JSONObject)resultadoJson.get(0)).getString("eritrocitos")) ||
+                            ((JSONObject)resultadoJson.get(0)).getString("eritrocitos").compareTo("null") == 0) {
+                        retorno.getObjecRespuesta().setEritrocitos(((JSONObject)resultadoJson.get(0)).getString("eritrocitos"));
+                    } else {
+                        retorno.getObjecRespuesta().setEritrocitos(((JSONObject)resultadoJson.get(0)).getString("eritrocitos"));
+                    }
                     retorno.setCodigoError(Long.parseLong("0"));
                     retorno.setMensajeError("");
 
@@ -2404,6 +2439,73 @@ public class SintomasWS extends EstudioCohorteCssfvWS {
             e.printStackTrace();
             retorno.setCodigoError(Long.parseLong("999"));
             retorno.setMensajeError(RES.getString(R.string.msj_error_no_controlado)+ " " + e.getMessage());
+        }
+
+        return retorno;
+    }
+
+    //Retornando la fis y la fif cuando la consulta es de seguimiento y convaleciente
+
+    public ResultadoObjectWSDTO<HojaConsultaDTO> getFisFifConsultaInicial(Integer codExpediente){
+
+        ResultadoObjectWSDTO<HojaConsultaDTO> retorno = new ResultadoObjectWSDTO<HojaConsultaDTO>();
+
+        try {
+            SoapObject request = new SoapObject(NAMESPACE, METODO_OBTENER_FIS_FIF);
+            SoapSerializationEnvelope sobre = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            sobre.dotNet = false;
+
+            PropertyInfo paramEviar = new PropertyInfo();
+            paramEviar.setValue(codExpediente);
+            paramEviar.setName("codExpediente");
+            paramEviar.setNamespace("");
+            paramEviar.setType(Integer.class);
+
+            request.addProperty(paramEviar);
+
+            sobre.setOutputSoapObject(request);
+
+            HttpTransportSE transporte = new HttpTransportSE(URL, this.TIME_OUT);
+            transporte.call(ACCIOSOAP_METODO_OBTENER_FIS_FIF, sobre, HEADER_PROPERTY);
+            String resultado = sobre.getResponse().toString();
+
+            if(!StringUtils.isNullOrEmpty(resultado)){
+                JSONObject  jObject = new JSONObject(resultado);
+                JSONObject mensaje = (JSONObject) jObject.get("mensaje");
+                if(mensaje.getInt("codigo") == 0){
+                    JSONArray resultadoJSON = (JSONArray) jObject.get("resultado");
+                    //JSONObject resultadoJson = ((JSONObject)resultadoJSON.get(0));
+
+                    retorno.setObjecRespuesta(new HojaConsultaDTO());
+
+                    retorno.getObjecRespuesta().setFis(((JSONObject)resultadoJSON.get(0)).getString("fis"));
+                    retorno.getObjecRespuesta().setFif(((JSONObject)resultadoJSON.get(0)).getString("fif"));
+
+                    retorno.setCodigoError(Long.parseLong("0"));
+                    retorno.setMensajeError("");
+
+                }else {
+                    retorno.setCodigoError((long)mensaje.getInt("codigo"));
+                    retorno.setMensajeError(mensaje.getString("texto"));
+                }
+
+            }else {
+                retorno.setCodigoError(Long.parseLong("1"));
+                retorno.setMensajeError(RES.getString(R.string.msj_servicio_no_envia_respuesta));
+            }
+
+        }catch (ConnectException ce){
+            ce.printStackTrace();
+            retorno.setCodigoError(Long.parseLong("2"));
+            retorno.setMensajeError(RES.getString(R.string.msj_servicio_no_dispon));
+        }catch (SocketTimeoutException et){
+            et.printStackTrace();
+            retorno.setCodigoError(Long.parseLong("2"));
+            retorno.setMensajeError(RES.getString(R.string.msj_servicio_no_dispon));
+        } catch (Exception e) {
+            e.printStackTrace();
+            retorno.setCodigoError(Long.parseLong("999"));
+            retorno.setMensajeError(RES.getString(R.string.msj_error_no_controlado));
         }
 
         return retorno;

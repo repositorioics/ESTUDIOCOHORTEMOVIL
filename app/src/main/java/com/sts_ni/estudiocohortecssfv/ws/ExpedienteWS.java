@@ -416,6 +416,81 @@ public class ExpedienteWS extends EstudioCohorteCssfvWS {
         }
     }
 
+    /*Modificacion 6/12/2019 -- SC
+    * */
+    public byte[] getFichaEpiPdf(int numHojaConsulta){
+
+        byte[] retorno=null;
+
+        try {
+            SoapObject request = new SoapObject(NAMESPACE, METODO_VISUALIZAR_FICHA_EPI_PDF);
+            SoapSerializationEnvelope sobre = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            sobre.dotNet = false;
+
+            PropertyInfo paramWS = new PropertyInfo();
+            paramWS.setValue(numHojaConsulta);
+            paramWS.setName("numHojaConsulta");
+            paramWS.setNamespace("");
+            paramWS.setType(Integer.class);
+            request.addProperty(paramWS);
+            sobre.setOutputSoapObject(request);
+
+
+            HttpTransportSE transporte = new HttpTransportSE(URL, this.TIME_OUT_PDF);
+            transporte.call(ACCIOSOAP_METODO_VISUALIZAR_FICHA_EPI_PDF, sobre, this.HEADER_PROPERTY);
+            retorno =  Base64.decode(sobre.getResponse().toString(), Base64.DEFAULT);
+            String resultado=sobre.getResponse().toString();
+
+
+        }catch (ConnectException ce){
+            ce.printStackTrace();
+
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (SoapFault soapFault) {
+            soapFault.printStackTrace();
+        } catch (HttpResponseException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NullPointerException ne) {
+            ne.printStackTrace();
+        }
+
+        return retorno;
+    }
+
+    public void ImprimirFichaEpiPdf(int numHojaConsulta){
+
+        try {
+            SoapObject request = new SoapObject(NAMESPACE, METODO_IMPRIMIR_FICHA_EPI_PDF);
+            SoapSerializationEnvelope sobre = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            sobre.dotNet = false;
+
+            PropertyInfo paramWS = new PropertyInfo();
+            paramWS.setValue(numHojaConsulta);
+            paramWS.setName("numHojaConsulta");
+            paramWS.setNamespace("");
+            paramWS.setType(Integer.class);
+            request.addProperty(paramWS);
+            sobre.setOutputSoapObject(request);
+            HttpTransportSE transporte = new HttpTransportSE(URL, this.TIME_OUT);
+            transporte.call(ACCIOSOAP_METODO_IMPRIMIR_FICHA_EPI_PDF, sobre, this.HEADER_PROPERTY);
+
+        }catch (ConnectException ce){
+            ce.printStackTrace();
+
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (SoapFault soapFault) {
+            soapFault.printStackTrace();
+        } catch (HttpResponseException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
 
 

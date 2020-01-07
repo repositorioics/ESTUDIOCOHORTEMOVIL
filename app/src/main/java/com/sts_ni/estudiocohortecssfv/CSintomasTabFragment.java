@@ -130,7 +130,7 @@ public class CSintomasTabFragment extends Fragment {
                             intent.putExtra("pacienteSeleccionado", (InicioDTO) getActivity().getIntent().getSerializableExtra("pacienteSeleccionado"));
                             intent.putExtra("pesoKgPaciente", ((EditText) getActivity().findViewById(R.id.edtxtPesoKgSintoma)).getText().toString());
                             intent.putExtra("tallaCmPaciente", ((EditText) getActivity().findViewById(R.id.edtxtTallaCmSintoma)).getText().toString());
-
+                            intent.putExtra("cabeceraSintoma", ((ConsultaActivity)getActivity()).CABECERA);
                             startActivity(intent);
                             getActivity().finish();
                         }
@@ -187,7 +187,7 @@ public class CSintomasTabFragment extends Fragment {
                     public void onClick(View view) {
                         Intent intent = new Intent(getActivity(), EstadoGeneralSintomasActivity.class);
                         intent.putExtra("pacienteSeleccionado", (InicioDTO) getActivity().getIntent().getSerializableExtra("pacienteSeleccionado"));
-
+                        intent.putExtra("cabeceraSintoma", ((ConsultaActivity)getActivity()).CABECERA);
                         startActivity(intent);
                         getActivity().finish();
                     }

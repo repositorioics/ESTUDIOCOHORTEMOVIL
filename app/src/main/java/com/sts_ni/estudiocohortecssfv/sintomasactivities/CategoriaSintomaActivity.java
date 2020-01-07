@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.View;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 import com.sts_ni.estudiocohortecssfv.ConsultaActivity;
 import com.sts_ni.estudiocohortecssfv.CssfvApp;
 import com.sts_ni.estudiocohortecssfv.R;
+import com.sts_ni.estudiocohortecssfv.dto.CabeceraSintomaDTO;
 import com.sts_ni.estudiocohortecssfv.dto.CategoriaSintomasDTO;
 import com.sts_ni.estudiocohortecssfv.dto.ControlCambiosDTO;
 import com.sts_ni.estudiocohortecssfv.dto.ErrorDTO;
@@ -460,6 +462,7 @@ public class CategoriaSintomaActivity extends ActionBarActivity {
                                     R.string.msj_aviso_control_cambios), vFueraRango), getResources().getString(
                             R.string.title_estudio_sostenible),preguntaEnviarDialogClickListener);
                 }  else {
+                    otrasValidacionesCatYSat();
                     enviarHojaConsulta();
                 }
             }
@@ -1395,5 +1398,54 @@ public class CategoriaSintomaActivity extends ActionBarActivity {
 
     public boolean isCategoriaAB() {
         return CATEGORIA_A_B;
+    }
+
+    /*Validacion para manifestaciones hemorragicas cuando en Renal se marco eritrocitos>= 20
+     *Validacion para petquias >= 10 y petequias >= 20 cuando se marque pureba torniquete positiva
+     *Validacion para manifestaciones hemorragicas cuando se marque (Prueba de torniquete positiva ó
+     * Epistaxis ó Gingivorragia ó Petequias espontaneas ó Hematemesis ó Melena)
+     * Fecha Creacion: 19/12/2019 - SC*/
+    public void otrasValidacionesCatYSat() throws Exception {
+        CabeceraSintomaDTO CABECERA = (CabeceraSintomaDTO) this.getIntent().getSerializableExtra("cabeceraSintoma");
+        String consulta = CABECERA.getConsulta();
+        String eritrocitos = CABECERA.getEritrocitos();
+        String linfocitosA = ((EditText) findViewById(R.id.edtxtLNF)).getText().toString();
+        boolean tieneManifestacionesHemorragicas = ((CheckBox) findViewById(R.id.chkbMAHSSintoma)).isChecked();
+        boolean pruebaTorniquetePositiva = ((CheckBox) findViewById(R.id.chkbPTPSSintoma)).isChecked();
+        boolean petequias10 = ((CheckBox) findViewById(R.id.chkbPTQSSintoma)).isChecked();
+        boolean petequias20 = ((CheckBox) findViewById(R.id.chkbPTTSSintoma)).isChecked();
+
+        boolean tieneEpistaxis = ((CheckBox) findViewById(R.id.chkbEPISSintoma)).isChecked();
+        boolean tieneGingivorragia = ((CheckBox) findViewById(R.id.chkbGNGSSintoma)).isChecked();
+        boolean tienePetequiasEspontaneas = ((CheckBox) findViewById(R.id.chkbPTSSSintoma)).isChecked();
+        boolean tieneHipermenorrea = ((CheckBox) findViewById(R.id.chkbHPESSintoma)).isChecked();
+        boolean tieneHematemesis = ((CheckBox) findViewById(R.id.chkbHMTSSintoma)).isChecked();
+        boolean tieneMelena = ((CheckBox) findViewById(R.id.chkbMLNSSintoma)).isChecked();
+
+        if(!StringUtils.isNullOrEmpty(eritrocitos)) {
+            if (eritrocitos.trim().equals("0") && !tieneManifestacionesHemorragicas) {
+                throw new Exception("Debe de marcar Manifestaciones Hemorrágicas, debido a que el paciente presenta Eritrocitos >=6x C ");
+            }
+        }
+        if (pruebaTorniquetePositiva && !petequias10 && !petequias20) {
+            throw new Exception("Debe de marcar Petequias >= 10 en PT ó Petequias >= en 20");
+        }
+        if (!pruebaTorniquetePositiva && (petequias10 || petequias20)) {
+            throw new Exception("No puede marcar Petequias >= 10 en PT ó Petequias >= en 20, " +
+                    "debido a que no se presenta una Prueba Torniquete Positiva");
+        }
+        if (!tieneManifestacionesHemorragicas && (pruebaTorniquetePositiva || tieneEpistaxis ||
+                tieneGingivorragia || tienePetequiasEspontaneas || tieneHipermenorrea ||
+                tieneHematemesis || tieneMelena)) {
+            throw new Exception("Debe de marcar Manifestaciones Hemorrágicas");
+        }
+        if (consulta.trim().equals("Seguimiento") && StringUtils.isNullOrEmpty(linfocitosA)) {
+            //throw new Exception("Debe de ingresar los Linfocitos Atípicos, ya que la consulta es de Seguimiento");
+            MensajesHelper.mostrarMensajeInfo(this.CONTEXT,
+                    "Si la consulta es de Seguimiento recuerde ingresar los Linfocitos Atípicos",
+                    getResources().getString(
+                            R.string.title_estudio_sostenible),
+                    null);
+        }
     }
 }

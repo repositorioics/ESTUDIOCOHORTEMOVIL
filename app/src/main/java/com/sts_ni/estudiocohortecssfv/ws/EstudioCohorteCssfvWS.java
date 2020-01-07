@@ -330,4 +330,14 @@ public class EstudioCohorteCssfvWS {
     public static final String METODO_ACTIVAR_DIAGNOSTICO = "procesoActivarDiagnostico";
     public static final String ACCIOSOAP_METODO_ACTIVAR_DIAGNOSTICO = NAMESPACE + METODO_ACTIVAR_DIAGNOSTICO;
 
+    /*Fecha Creacion 6/12/2019 -- SC*/
+    public static final String METODO_VISUALIZAR_FICHA_EPI_PDF = "getFichaEpiSindromesFebrilesPdf";
+    public static final String ACCIOSOAP_METODO_VISUALIZAR_FICHA_EPI_PDF = NAMESPACE + METODO_VISUALIZAR_FICHA_EPI_PDF;
+
+    public static final String METODO_IMPRIMIR_FICHA_EPI_PDF = "imprimirFichaEpiSindromesFebrilesPdf";
+    public static final String ACCIOSOAP_METODO_IMPRIMIR_FICHA_EPI_PDF = NAMESPACE + METODO_IMPRIMIR_FICHA_EPI_PDF;
+
+  public static final String METODO_OBTENER_FIS_FIF = "getFisAndFifByCodExp";
+  public static final String ACCIOSOAP_METODO_OBTENER_FIS_FIF = NAMESPACE + METODO_OBTENER_FIS_FIF;
+
 }

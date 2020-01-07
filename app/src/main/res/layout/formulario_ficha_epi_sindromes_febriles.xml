@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:paddingLeft="12dp"
+    android:paddingTop="12dp"
+    android:paddingRight="12dp"
+    android:paddingBottom="12dp"
+    tools:context=".FichaEpiSindromesFebrilesActivity$PlaceholderFragment">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:baselineAligned="false"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/txtvTituloFichaEpiSindFebriles"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:text="@string/title_ficha_epi_sindromes_febriles"
+                android:textAppearance="@style/TextoTituloEstiloVigilancia" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/txtvNumSeguimiento"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtvTituloFichaEpiSindFebriles"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="45dp"
+                android:layout_toRightOf="@+id/edtxtCodExpediente"
+                android:text="@string/label_NumHojaConsulta"
+                android:textAppearance="@style/TextViewEstiloSeguimiento" />
+
+            <EditText
+                android:id="@+id/edtxtNumHojaConsulta"
+                style="@style/EditTextEstiloSeguimiento"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtvTituloFichaEpiSindFebriles"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="41dp"
+                android:layout_toRightOf="@+id/txtvNumSeguimiento"
+                android:inputType="number" />-->
+
+            <!--<Button
+                android:id="@+id/ibtCrearFicha"
+                android:layout_width="85dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtvTituloVigilanciaInegrada"
+                android:layout_marginLeft="13dp"
+                android:layout_marginTop="30dp"
+                android:layout_toRightOf="@+id/edtxtNumSeguimiento"
+                android:background="@drawable/bg_button_seguimiento_selector"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:text="@string/boton_crear_ficha_vigilancia_integrada_irag_eti"
+                android:textColor="@android:color/white"
+                android:textSize="14dp" />-->
+
+            <!--<Button
+                android:id="@+id/ibtBuscarFichaEpi"
+                android:layout_width="85dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtvTituloFichaEpiSindFebriles"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="30dp"
+                android:layout_toRightOf="@+id/edtxtNumSeguimiento"
+                android:background="@drawable/bg_button_seguimiento_selector"
+                android:text="@string/boton_buscar_ficha_vigilancia_integrada_irag_eti"
+                android:textColor="@android:color/white"
+                android:textSize="14dp" />-->
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <!--<Button
+                android:id="@+id/btnGuardarFichaEpi"
+                android:layout_width="110dp"
+                android:layout_height="45dp"
+                android:layout_below="@+id/txtvCodExpediente"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="50dp"
+
+                android:background="@drawable/bg_button_verder_oscuro_selector"
+                android:text="@string/boton_guardar_hoja_consulta"
+                android:textColor="@android:color/white"
+                android:textSize="14dp" />-->
+
+            <Button
+                android:id="@+id/btnlimpiarFichaEpi"
+                android:layout_width="110dp"
+                android:layout_height="45dp"
+                android:layout_below="@+id/txtvCodExpediente"
+                android:layout_toRightOf="@+id/btnGuardarFicha"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_button_gris_selector"
+                android:text="@string/boton_limpiar"
+                android:textColor="@android:color/white"
+                android:textSize="14dp" />
+
+            <ImageButton
+                android:id="@+id/ibtImprimirFichaEpi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtvCodExpediente"
+                android:layout_toRightOf="@+id/btnlimpiarFicha"
+                android:src="@drawable/printer64"
+                android:background="@null"
+                android:layout_marginLeft="18dp"
+                android:layout_marginTop="20dp" />
+
+            <ImageButton
+                android:id="@+id/ibtFichaEpiPDF"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtvCodExpediente"
+                android:layout_toRightOf="@+id/ibtImprimir"
+                android:src="@drawable/pdf64"
+                android:background="@null"
+                android:layout_marginLeft="18dp"
+                android:layout_marginTop="20dp" />
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

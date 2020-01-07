@@ -316,6 +316,8 @@ public class DiagnosticoActivity extends ActionBarActivity
             SEC_HOJA_CONSULTA = pacienteSeleccionado.getIdObjeto();
             hojaconsulta = cargarHojaConsulta();
             validarCampos();
+            /*Nueva funcion agregada*/
+            validrDiagnosticosSeleccionados();
             if (pacienteSeleccionado.getCodigoEstado() == '7') {
                 if (tieneCambios()) {
                     DialogInterface.OnClickListener preguntaDialogClickListener = new DialogInterface.OnClickListener() {
@@ -378,6 +380,55 @@ public class DiagnosticoActivity extends ActionBarActivity
             throw new Exception(getString(R.string.msj_completar_informacion) + ", debe seleccionar un valor en el primer Diagnostico.");
         }
     }
+
+    /*
+    * Metodo para validar la seleccion de los diagnosticos dependiendo de la categoria seleccionada
+    * Fecha Creacion: 13/12/2019 - SC
+    **/
+    public void validrDiagnosticosSeleccionados() throws Exception {
+
+        CabeceraSintomaDTO CABECERA = (CabeceraSintomaDTO) this.getIntent().getSerializableExtra("cabeceraSintoma");
+        String categoria = CABECERA.getCategoria();
+
+        Integer diagnosticoId1 =  ((DiagnosticoDTO) ((Spinner)findViewById(R.id.spnDialogo1)).getSelectedItem()).getSecDiagnostico();
+        Integer diagnosticoId2 =  ((DiagnosticoDTO) ((Spinner)findViewById(R.id.spnDialogo2)).getSelectedItem()).getSecDiagnostico();
+        Integer diagnosticoId3 =  ((DiagnosticoDTO) ((Spinner)findViewById(R.id.spnDialogo3)).getSelectedItem()).getSecDiagnostico();
+        Integer diagnosticoId4 =  ((DiagnosticoDTO) ((Spinner)findViewById(R.id.spnDialogo4)).getSelectedItem()).getSecDiagnostico();
+
+        if (categoria.trim().equals("A")) {
+            if (diagnosticoId1 == 57 || diagnosticoId2 == 57 || diagnosticoId3 == 57 || diagnosticoId4 == 57) {
+                throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
+                        ", Diagnostico: SINDROME FEBRIL AGUDO SIN FOCO APARENTE");
+            }
+        }
+        if (categoria.trim().equals("B") || categoria.trim().equals("C")) {
+            if (diagnosticoId1 == 94 || diagnosticoId2 == 94 || diagnosticoId3 == 94 || diagnosticoId4 == 94) {
+                throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
+                        ", Diagnostico: DENGUE SIN SIGNOS DE ALARMA");
+            }
+            if (diagnosticoId1 == 95 || diagnosticoId2 == 95 || diagnosticoId3 == 95 || diagnosticoId4 == 95) {
+                throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
+                        ", Diagnostico: DENGUE CON SIGNOS DE ALARMA");
+            }
+            if (diagnosticoId1 == 96 || diagnosticoId2 == 96 || diagnosticoId3 == 96 || diagnosticoId4 == 96) {
+                throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
+                        ", Diagnostico: DENGUE GRAVE");
+            }
+            if (diagnosticoId1 == 97 || diagnosticoId2 == 97 || diagnosticoId3 == 97 || diagnosticoId4 == 97) {
+                throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
+                        ", Diagnostico: CHOQUE INICIAL");
+            }
+            if (diagnosticoId1 == 98 || diagnosticoId2 == 98 || diagnosticoId3 == 98 || diagnosticoId4 == 98) {
+                throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
+                        ", Diagnostico: CHOQUE HIPOTENSIVO");
+            }
+            if (diagnosticoId1 == 99 || diagnosticoId2 == 99 || diagnosticoId3 == 99 || diagnosticoId4 == 99) {
+                throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
+                        ", Diagnostico: DENGUE CONFIRMADO POR PCR");
+            }
+        }
+    }
+
 
     /***
      * Metodo que llama el servicio para guardar Diagnostico.

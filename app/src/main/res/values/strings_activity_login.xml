@@ -38,8 +38,14 @@
     <string name="date_version">Noviembre 04, 2019</string>-->
     <!--<string name="version">Versión 1.1.4</string>
     <string name="date_version">Noviembre 12, 2019</string>-->
-    <string name="version">Versión 1.1.5</string>
-    <string name="date_version">Noviembre 18, 2019</string>
+    <!--<string name="version">Versión 1.1.5</string>
+    <string name="date_version">Noviembre 18, 2019</string>-->
+    <!--<string name="version">Versión 1.1.6</string>
+    <string name="date_version">Diciembre 16, 2019</string>--><!--Instalacion de la ficha de dengue-->
+
+    <string name="version">Versión 1.1.7</string><!--Instacion de validaciones solicitadas por los Dres-->
+    <string name="date_version">Enero 06, 2020</string>
+
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>

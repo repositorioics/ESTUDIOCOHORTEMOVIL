@@ -765,4 +765,11 @@
     <string name="mensaje_dolor_articular">Debe indicar la intesidad del Dolor Articular</string>
 
     <string name="msj_usuario_logueado_diferente_a_usuario_medico">El Usuario Logueado no coincide con el Usuario Medico del Día %1s favor revisar.</string>
+
+    <!--Agregando la ficha epidemiologica para sindromes febriles fecha creaion 5/11/2019 SC -->
+    <string name="title_ficha_epi_sindromes_febriles">FICHA EPIDEMIOLOGICA PARA SINDROMES FEBRILES</string>
+    <string name="label_ficha_epi_sindromes_febriles">Ficha Epidemiologica Para Sindromes Febriles</string>
+
+    <!--Mensaje de Examen guardado y revision de impresora 11/12/2019  SC -->
+    <string name="mensaje_examen_guardado_y_revision_impresora">Los examenes se han guardado correctamente, si envió a realizar el exámen de Serología Dengue recuerde revisar la impresora</string>
 </resources>

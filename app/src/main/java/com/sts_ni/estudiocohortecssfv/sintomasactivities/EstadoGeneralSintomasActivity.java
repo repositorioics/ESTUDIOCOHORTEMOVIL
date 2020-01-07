@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.sts_ni.estudiocohortecssfv.ConsultaActivity;
 import com.sts_ni.estudiocohortecssfv.CssfvApp;
 import com.sts_ni.estudiocohortecssfv.R;
+import com.sts_ni.estudiocohortecssfv.dto.CabeceraSintomaDTO;
 import com.sts_ni.estudiocohortecssfv.dto.ErrorDTO;
 import com.sts_ni.estudiocohortecssfv.dto.EstadoGeneralesSintomasDTO;
 import com.sts_ni.estudiocohortecssfv.dto.HojaConsultaDTO;
@@ -197,6 +198,7 @@ public class EstadoGeneralSintomasActivity extends ActionBarActivity {
     public void onClick_btnEstadoGeneral(View view) {
         try{
             validarCampos();
+            validarFiebre();
             mHojaConsulta = cargarHojaConsulta();
             if (mPacienteSeleccionado.getCodigoEstado() == '7') {
                 if(mCorrienteEstadoGenerales != null) {
@@ -261,6 +263,40 @@ public class EstadoGeneralSintomasActivity extends ActionBarActivity {
             throw new Exception(getString(R.string.msj_completar_informacion));
         }
     }
+
+    /***
+     * Metodo para validar que se marque la fiebre siempre y cuando exista la fif
+     * @throws Exception
+     */
+    public void validarFiebre() throws Exception {
+        CabeceraSintomaDTO CABECERA = (CabeceraSintomaDTO) this.getIntent().getSerializableExtra("cabeceraSintoma");
+        String fif = CABECERA.getFif() != null ? CABECERA.getFif() : null;
+        String consulta = CABECERA.getConsulta() != null ? CABECERA.getConsulta() : null;
+        String temperaturaMedico = CABECERA.getTemMedc();
+
+        if (consulta != null) {
+            /*Validar si es consulta Inicial*/
+            if (consulta.trim().equals("Inicial")) {
+                /*Validar fiebre si presenta fif*/
+                boolean presentaFiebre = ((CheckBox) findViewById(R.id.chkbFiebreSEGSintoma)).isChecked();
+                if (fif != null && !fif.trim().equals("null") && !presentaFiebre) {
+                    throw new Exception("Debe marcar fiebre debido a que se ingreso la FIF");
+                }
+            }
+            /*Validar si es consulta Inicial ó Seguimiento*/
+            if (consulta.trim().equals("Inicial") || consulta.trim().equals("Seguimiento")) {
+                /*Validar fiebre con temperatura medico*/
+                if (temperaturaMedico != null && !temperaturaMedico.equals("null")) {
+                    boolean presentaFiebre = ((CheckBox) findViewById(R.id.chkbFiebreSEGSintoma)).isChecked();
+                    double tempMedc = Double.parseDouble(temperaturaMedico);
+                    if (tempMedc >= 37.8 && !presentaFiebre) {
+                        throw new Exception("Debe marcar fiebre debido a que el paciente presenta una temperatura de: " + tempMedc);
+                    }
+                }
+            }
+        }
+    }
+
     /***
      * Metodo que carga la informacion de Estado general cuando ya se habia guardado anteriormente.
      * @return

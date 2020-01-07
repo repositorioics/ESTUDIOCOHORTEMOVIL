@@ -29,6 +29,11 @@ public class InicioDTO implements Serializable {
     private String usuarioEnfermeria;
     private String horasv;
     private String estudiosParticipantes;
+    /*Nuevo campo agregado*/
+    private String categoria;
+    private String fif;
+    private String consulta;
+    private String temMedc;
 
     public int getIdObjeto() {
         return idObjeto;
@@ -163,5 +168,37 @@ public class InicioDTO implements Serializable {
 
     public void setEstudiosParticipantes(String estudiosParticipantes) {
         this.estudiosParticipantes = estudiosParticipantes;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
+
+    public String getFif() {
+        return fif;
+    }
+
+    public void setFif(String fif) {
+        this.fif = fif;
+    }
+
+    public String getConsulta() {
+        return consulta;
+    }
+
+    public void setConsulta(String consulta) {
+        this.consulta = consulta;
+    }
+
+    public String getTemMedc() {
+        return temMedc;
+    }
+
+    public void setTemMedc(String temMedc) {
+        this.temMedc = temMedc;
     }
 }

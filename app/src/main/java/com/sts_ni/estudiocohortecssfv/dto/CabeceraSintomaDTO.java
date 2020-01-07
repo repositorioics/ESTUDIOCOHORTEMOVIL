@@ -21,6 +21,12 @@ public class CabeceraSintomaDTO implements Serializable {
     private Calendar fechaConsulta;
     private String horaConsulta;
     private Short usuarioMedico;
+    /*Nuevo campo agregado*/
+    private String categoria;
+    private String fif;
+    private String consulta;
+    private String temMedc;
+    private String eritrocitos;
 
 
     public String getExpedienteFisico() {
@@ -101,5 +107,45 @@ public class CabeceraSintomaDTO implements Serializable {
 
     public void setUsuarioMedico(Short usuarioMedico) {
         this.usuarioMedico = usuarioMedico;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
+
+    public String getFif() {
+        return fif;
+    }
+
+    public void setFif(String fif) {
+        this.fif = fif;
+    }
+
+    public String getConsulta() {
+        return consulta;
+    }
+
+    public void setConsulta(String consulta) {
+        this.consulta = consulta;
+    }
+
+    public String getTemMedc() {
+        return temMedc;
+    }
+
+    public void setTemMedc(String temMedc) {
+        this.temMedc = temMedc;
+    }
+
+    public String getEritrocitos() {
+        return eritrocitos;
+    }
+
+    public void setEritrocitos(String eritrocitos) {
+        this.eritrocitos = eritrocitos;
     }
 }

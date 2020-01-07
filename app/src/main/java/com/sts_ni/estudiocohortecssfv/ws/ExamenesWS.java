@@ -111,6 +111,13 @@ public class ExamenesWS extends EstudioCohorteCssfvWS{
                     } else {
                         retorno.getObjecRespuesta().setHoraConsulta(((JSONObject)resultadoJson.get(0)).getString("horaConsulta"));
                     }
+                    /*Nuevo Campo consulta agregado 06/01/2020*/
+                    if(StringUtils.isNullOrEmpty(((JSONObject)resultadoJson.get(0)).getString("consulta")) ||
+                            ((JSONObject)resultadoJson.get(0)).getString("consulta").compareTo("null") == 0) {
+                        retorno.getObjecRespuesta().setConsulta(((JSONObject)resultadoJson.get(0)).getString("consulta"));
+                    } else {
+                        retorno.getObjecRespuesta().setConsulta(((JSONObject)resultadoJson.get(0)).getString("consulta"));
+                    }
 
                     retorno.setCodigoError(Long.parseLong("0"));
                     retorno.setMensajeError("");

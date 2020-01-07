@@ -955,9 +955,22 @@ public class CExamenesTabFragment extends Fragment {
         }
     }
 
+    /**
+     * Metodo para marcar la serologia de dengue
+     */
+
     /***
      * Metodo que se ejecuta en el evento onClick del boton Enviar examen.
      */
+    public void otrasValidaciones() throws Exception {
+        CabeceraSintomaDTO CABECERA = (CabeceraSintomaDTO) this.getActivity().getIntent().getSerializableExtra("cabeceraSintoma");
+        if (CABECERA.getConsulta().trim().equals("Convaleciente")) {
+            boolean serogiaDengue = ((CheckBox) getActivity().findViewById(R.id.chkbSSerologiaDengueExamen)).isChecked();
+            if (!serogiaDengue) {
+                throw new Exception("Debe enviar el examen de Serología Dengue ya que la consulta es Convaleciente");
+            }
+        }
+    }
     public void onClick_btnEnviarOrdLab(){
         DialogInterface.OnClickListener preguntaEnviarOrdLab = new DialogInterface.OnClickListener() {
             @Override
@@ -1048,6 +1061,21 @@ public class CExamenesTabFragment extends Fragment {
                 return;
             }
         }
+
+        /*Nueva validacion agregada*/
+        CabeceraSintomaDTO CABECERA = (CabeceraSintomaDTO) this.getActivity().getIntent().getSerializableExtra("cabeceraSintoma");
+        if (CABECERA.getConsulta().trim().equals("Convaleciente")) {
+            boolean serogiaDengue = ((CheckBox) getActivity().findViewById(R.id.chkbSSerologiaDengueExamen)).isChecked();
+            if (!serogiaDengue) {
+                MensajesHelper.mostrarMensajeError(getActivity(),
+                        "Debe enviar el examen de Serología Dengue ya que la consulta es Convaleciente",
+                        getResources().getString(
+                                R.string.title_estudio_sostenible),
+                        null);
+                return;
+            }
+        }
+        //------------------------------------
 
         HojaConsultaDTO hojaConsulta = cargarHojaConsulta();
         GeneralesControlCambiosDTO genCtrlCambios = new GeneralesControlCambiosDTO();
@@ -1222,7 +1250,9 @@ public class CExamenesTabFragment extends Fragment {
                 PD.dismiss();
 
                 if (RESPUESTA.getCodigoError().intValue() == 0){
-
+                    MensajesHelper.mostrarMensajeInfo(getActivity(),
+                            getResources().getString(R.string.mensaje_examen_guardado_y_revision_impresora), getResources().getString(
+                                    R.string.title_estudio_sostenible), null);
                 }else if (RESPUESTA.getCodigoError().intValue() != 999){
                     MensajesHelper.mostrarMensajeInfo(CONTEXT,
                             RESPUESTA.getMensajeError(),getResources().getString(

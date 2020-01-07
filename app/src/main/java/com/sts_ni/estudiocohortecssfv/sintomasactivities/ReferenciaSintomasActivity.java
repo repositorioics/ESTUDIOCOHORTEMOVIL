@@ -96,6 +96,14 @@ public class ReferenciaSintomasActivity extends ActionBarActivity {
     public void onChkboxClickedRFDEN(View view) {
         AndroidUtils.controlarCheckBoxGroup(findViewById(R.id.chkbRFDSENSintoma), findViewById(R.id.chkbRFDNENSintoma),
                 view);
+        boolean referenciaDengue = ((CheckBox) findViewById(R.id.chkbRFDSENSintoma)).isChecked();
+        if (referenciaDengue) {
+            String mensaje = "Recuerde marcar las casillas que son de gravedad";
+            MensajesHelper.mostrarMensajeInfo(this.CONTEXT,
+                    mensaje, getResources().getString(
+                            R.string.title_estudio_sostenible),
+                    null);
+        }
     }
 
     public void onChkboxClickedRFIEN(View view) {
