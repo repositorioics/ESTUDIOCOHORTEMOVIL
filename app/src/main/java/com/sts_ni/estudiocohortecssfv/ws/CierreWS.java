@@ -6,6 +6,8 @@ import com.sts_ni.estudiocohortecssfv.R;
 import com.sts_ni.estudiocohortecssfv.dto.ErrorDTO;
 import com.sts_ni.estudiocohortecssfv.dto.GrillaCierreDTO;
 import com.sts_ni.estudiocohortecssfv.dto.HojaConsultaDTO;
+import com.sts_ni.estudiocohortecssfv.dto.InicioDTO;
+import com.sts_ni.estudiocohortecssfv.dto.ResultadoListWSDTO;
 import com.sts_ni.estudiocohortecssfv.dto.ResultadoObjectWSDTO;
 import com.sts_ni.estudiocohortecssfv.utils.StringUtils;
 
@@ -24,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 /**
  * Clase para realizar los consumos SOAP de los metodos relacionados al Cierre de Hoja de consulta.
@@ -32,7 +35,7 @@ public class CierreWS extends EstudioCohorteCssfvWS {
 
     private Resources RES;
 
-    private int TIME_OUT = 120000;
+    private int TIME_OUT = 180000;
 
     public CierreWS(Resources res) {
 
@@ -481,6 +484,71 @@ public class CierreWS extends EstudioCohorteCssfvWS {
             e.printStackTrace();
             retorno.setCodigoError(Long.parseLong("999"));
             retorno.setMensajeError(RES.getString(R.string.msj_error_no_controlado)+ " " + e.getMessage());
+        }
+
+        return retorno;
+    }
+
+
+
+
+    public ErrorDTO updateValueUAF(int secHojaConsulta, boolean uaf){
+
+        ErrorDTO retorno = new ErrorDTO();
+
+        try {
+            SoapObject request = new SoapObject(NAMESPACE, METODO_CAMBIAR_VALOR_VARIABLE_UAF);
+            SoapSerializationEnvelope sobre = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            sobre.dotNet = false;
+
+            PropertyInfo paramWS = new PropertyInfo();
+            paramWS.setValue(secHojaConsulta);
+            paramWS.setName("secHojaConsulta");
+            paramWS.setNamespace("");
+            paramWS.setType(Integer.class);
+
+            PropertyInfo paramEsEnfermeriaWS = new PropertyInfo();
+            paramEsEnfermeriaWS.setValue(uaf);
+            paramEsEnfermeriaWS.setName("uaf");
+            paramEsEnfermeriaWS.setNamespace("");
+            paramEsEnfermeriaWS.setType(Boolean.class);
+
+            request.addProperty(paramWS);
+            request.addProperty(paramEsEnfermeriaWS);
+            sobre.setOutputSoapObject(request);
+
+
+            HttpTransportSE transporte = new HttpTransportSE(URL, this.TIME_OUT);
+            transporte.call(ACCIOSOAP_METODO_CAMBIAR_VALOR_VARIABLE_UAF, sobre, this.HEADER_PROPERTY);
+
+            String resultado = sobre.getResponse().toString();
+
+            if (resultado != null && !resultado.isEmpty()) {
+
+                JSONObject jObj = new JSONObject(resultado);
+
+                JSONObject mensaje = (JSONObject) jObj.get("mensaje");
+
+                retorno.setCodigoError((long) mensaje.getInt("codigo"));
+                retorno.setMensajeError(mensaje.getString("texto"));
+
+            } else {
+                retorno.setCodigoError(Long.parseLong("3"));
+                retorno.setMensajeError(RES.getString(R.string.msj_servicio_no_envia_respuesta));
+            }
+
+        }catch (ConnectException ce){
+            ce.printStackTrace();
+            retorno.setCodigoError(Long.parseLong("2"));
+            retorno.setMensajeError(RES.getString(R.string.msj_servicio_no_dispon));
+        }catch (SocketTimeoutException et){
+            et.printStackTrace();
+            retorno.setCodigoError(Long.parseLong("2"));
+            retorno.setMensajeError(RES.getString(R.string.msj_servicio_no_dispon));
+        } catch (Exception e) {
+            e.printStackTrace();
+            retorno.setCodigoError(Long.parseLong("999"));
+            retorno.setMensajeError(RES.getString(R.string.msj_error_no_controlado));
         }
 
         return retorno;

@@ -42,7 +42,7 @@ public class ExamenesWS extends EstudioCohorteCssfvWS{
 
     private Resources RES;
 
-    private int TIME_OUT = 40000;
+    private int TIME_OUT = 80000;
 
     public ExamenesWS(Resources res) {
 

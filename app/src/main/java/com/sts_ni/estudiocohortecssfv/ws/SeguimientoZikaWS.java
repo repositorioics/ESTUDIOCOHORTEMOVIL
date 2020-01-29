@@ -38,8 +38,8 @@ import java.util.List;
  * Clase para gestionar el cosumo del webservice a los metodos relacionados a Siguimiento Zika.
  */
 public class SeguimientoZikaWS extends EstudioCohorteCssfvWS {
-    private int TIME_OUT = 40000;
-    private static int TIME_OUT_PDF = 120000;
+    private int TIME_OUT = 80000;
+    private static int TIME_OUT_PDF = 180000;
     public ArrayList<HeaderProperty> HEADER_PROPERTY;
     private Resources RES;
 

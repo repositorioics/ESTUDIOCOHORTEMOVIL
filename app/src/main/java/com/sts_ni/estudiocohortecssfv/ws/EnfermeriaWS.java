@@ -38,7 +38,7 @@ import java.util.Locale;
 public class EnfermeriaWS extends EstudioCohorteCssfvWS {
 
     private Resources RES;
-    private int TIME_OUT = 40000;
+    private int TIME_OUT = 80000;
 
     public EnfermeriaWS(Resources res) {
 

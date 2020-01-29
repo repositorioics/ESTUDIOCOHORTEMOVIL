@@ -29,7 +29,7 @@ import java.util.Calendar;
  * Created by mmoreno on 08/10/2015.
  */
 public class ControlCambiosWS extends EstudioCohorteCssfvWS {
-    private int TIME_OUT = 40000;
+    private int TIME_OUT = 80000;
     public ArrayList<HeaderProperty> HEADER_PROPERTY;
     private Resources RES;
 

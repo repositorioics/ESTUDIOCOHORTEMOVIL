@@ -772,4 +772,6 @@
 
     <!--Mensaje de Examen guardado y revision de impresora 11/12/2019  SC -->
     <string name="mensaje_examen_guardado_y_revision_impresora">Los examenes se han guardado correctamente, si envió a realizar el exámen de Serología Dengue recuerde revisar la impresora</string>
+
+    <string name="label_uaf">UAF:</string>
 </resources>

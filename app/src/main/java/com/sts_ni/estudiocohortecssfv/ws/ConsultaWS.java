@@ -38,8 +38,8 @@ import java.util.Locale;
 public class ConsultaWS extends EstudioCohorteCssfvWS {
 
     private Resources RES;
-    private static int TIME_OUT = 40000;
-    private static int TIME_OUT_PDF = 120000;
+    private static int TIME_OUT = 80000;
+    private static int TIME_OUT_PDF = 180000;
     public ArrayList<HeaderProperty> HEADER_PROPERTY;
     public ConsultaWS(Resources res) {
         this.HEADER_PROPERTY = new ArrayList<HeaderProperty>();

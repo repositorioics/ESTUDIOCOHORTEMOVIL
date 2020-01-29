@@ -40,7 +40,7 @@ import java.util.GregorianCalendar;
 public class DiagnosticoWS extends EstudioCohorteCssfvWS {
 
     private Resources RES;
-    private int TIME_OUT = 40000;
+    private int TIME_OUT = 80000;
 
     public ArrayList<HeaderProperty> HEADER_PROPERTY;
 
@@ -50,7 +50,7 @@ public class DiagnosticoWS extends EstudioCohorteCssfvWS {
 
         this.HEADER_PROPERTY.add(new HeaderProperty("Connection", "close"));
 
-        this.TIME_OUT = 40000;
+        this.TIME_OUT = 80000;
         this.RES = res;
     }
 

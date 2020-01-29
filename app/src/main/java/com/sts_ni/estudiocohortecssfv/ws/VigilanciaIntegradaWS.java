@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VigilanciaIntegradaWS extends EstudioCohorteCssfvWS{
-    private int TIME_OUT = 40000;
-    private static int TIME_OUT_PDF = 120000;
+    private int TIME_OUT = 80000;
+    private static int TIME_OUT_PDF = 180000;
     public ArrayList<HeaderProperty> HEADER_PROPERTY;
     private Resources RES;
 

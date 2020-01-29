@@ -200,6 +200,11 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
                     ((CheckBox) findViewById(R.id.chkbConsultaSeguimGeneralesSint)).setChecked(false);
                     ((EditText) findViewById(R.id.dpFis)).setText("");
                     ((EditText) findViewById(R.id.dpFif)).setText("");
+                    ((EditText) findViewById(R.id.dpUltmFiebGeneralesSint)).setText("");
+                    ((CheckBox) findViewById(R.id.chkbAMUltFGeneralesSint)).setChecked(false);
+                    ((CheckBox) findViewById(R.id.chkbPMUltFGeneralesSint)).setChecked(false);
+                    ((EditText) findViewById(R.id.dpUltmDosGeneralesSint)).setText("");
+                    ((EditText) findViewById(R.id.edtxtHoraGeneralesSint)).setText("");
                 }
                 else
                     ((CheckBox) view).setChecked(true);

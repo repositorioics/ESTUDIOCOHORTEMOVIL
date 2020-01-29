@@ -337,7 +337,10 @@ public class EstudioCohorteCssfvWS {
     public static final String METODO_IMPRIMIR_FICHA_EPI_PDF = "imprimirFichaEpiSindromesFebrilesPdf";
     public static final String ACCIOSOAP_METODO_IMPRIMIR_FICHA_EPI_PDF = NAMESPACE + METODO_IMPRIMIR_FICHA_EPI_PDF;
 
-  public static final String METODO_OBTENER_FIS_FIF = "getFisAndFifByCodExp";
-  public static final String ACCIOSOAP_METODO_OBTENER_FIS_FIF = NAMESPACE + METODO_OBTENER_FIS_FIF;
+    public static final String METODO_OBTENER_FIS_FIF = "getFisAndFifByCodExp";
+    public static final String ACCIOSOAP_METODO_OBTENER_FIS_FIF = NAMESPACE + METODO_OBTENER_FIS_FIF;
+
+  public static final String METODO_CAMBIAR_VALOR_VARIABLE_UAF = "updateUafValue";
+  public static final String ACCIOSOAP_METODO_CAMBIAR_VALOR_VARIABLE_UAF = NAMESPACE + METODO_CAMBIAR_VALOR_VARIABLE_UAF;
 
 }

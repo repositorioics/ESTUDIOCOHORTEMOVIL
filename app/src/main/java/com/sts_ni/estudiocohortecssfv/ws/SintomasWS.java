@@ -55,7 +55,7 @@ public class SintomasWS extends EstudioCohorteCssfvWS {
 
     private Resources RES;
 
-    private int TIME_OUT = 70000;
+    private int TIME_OUT = 80000;
 
     public SintomasWS(Resources res) {
 

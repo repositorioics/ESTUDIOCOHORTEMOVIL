@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -105,6 +106,25 @@ public class CCierreTabFragment extends Fragment implements CancelacionDialog.Di
             ((EditText) getActivity().findViewById(R.id.edtxtTempCSintomaC)).setText(((ConsultaActivity) getActivity()).CABECERA.getTemperaturac().toString());
             ((EditText) getActivity().findViewById(R.id.edtxtFechaSintomaC)).setText(new SimpleDateFormat("dd/MM/yyyy").format(((ConsultaActivity) getActivity()).CABECERA.getFechaConsulta().getTime()));
             ((EditText) getActivity().findViewById(R.id.edtxtHoraSintomaC)).setText(((ConsultaActivity) getActivity()).CABECERA.getHoraConsulta());
+
+
+            /*Habilitando el checkbox UAF para el estudio de Dengue
+            Fecha creacion 16/01/2019 - SC*/
+            String estudiosParticipantes = ((ConsultaActivity) getActivity()).CABECERA.getCodConsentimeinto();
+            boolean perteneceEstudioDengue = false;
+            if (estudiosParticipantes != null) {
+                String [] arrayEstudiosParticipantes = estudiosParticipantes.split(",");
+                for(int i = 0; i < arrayEstudiosParticipantes.length; i++){
+                    if (arrayEstudiosParticipantes[i].trim().equals("Dengue")) {
+                        perteneceEstudioDengue = true;
+                    }
+                }
+            }
+
+            if (perteneceEstudioDengue) {
+                getActivity().findViewById(R.id.txtUaf).setVisibility(View.VISIBLE);
+                getActivity().findViewById(R.id.chkUaf).setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -242,6 +262,16 @@ public class CCierreTabFragment extends Fragment implements CancelacionDialog.Di
             rootView.findViewById(R.id.btnCancelarCierre).setEnabled(false);
             rootView.findViewById(R.id.btnNoAtiendeLlamadoCierre).setEnabled(false);
         }
+
+        /*Inicializando el evento onClick para la UAF Fecha Creacion 16/01/2020 - SC*/
+        rootView.findViewById(R.id.chkUaf).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                InicioDTO pacienteSeleccionado = (InicioDTO) getActivity().getIntent().getSerializableExtra("pacienteSeleccionado");
+                boolean chkUafValue = ((CheckBox) getActivity().findViewById(R.id.chkUaf)).isChecked();
+                llamarProcesoUaf(pacienteSeleccionado.getIdObjeto(), chkUafValue);
+            }
+        });
     }
 
     /***
@@ -818,5 +848,75 @@ public class CCierreTabFragment extends Fragment implements CancelacionDialog.Di
         task.execute((Void[])null);
     }
 
+    /***
+     * Metodo para llamar servicio que realiza el cambio de valor de la uaf (true a false y de false a true) en la Hoja de consulta.
+     * Fecha Creacion: 16/01/2020 - SC
+     */
+    private void llamarProcesoUaf(final int secHojaConsulta, final boolean uaf){
+        AsyncTask<Void, Void, Void> procesoUafTask = new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog PD;
+            private ConnectivityManager CM = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+            private NetworkInfo NET_INFO = CM.getActiveNetworkInfo();
+            private ErrorDTO RESPUESTA = new ErrorDTO();
+            private CierreWS CIERREWS;
+
+            @Override
+            protected void onPreExecute() {
+                try {
+                    CIERREWS = new CierreWS(getResources());
+                    PD = new ProgressDialog(getActivity());
+                    PD.setTitle(getResources().getString(R.string.tittle_actualizando));
+                    PD.setMessage(getResources().getString(R.string.msj_espere_por_favor));
+                    PD.setCancelable(false);
+                    PD.setIndeterminate(true);
+                    PD.show();
+                } catch (IllegalArgumentException iae) {
+                    iae.printStackTrace();
+                } catch (NullPointerException npe) {
+                    npe.printStackTrace();
+                }
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    if (NET_INFO != null && NET_INFO.isConnected()){
+
+
+                        RESPUESTA = CIERREWS.updateValueUAF(secHojaConsulta, uaf);
+                    }else{
+                        RESPUESTA.setCodigoError(Long.parseLong("3"));
+                        RESPUESTA.setMensajeError(getResources().getString(R.string.msj_no_tiene_conexion));
+
+                    }
+                } catch (IllegalArgumentException iae) {
+                    iae.printStackTrace();
+                } catch (NullPointerException npe) {
+                    npe.printStackTrace();
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result){
+                try {
+                    PD.dismiss();
+                    if (RESPUESTA.getCodigoError().intValue() == 0){
+
+                    } else {
+                        MensajesHelper.mostrarMensajeError(getActivity(),
+                                RESPUESTA.getMensajeError(),getResources().getString(
+                                        R.string.title_estudio_sostenible), null);
+                    }
+                } catch (IllegalArgumentException iae) {
+                    iae.printStackTrace();
+                } catch (NullPointerException npe) {
+                    npe.printStackTrace();
+                }
+            }
+        };
+        procesoUafTask.execute((Void[])null);
+    }
 
 }
