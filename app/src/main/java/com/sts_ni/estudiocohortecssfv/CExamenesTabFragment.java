@@ -871,7 +871,7 @@ public class CExamenesTabFragment extends Fragment {
                             ((CheckBox) getActivity().findViewById(R.id.chkbSCPKExamen)).setChecked(false);
                             ((CheckBox) getActivity().findViewById(R.id.chkbSColesterolExamen)).setChecked(false);
                             ((CheckBox) getActivity().findViewById(R.id.chkbSInfluenzaExamen)).setChecked(false);
-                            ((CheckBox) getActivity().findViewById(R.id.chkbSOtroExamen)).setChecked(false);
+                            //((CheckBox) getActivity().findViewById(R.id.chkbSOtroExamen)).setChecked(false);
 
                             if(valor==1) ((CheckBox) getActivity().findViewById(R.id.chkbSBHCExamen)).setChecked(true);
                             if(valor==1) ((CheckBox) getActivity().findViewById(R.id.chkbSSerologiaDengueExamen)).setChecked(true);
@@ -888,10 +888,10 @@ public class CExamenesTabFragment extends Fragment {
                             if(valor==1) ((CheckBox) getActivity().findViewById(R.id.chkbSCPKExamen)).setChecked(true);
                             if(valor==1) ((CheckBox) getActivity().findViewById(R.id.chkbSColesterolExamen)).setChecked(true);
                             if(valor==1) ((CheckBox) getActivity().findViewById(R.id.chkbSInfluenzaExamen)).setChecked(true);
-                            if(valor==1) {
+                            /*if(valor==1) {
                                 ((CheckBox) getActivity().findViewById(R.id.chkbSOtroExamen)).setChecked(true);
                                 getActivity().findViewById(R.id.edtxtOtroExamenLab).setVisibility(View.VISIBLE);
-                            }
+                            }*/
 
                             ((CheckBox) getActivity().findViewById(R.id.chkbNBHCExamen)).setChecked(false);
                             ((CheckBox) getActivity().findViewById(R.id.chkbNSerologiaDengueExamen)).setChecked(false);
@@ -910,7 +910,7 @@ public class CExamenesTabFragment extends Fragment {
                             ((CheckBox) getActivity().findViewById(R.id.chkbNCPKExamen)).setChecked(false);
                             ((CheckBox) getActivity().findViewById(R.id.chkbNColesterolExamen)).setChecked(false);
                             ((CheckBox) getActivity().findViewById(R.id.chkbNInfluenzaExamen)).setChecked(false);
-                            ((CheckBox) getActivity().findViewById(R.id.chkbNOtroExamen)).setChecked(false);
+                            //((CheckBox) getActivity().findViewById(R.id.chkbNOtroExamen)).setChecked(false);
 
                             if(valor==2) ((CheckBox) getActivity().findViewById(R.id.chkbNBHCExamen)).setChecked(true);
                             if(valor==2) ((CheckBox) getActivity().findViewById(R.id.chkbNSerologiaDengueExamen)).setChecked(true);
@@ -927,11 +927,11 @@ public class CExamenesTabFragment extends Fragment {
                             if(valor==2) ((CheckBox) getActivity().findViewById(R.id.chkbNCPKExamen)).setChecked(true);
                             if(valor==2) ((CheckBox) getActivity().findViewById(R.id.chkbNColesterolExamen)).setChecked(true);
                             if(valor==2) ((CheckBox) getActivity().findViewById(R.id.chkbNInfluenzaExamen)).setChecked(true);
-                            if(valor==2) {
+                            /*if(valor==2) {
                                 ((CheckBox) getActivity().findViewById(R.id.chkbNOtroExamen)).setChecked(true);
                                 ((EditText) getActivity().findViewById(R.id.edtxtOtroExamenLab)).setText("");
                                 getActivity().findViewById(R.id.edtxtOtroExamenLab).setVisibility(View.INVISIBLE);
-                            }
+                            }*/
 
                             break;
                         case DialogInterface.BUTTON_NEGATIVE:
@@ -997,6 +997,13 @@ public class CExamenesTabFragment extends Fragment {
                         R.string.title_estudio_sostenible), null);
     }
 
+    public void presentaMensajeOtroExamen(){
+        MensajesHelper.mostrarMensajeInfo(this.CONTEXT,
+                getResources().getString(
+                        R.string.msj_falta_marcar_otro_examen_lab),getResources().getString(
+                        R.string.title_estudio_sostenible), null);
+    }
+
     /***
      * Metodo para que realiza la validación del checkbox que deben estar marcados.
      */
@@ -1049,9 +1056,10 @@ public class CExamenesTabFragment extends Fragment {
         }else if(AndroidUtils.esChkboxsFalse(getActivity().findViewById(R.id.chkbSInfluenzaExamen), getActivity().findViewById(R.id.chkbNInfluenzaExamen))) {
             presentaMensaje();
             return;
-        }/*else if(AndroidUtils.esChkboxsFalse(getActivity().findViewById(R.id.chkbSOtroExamen), getActivity().findViewById(R.id.chkbNOtroExamen))) {
+        }else if(AndroidUtils.esChkboxsFalse(getActivity().findViewById(R.id.chkbSOtroExamen), getActivity().findViewById(R.id.chkbNOtroExamen))) {
+            presentaMensajeOtroExamen();
             return;
-        }*/
+        }
         if(((CheckBox) getActivity().findViewById(R.id.chkbSOtroExamen)).isChecked()) {
             if(StringUtils.isNullOrEmpty(((EditText) getActivity().findViewById(R.id.edtxtOtroExamenLab)).getText().toString())) {
                 MensajesHelper.mostrarMensajeInfo(this.CONTEXT,

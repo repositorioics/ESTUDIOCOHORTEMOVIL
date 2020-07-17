@@ -51,6 +51,15 @@ public class SeguimientoInfluenzaDTO implements Serializable {
     private String dolorArticularModerada;
     private String dolorArticularSevera;
 
+    private String cuadroConfusional;
+    private String cuadroNeurologico;
+    private String confusionMental;
+    private String anosmia;
+    private String ageusia;
+    private String mareo;
+    private String ictus;
+    private String sincope;
+
     public int getSecHojaInfluenza() {
         return secHojaInfluenza;
     }
@@ -377,5 +386,69 @@ public class SeguimientoInfluenzaDTO implements Serializable {
 
     public void setDolorArticularSevera(String dolorArticularSevera) {
         this.dolorArticularSevera = dolorArticularSevera;
+    }
+
+    public String getCuadroConfusional() {
+        return cuadroConfusional;
+    }
+
+    public void setCuadroConfusional(String cuadroConfusional) {
+        this.cuadroConfusional = cuadroConfusional;
+    }
+
+    public String getCuadroNeurologico() {
+        return cuadroNeurologico;
+    }
+
+    public void setCuadroNeurologico(String cuadroNeurologico) {
+        this.cuadroNeurologico = cuadroNeurologico;
+    }
+
+    public String getConfusionMental() {
+        return confusionMental;
+    }
+
+    public void setConfusionMental(String confusionMental) {
+        this.confusionMental = confusionMental;
+    }
+
+    public String getAnosmia() {
+        return anosmia;
+    }
+
+    public void setAnosmia(String anosmia) {
+        this.anosmia = anosmia;
+    }
+
+    public String getAgeusia() {
+        return ageusia;
+    }
+
+    public void setAgeusia(String ageusia) {
+        this.ageusia = ageusia;
+    }
+
+    public String getMareo() {
+        return mareo;
+    }
+
+    public void setMareo(String mareo) {
+        this.mareo = mareo;
+    }
+
+    public String getIctus() {
+        return ictus;
+    }
+
+    public void setIctus(String ictus) {
+        this.ictus = ictus;
+    }
+
+    public String getSincope() {
+        return sincope;
+    }
+
+    public void setSincope(String sincope) {
+        this.sincope = sincope;
     }
 }

@@ -175,7 +175,7 @@ public class CSintomasTabFragment extends Fragment {
                     public void onClick(View view) {
                         Intent intent = new Intent(getActivity(), GeneralesSintomasActivity.class);
                         intent.putExtra("pacienteSeleccionado", (InicioDTO) getActivity().getIntent().getSerializableExtra("pacienteSeleccionado"));
-
+                        intent.putExtra("cabeceraSintoma", ((ConsultaActivity)getActivity()).CABECERA);
                         startActivity(intent);
                         getActivity().finish();
                     }

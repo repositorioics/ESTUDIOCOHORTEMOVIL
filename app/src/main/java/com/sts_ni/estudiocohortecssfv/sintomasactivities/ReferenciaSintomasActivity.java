@@ -131,6 +131,11 @@ public class ReferenciaSintomasActivity extends ActionBarActivity {
                 view);
     }
 
+    public void onChkcoxClickedCV(View view) {
+        AndroidUtils.controlarCheckBoxGroup(findViewById(R.id.chkbCOVIDSSintoma), findViewById(R.id.chkbCOVIDNSintoma),
+                view);
+    }
+
     /***
      * Metodo que es ejecutado en el evento onClick de la eqitueta no o si
      * @param view
@@ -150,6 +155,7 @@ public class ReferenciaSintomasActivity extends ActionBarActivity {
                             ((CheckBox) findViewById(R.id.chkbETINENSintoma)).setChecked(!valor);
                             ((CheckBox) findViewById(R.id.chkbIRANENSintoma)).setChecked(!valor);
                             ((CheckBox) findViewById(R.id.chkbNEUNENSintoma)).setChecked(!valor);
+                            ((CheckBox) findViewById(R.id.chkbCOVIDNSintoma)).setChecked(!valor);
 
                             ((CheckBox) findViewById(R.id.chkbINPSENSintoma)).setChecked(valor);
                             ((CheckBox) findViewById(R.id.chkbRFHSENSintoma)).setChecked(valor);
@@ -159,6 +165,7 @@ public class ReferenciaSintomasActivity extends ActionBarActivity {
                             ((CheckBox) findViewById(R.id.chkbETISENSintoma)).setChecked(valor);
                             ((CheckBox) findViewById(R.id.chkbIRASENSintoma)).setChecked(valor);
                             ((CheckBox) findViewById(R.id.chkbNEUSENSintoma)).setChecked(valor);
+                            ((CheckBox) findViewById(R.id.chkbCOVIDSSintoma)).setChecked(valor);
 
                             break;
                         case DialogInterface.BUTTON_NEGATIVE:
@@ -269,6 +276,9 @@ public class ReferenciaSintomasActivity extends ActionBarActivity {
         if( hcRef.getNeumonia().charValue() != '4' && hcRef.getNeumonia().charValue() != hojaconsulta.getNeumonia().charValue() ){
             return true;
         }
+        if( hcRef.getcV().charValue() != '4' && hcRef.getcV().charValue() != hojaconsulta.getcV().charValue() ){
+            return true;
+        }
 
         return false;
     }
@@ -289,6 +299,8 @@ public class ReferenciaSintomasActivity extends ActionBarActivity {
         } else if(AndroidUtils.esChkboxsFalse(findViewById(R.id.chkbIRASENSintoma), findViewById(R.id.chkbIRANENSintoma))) {
             throw new Exception(getString(R.string.msj_completar_informacion));
         } else if(AndroidUtils.esChkboxsFalse(findViewById(R.id.chkbNEUSENSintoma), findViewById(R.id.chkbNEUNENSintoma))) {
+            throw new Exception(getString(R.string.msj_completar_informacion));
+        }else if(AndroidUtils.esChkboxsFalse(findViewById(R.id.chkbCOVIDSSintoma), findViewById(R.id.chkbCOVIDNSintoma))) {
             throw new Exception(getString(R.string.msj_completar_informacion));
         }
     }
@@ -313,6 +325,8 @@ public class ReferenciaSintomasActivity extends ActionBarActivity {
         hojaConsulta.setIrag(AndroidUtils.resultadoGenericoChkbSND(findViewById(R.id.chkbIRASENSintoma), findViewById(R.id.chkbIRANENSintoma)));
 
         hojaConsulta.setNeumonia(AndroidUtils.resultadoGenericoChkbSND(findViewById(R.id.chkbNEUSENSintoma), findViewById(R.id.chkbNEUNENSintoma)));
+
+        hojaConsulta.setcV(AndroidUtils.resultadoGenericoChkbSND(findViewById(R.id.chkbCOVIDSSintoma), findViewById(R.id.chkbCOVIDNSintoma)));
 
         return hojaConsulta;
     }
@@ -475,6 +489,10 @@ public class ReferenciaSintomasActivity extends ActionBarActivity {
                 AndroidUtils.establecerCheckboxGuardado(findViewById(R.id.chkbNEUSENSintoma), findViewById(R.id.chkbNEUNENSintoma),
                         ((referenciaSintomas.getNeumonia() != null) ? referenciaSintomas.getNeumonia().charValue() : '4'));
                 hcRef.setNeumonia(((referenciaSintomas.getNeumonia() != null) ? referenciaSintomas.getNeumonia().charValue() : '4'));
+
+                AndroidUtils.establecerCheckboxGuardado(findViewById(R.id.chkbCOVIDSSintoma), findViewById(R.id.chkbCOVIDNSintoma),
+                        ((referenciaSintomas.getcV() != null) ? referenciaSintomas.getcV().charValue() : '4'));
+                hcRef.setcV(((referenciaSintomas.getcV() != null) ? referenciaSintomas.getcV().charValue() : '4'));
             }
         };
         lecturaTask.execute((Void[])null);

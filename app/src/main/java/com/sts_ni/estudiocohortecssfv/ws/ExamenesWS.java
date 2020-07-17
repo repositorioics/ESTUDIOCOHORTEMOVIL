@@ -111,12 +111,41 @@ public class ExamenesWS extends EstudioCohorteCssfvWS{
                     } else {
                         retorno.getObjecRespuesta().setHoraConsulta(((JSONObject)resultadoJson.get(0)).getString("horaConsulta"));
                     }
-                    /*Nuevo Campo consulta agregado 06/01/2020*/
+                    /*Nuevos Campos agregados 06/01/2020*/
+                    /*Nuevo Campo categoria agregado */
+                    if(StringUtils.isNullOrEmpty(((JSONObject)resultadoJson.get(0)).getString("categoria")) ||
+                            ((JSONObject)resultadoJson.get(0)).getString("categoria").compareTo("null") == 0) {
+                        retorno.getObjecRespuesta().setCategoria(((JSONObject)resultadoJson.get(0)).getString("categoria"));
+                    } else {
+                        retorno.getObjecRespuesta().setCategoria(((JSONObject)resultadoJson.get(0)).getString("categoria"));
+                    }
+                    /*Nuevo Campo fif agregado */
+                    if(StringUtils.isNullOrEmpty(((JSONObject)resultadoJson.get(0)).getString("fif")) ||
+                            ((JSONObject)resultadoJson.get(0)).getString("fif").compareTo("null") == 0) {
+                        retorno.getObjecRespuesta().setFif(((JSONObject)resultadoJson.get(0)).getString("fif"));
+                    } else {
+                        retorno.getObjecRespuesta().setFif(((JSONObject)resultadoJson.get(0)).getString("fif"));
+                    }
+                    /*Nuevo Campo consulta agregado */
                     if(StringUtils.isNullOrEmpty(((JSONObject)resultadoJson.get(0)).getString("consulta")) ||
                             ((JSONObject)resultadoJson.get(0)).getString("consulta").compareTo("null") == 0) {
                         retorno.getObjecRespuesta().setConsulta(((JSONObject)resultadoJson.get(0)).getString("consulta"));
                     } else {
                         retorno.getObjecRespuesta().setConsulta(((JSONObject)resultadoJson.get(0)).getString("consulta"));
+                    }
+                    /*Nuevo Campo temperatura medico agregado */
+                    if(StringUtils.isNullOrEmpty(((JSONObject)resultadoJson.get(0)).getString("temMedc")) ||
+                            ((JSONObject)resultadoJson.get(0)).getString("temMedc").compareTo("null") == 0) {
+                        retorno.getObjecRespuesta().setTemMedc(((JSONObject)resultadoJson.get(0)).getString("temMedc"));
+                    } else {
+                        retorno.getObjecRespuesta().setTemMedc(((JSONObject)resultadoJson.get(0)).getString("temMedc"));
+                    }
+                    /*Nuevo Campo eritrocitis agregado */
+                    if(StringUtils.isNullOrEmpty(((JSONObject)resultadoJson.get(0)).getString("eritrocitos")) ||
+                            ((JSONObject)resultadoJson.get(0)).getString("eritrocitos").compareTo("null") == 0) {
+                        retorno.getObjecRespuesta().setEritrocitos(((JSONObject)resultadoJson.get(0)).getString("eritrocitos"));
+                    } else {
+                        retorno.getObjecRespuesta().setEritrocitos(((JSONObject)resultadoJson.get(0)).getString("eritrocitos"));
                     }
 
                     retorno.setCodigoError(Long.parseLong("0"));

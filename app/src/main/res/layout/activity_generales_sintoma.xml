@@ -549,12 +549,27 @@
             android:editable="false"
             android:layout_toRightOf="@+id/txtvUltmFebGeneralesSint"
             android:layout_below="@+id/dpFis"
-            android:layout_marginTop="33dp"
+            android:layout_marginTop="10dp"
             android:layout_marginLeft="8dp"
             android:ems="10"
             android:textCursorDrawable="@null"
             android:drawableRight="@drawable/calendar"
             style="@style/EditTextEstilo" />
+
+        <!--<EditText
+            android:id="@+id/dpUltmFiebGeneralesSint"
+            android:layout_width="160dp"
+            android:layout_height="40dp"
+            android:inputType="date"
+            android:editable="false"
+            android:layout_toRightOf="@+id/txtvUltmFebGeneralesSint"
+            android:layout_below="@+id/dpFis"
+            android:layout_marginTop="33dp"
+            android:layout_marginLeft="8dp"
+            android:ems="10"
+            android:textCursorDrawable="@null"
+            android:drawableRight="@drawable/calendar"
+            style="@style/EditTextEstilo" />-->
 
         <TextView
             android:id="@+id/txtvAMUltFGeneralesSint"

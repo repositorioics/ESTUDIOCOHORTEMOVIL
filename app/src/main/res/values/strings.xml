@@ -57,7 +57,7 @@
     <string name="label_medico_opcional">Médico (opcional):</string>
     <string name="label_estado_nturicional">Estado Nutricional:</string>
     <string name="label_medico">Médico</string>
-    
+
     <string name="label_separador">-</string>
     <string name="label_codigo_expediente">Código del Participante:</string>
     <string name="label_nombre_paciente">Nombre Paciente:</string>
@@ -134,7 +134,7 @@
     <string name="label_edema_articular_hombros">Edema Articular en Hombros</string>
     <string name="label_edema_articular_rodillas">Edema Articular en Rodillas</string>
     <string name="label_edema_articular_tobillos">Edema Articular en Tobillos</string>
-    <string name="label_cafalea">Cafalea</string>
+    <string name="label_cafalea">Cefalea</string>
     <string name="label_rigidez_cuello">Rigidez de Cuello</string>
     <string name="label_inyeccion_conjutival">Inyección conjuntival</string>
     <string name="label_hemorragia_sunconjutival">Hemorragia Suconjutival</string>
@@ -268,6 +268,22 @@
     <string name="label_dia12">Día 12</string>
     <string name="label_dia13">Día 13</string>
     <string name="label_dia14">Día 14</string>
+    <!--Nuevos dias Agregrados al seguimiento de influenza-->
+    <string name="label_dia15">Día 15</string>
+    <string name="label_dia16">Día 16</string>
+    <string name="label_dia17">Día 17</string>
+    <string name="label_dia18">Día 18</string>
+    <string name="label_dia19">Día 19</string>
+    <string name="label_dia20">Día 20</string>
+    <string name="label_dia21">Día 21</string>
+    <string name="label_dia22">Día 22</string>
+    <string name="label_dia23">Día 23</string>
+    <string name="label_dia24">Día 24</string>
+    <string name="label_dia25">Día 25</string>
+    <string name="label_dia26">Día 26</string>
+    <string name="label_dia27">Día 27</string>
+    <string name="label_dia28">Día 28</string>
+
     <string name="label_consulta_inicial">Consulta Inicial</string>
     <string name="title_expedientes">Búsqueda de Expediente</string>
     <string name="title_seguimiento_influenza">CASOS DE SEGUIMIENTO PARA INFLUENZA</string>
@@ -523,7 +539,7 @@
     <string name="label_LiquidosIV">Liquidos IV</string>
     <string name="label_Prednisona">Prednisona</string>
     <string name="label_Hidrocortisona">Hidrocortisona IV</string>
-    <string name="label_Salutamol">Salutamol</string>
+    <string name="label_Salutamol">Salbutamol</string>
     <string name="label_Oseltamivir">Oseltamivir</string>
 
     <string name="label_otrosdiagnostico">Otro Diagnostico:</string>
@@ -774,4 +790,22 @@
     <string name="mensaje_examen_guardado_y_revision_impresora">Los examenes se han guardado correctamente, si envió a realizar el exámen de Serología Dengue recuerde revisar la impresora</string>
 
     <string name="label_uaf">UAF:</string>
+    <string name="descargar_apk">http://192.168.1.97:8080/estudioCohorte_CSSFV.apk</string>
+    <!--<string name="descargar_apk">http://192.168.1.25:8080/estudioCohorte_CSSFV.apk</string>-->
+    <string name="label_covid">CV</string>
+
+    <string name="btn_regresar_diagnostico">Regresar</string>
+
+    <!--Nuevos campos para la hoja de influenza-->
+    <string name="label_cuadro_confusional">Cuadro Confusional</string>
+    <string name="label_cuadro_neurologico">Cuadro Neurológico</string>
+    <string name="label_confuncion_mental">Confusión Mental</string>
+    <string name="label_anosmia">Anosmia</string>
+    <string name="label_ageusia">Ageusia</string>
+    <string name="label_mareo">Mareo</string>
+    <string name="label_ictus">Ictus</string>
+    <string name="label_sincope">Sincope</string>
+
+
+    <string name="msj_falta_marcar_otro_examen_lab">Debe de marcar Otro Examen</string>
 </resources>

@@ -8,6 +8,7 @@
     <string name="prompt_password">Ingrese su clave</string>
     <string name="action_sign_in">Iniciar Sesión</string>
     <string name="action_sign_in_short">Sign in</string>
+    <string name="action_update_apk">Actualizar Apk</string>
     <!--<string name="version">Versión 1.0.0</string>
     <string name="date_version">Enero 11, 2019</string> -->
     <!--<string name="version">Versión 1.0.1</string>
@@ -46,8 +47,19 @@
     <!--<string name="version">Versión 1.1.7</string>&lt;!&ndash;Instacion de validaciones solicitadas por los Dres&ndash;&gt;
     <string name="date_version">Enero 06, 2020</string>-->
 
-    <string name="version">Versión 1.1.8</string><!--Instacion validar hoja zika en el cierre-->
-    <string name="date_version">Enero 28, 2020</string>
+    <!--<string name="version">Versión 1.1.8</string>Instacion validar hoja zika en el cierre
+    <string name="date_version">Enero 28, 2020</string> -->
+
+    <!--<string name="version">Versión 1.1.9</string>Instacion validar hoja zika en el cierre
+    <string name="date_version">Abril 24, 2020</string>-->
+
+    <!--<string name="version">Versión 1.2.1</string>&lt;!&ndash;Validacion para fecha ultimo dia fiebre&ndash;&gt;
+    <string name="date_version">Mayo 12, 2020</string>-->
+
+    <!--<string name="version">Versión 1.2.2</string>&lt;!&ndash;Validacion para fecha ultimo dia fiebre&ndash;&gt;
+    <string name="date_version">Junio 15, 2020</string>-->
+    <string name="version">Versión 1.2.3</string><!--Nuevos sintomas en la hoja de influenza-->
+    <string name="date_version">Julio 13, 2020</string>
 
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>

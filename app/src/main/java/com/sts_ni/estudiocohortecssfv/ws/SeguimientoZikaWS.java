@@ -371,7 +371,7 @@ public class SeguimientoZikaWS extends EstudioCohorteCssfvWS {
     }
 
     //Funcion para guardar los datos desde la pantalla Emergencia
-    public ErrorDTO guardarHojaSeguimiento(HojaZikaDTO hojaZika, List<SeguimientoZikaDTO> seguimiento){
+    public ErrorDTO guardarHojaSeguimiento(HojaZikaDTO hojaZika, List<SeguimientoZikaDTO> seguimiento, String user){
 
         ErrorDTO retorno = new ErrorDTO();
 
@@ -481,6 +481,14 @@ public class SeguimientoZikaWS extends EstudioCohorteCssfvWS {
             paramEviar2.setType(String.class);
 
             request.addProperty(paramEviar2);
+
+            PropertyInfo paramEviar3 = new PropertyInfo();
+            paramEviar3.setValue(user);
+            paramEviar3.setName("user");
+            paramEviar3.setNamespace("");
+            paramEviar3.setType(String.class);
+
+            request.addProperty(paramEviar3);
 
             sobre.setOutputSoapObject(request);
 

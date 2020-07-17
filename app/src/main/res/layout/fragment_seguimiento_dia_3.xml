@@ -1074,5 +1074,220 @@
             />
 
     </LinearLayout>
+    <!--Cuadro Confuncional-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="14dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
 
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:text="@string/label_cuadro_confusional"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <Spinner
+            android:id="@+id/spnDia3Fila16"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.50"
+            android:background="@drawable/rounded_spinner"
+            />
+
+    </LinearLayout>
+    <!--Cuadro Neurológico-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="14dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:text="@string/label_cuadro_neurologico"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <Spinner
+            android:id="@+id/spnDia3Fila17"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.50"
+            android:background="@drawable/rounded_spinner"
+            />
+
+    </LinearLayout>
+    <!--Confunsión Mental-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="14dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:text="@string/label_confuncion_mental"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <Spinner
+            android:id="@+id/spnDia3Fila18"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.50"
+            android:background="@drawable/rounded_spinner"
+            />
+
+    </LinearLayout>
+    <!--Anosmia-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="14dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:text="@string/label_anosmia"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <Spinner
+            android:id="@+id/spnDia3Fila19"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.50"
+            android:background="@drawable/rounded_spinner"
+            />
+
+    </LinearLayout>
+    <!--Ageusia-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="14dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:text="@string/label_ageusia"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <Spinner
+            android:id="@+id/spnDia3Fila20"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.50"
+            android:background="@drawable/rounded_spinner"
+            />
+
+    </LinearLayout>
+    <!--Mareo-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="14dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:text="@string/label_mareo"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <Spinner
+            android:id="@+id/spnDia3Fila21"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.50"
+            android:background="@drawable/rounded_spinner"
+            />
+
+    </LinearLayout>
+    <!--Ictus-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="14dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:text="@string/label_ictus"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <Spinner
+            android:id="@+id/spnDia3Fila22"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.50"
+            android:background="@drawable/rounded_spinner"
+            />
+
+    </LinearLayout>
+    <!--Sincope-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="14dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:text="@string/label_sincope"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextViewEstiloSeguimiento"
+            />
+
+        <Spinner
+            android:id="@+id/spnDia3Fila23"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.50"
+            android:background="@drawable/rounded_spinner"
+            />
+
+    </LinearLayout>
 </LinearLayout>

@@ -120,6 +120,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
     public String mFif = null;
     public ArrayList<SeguimientoZikaDTO> listaSegZika;
     public ArrayList<SeguimientoZikaDTO> nuevaListaSegZika;
+    public static String currentUser = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,7 +141,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
         actionBar.setCustomView(R.layout.custom_action_bar_title_center);
         ((TextView) actionBar.getCustomView().findViewById(R.id.myTitleBar)).setText(getResources().getString(R.string.label_seguimiento_zika));
         ((TextView) actionBar.getCustomView().findViewById(R.id.myUserBar)).setText(((CssfvApp) getApplication()).getInfoSessionWSDTO().getUser());
-
+        currentUser = ((CssfvApp) getApplication()).getInfoSessionWSDTO().getUser();
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
@@ -1190,9 +1191,13 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         }
                     }
 
+                    /* Obteniendo el usuario logeado para enviarlo a guardar cuando la hoja se cierre
+                     * Fecha: 22/04/2020 */
+                    String user = currentUser;
+
                     hojaZika.setLstSeguimientoZika(lstSeg);
                     mSeguimientoZikaActivity.mCerrarHojaSeguimientoTask = (CerrarHojaSeguimientoZikaTask) new
-                            CerrarHojaSeguimientoZikaTask(mSeguimientoZikaActivity).execute(hojaZika);
+                            CerrarHojaSeguimientoZikaTask(mSeguimientoZikaActivity).execute(hojaZika, user);
 
                 }
             }else{

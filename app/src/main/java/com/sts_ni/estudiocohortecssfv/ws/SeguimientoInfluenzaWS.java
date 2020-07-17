@@ -420,7 +420,7 @@ public class SeguimientoInfluenzaWS extends EstudioCohorteCssfvWS {
     }
 
     //Funcion para guardar los datos desde la pantalla Emergencia
-    public ErrorDTO guardarHojaSeguimiento(HojaInfluenzaDTO hojaInfluenza, List<SeguimientoInfluenzaDTO> seguimiento){
+    public ErrorDTO guardarHojaSeguimiento(HojaInfluenzaDTO hojaInfluenza, List<SeguimientoInfluenzaDTO> seguimiento, String user){
 
         ErrorDTO retorno = new ErrorDTO();
 
@@ -490,6 +490,15 @@ public class SeguimientoInfluenzaWS extends EstudioCohorteCssfvWS {
                     objenvioSeg.put("dolorArticularModerada", seg.getDolorArticularModerada());
                     objenvioSeg.put("dolorArticularSevera", seg.getDolorArticularSevera());
                     objenvioSeg.put("secHojaInfluenza", seg.getSecHojaInfluenza());
+                    /*NUEVOS CAMPOS AGREGADOS*/
+                    objenvioSeg.put("cuadroConfusional", seg.getCuadroConfusional());
+                    objenvioSeg.put("cuadroNeurologico", seg.getCuadroNeurologico());
+                    objenvioSeg.put("confusionMental", seg.getConfusionMental());
+                    objenvioSeg.put("anosmia", seg.getAnosmia());
+                    objenvioSeg.put("ageusia", seg.getAgeusia());
+                    objenvioSeg.put("mareo", seg.getMareo());
+                    objenvioSeg.put("ictus", seg.getIctus());
+                    objenvioSeg.put("sincope", seg.getSincope());
 
                     jsonArray.put(objenvioSeg.toString());
                 }
@@ -513,6 +522,17 @@ public class SeguimientoInfluenzaWS extends EstudioCohorteCssfvWS {
             paramEviar2.setType(String.class);
 
             request.addProperty(paramEviar2);
+
+            /* Nuevo parametro a enviar, contiene el usuario logeado
+            * Fecha: 24/04/2020 */
+
+            PropertyInfo paramEviar3 = new PropertyInfo();
+            paramEviar3.setValue(user);
+            paramEviar3.setName("user");
+            paramEviar3.setNamespace("");
+            paramEviar3.setType(String.class);
+
+            request.addProperty(paramEviar3);
 
             sobre.setOutputSoapObject(request);
 

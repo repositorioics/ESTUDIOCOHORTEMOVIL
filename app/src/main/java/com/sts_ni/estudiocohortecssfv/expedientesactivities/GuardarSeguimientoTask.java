@@ -46,7 +46,8 @@ public class GuardarSeguimientoTask extends UserTask<Object, Void, ErrorDTO> {
         if (netInfo != null && netInfo.isConnected()) {
             HojaInfluenzaDTO hojaInfluenza = (HojaInfluenzaDTO) params[0];
             SeguimientoInfluenzaWS influenzaWS = new SeguimientoInfluenzaWS(this.seguimientoInfluenzaActivity.getResources());
-            resultado = influenzaWS.guardarHojaSeguimiento(hojaInfluenza, hojaInfluenza.getLstSeguimientoInfluenza());
+            String user = "";
+            resultado = influenzaWS.guardarHojaSeguimiento(hojaInfluenza, hojaInfluenza.getLstSeguimientoInfluenza(), user);
         } else {
             resultado.setCodigoError(Long.parseLong("3"));
             resultado.setMensajeError(this.seguimientoInfluenzaActivity.getResources().getString(R.string.msj_no_tiene_conexion));

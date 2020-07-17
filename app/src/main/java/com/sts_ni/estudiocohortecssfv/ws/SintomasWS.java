@@ -1100,6 +1100,7 @@ public class SintomasWS extends EstudioCohorteCssfvWS {
             objenvio.put("eti", hojaConsulta.getEti());
             objenvio.put("irag", hojaConsulta.getIrag());
             objenvio.put("neumonia", hojaConsulta.getNeumonia());
+            objenvio.put("cV", hojaConsulta.getcV());
             objenvio.put("usuarioLogiado", usuarioLogiado);
 
             //Seteando parametros

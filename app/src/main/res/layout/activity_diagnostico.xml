@@ -92,6 +92,19 @@
     <!-- Content below header and above footer -->
 
 
+    <Button android:id="@+id/btnSalirDiagnostico"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="10dp"
+        android:text="@string/btn_regresar_diagnostico"
+        android:textStyle="bold"
+        android:layout_below="@+id/txvotrosdiagnostico"
+        android:textColor="@android:color/white"
+        android:onClick="onClick_btnSalirDiagnostico"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/bg_button_login_selector"/>
+
 
 
 </RelativeLayout>

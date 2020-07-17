@@ -326,6 +326,44 @@
             android:onClick="onChkboxClickedNEUEN"
             />
 
+
+
+
+
+
+        <TextView
+            android:id="@+id/txtvCovidSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvNEUENSintoma"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="24dp"
+            android:text="@string/label_covid"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbCOVIDSSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvPrincipalENSintoma"
+            android:layout_below="@+id/txtvNEUENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkcoxClickedCV"
+            />
+
+        <CheckBox
+            android:id="@+id/chkbCOVIDNSintoma"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtvSENSintoma"
+            android:layout_below="@+id/txtvNEUENSintoma"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:onClick="onChkcoxClickedCV"
+            />
+
     </RelativeLayout>
 
 </ScrollView>

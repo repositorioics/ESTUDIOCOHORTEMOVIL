@@ -1,6 +1,7 @@
 package com.sts_ni.estudiocohortecssfv.sintomasactivities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,6 +10,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.renderscript.Sampler;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -20,11 +22,13 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.sts_ni.estudiocohortecssfv.ConsultaActivity;
 import com.sts_ni.estudiocohortecssfv.CssfvApp;
 import com.sts_ni.estudiocohortecssfv.InicioEnfermeriaActivity;
 import com.sts_ni.estudiocohortecssfv.R;
+import com.sts_ni.estudiocohortecssfv.dto.CabeceraSintomaDTO;
 import com.sts_ni.estudiocohortecssfv.dto.ComplementoCambiosDTO;
 import com.sts_ni.estudiocohortecssfv.dto.ControlCambiosDTO;
 import com.sts_ni.estudiocohortecssfv.dto.ErrorDTO;
@@ -52,6 +56,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Cotnrolador de pantalla Generales Sintomas.
@@ -497,6 +502,7 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
         try {
             validarCampoRequerido(controlCambios);
             validarUltDosisAntipiretico();
+            //alertDialog();
             if( controlCambios.size() > 0){
                 genControlCambios = new GeneralesControlCambiosDTO();
                 genControlCambios.setUsuario(((CssfvApp) this.getApplication()).getInfoSessionWSDTO().getUser());
@@ -508,7 +514,12 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which){
                             case DialogInterface.BUTTON_POSITIVE:
-                                hojaConsultaSave();
+                                //hojaConsultaSave();
+                                if (diffDayFConsultaAndFif()) {
+                                    alertDialogUltDiaFiebre();
+                                } else {
+                                    hojaConsultaSave();
+                                }
                                 break;
                             case DialogInterface.BUTTON_NEGATIVE:
                                 //No button clicked
@@ -521,7 +532,12 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
                                 R.string.msj_aviso_control_cambios), vFueraRango), getResources().getString(
                         R.string.title_estudio_sostenible),preguntaEnviarDialogClickListener);
             }else {
-                hojaConsultaSave();
+                if (diffDayFConsultaAndFif()) {
+                    alertDialogUltDiaFiebre();
+                } else {
+                    hojaConsultaSave();
+                }
+                //hojaConsultaSave();
             }
         } catch (Exception e){
             if(e.getMessage() != null && !e.getMessage().isEmpty()) {
@@ -567,6 +583,65 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
         } else {
             guardarGeneralesServicio();
         }
+    }
+
+    /**
+     * Meotod para verificar si el participante tiene mas de 4 días de FIF.
+     * Fecha: 07/05/2020 - SC
+     * */
+    public boolean diffDayFConsultaAndFif() {
+        boolean esMayorA4Dias = false;
+        try {
+            if (!StringUtils.isNullOrEmpty(((EditText) findViewById(R.id.dpFif)).getText().toString())) {
+                CabeceraSintomaDTO CABECERA = (CabeceraSintomaDTO) this.getIntent().getSerializableExtra("cabeceraSintoma");
+                EditText fif = (EditText) findViewById(R.id.dpFif);
+                String fifValue = fif.getText().toString();
+                SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
+                Date dateFechaConsulta = CABECERA.getFechaConsulta().getTime();
+                String resultFechaConsulta = sdf2.format(dateFechaConsulta);
+                Date dateFif = sdf2.parse(fifValue);
+                Date dateFConsulta = sdf2.parse(resultFechaConsulta);
+
+                long diffInMillies = Math.abs(dateFConsulta.getTime() - dateFif.getTime());
+                long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+
+                if (diff >= 4) {
+                    //alertDialogUltDiaFiebre();
+                    esMayorA4Dias = true;
+                } else {
+                    esMayorA4Dias = false;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return esMayorA4Dias;
+    }
+
+    /**
+     * Metodo para mostrar la alerta para la fecha ultimo dia de fiebre
+     * Fecha: 07/05/2020 - SC
+     * */
+    private void alertDialogUltDiaFiebre() {
+        AlertDialog.Builder dialog=new AlertDialog.Builder(this);
+        dialog.setMessage("Recuerde llenar la fecha último día fiebre");
+        dialog.setTitle(getResources().getString(R.string.title_estudio_sostenible));
+        dialog.setPositiveButton("Continuar",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,
+                                        int which) {
+                        //Toast.makeText(getApplicationContext(),"Yes is clicked",Toast.LENGTH_LONG).show();
+                        hojaConsultaSave();
+                    }
+                });
+        dialog.setNegativeButton("Cancelar",new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(),"Se a cancelado el guardado",Toast.LENGTH_LONG).show();
+            }
+        });
+        AlertDialog alertDialog=dialog.create();
+        alertDialog.show();
     }
 
     /*Validacion para ultimo dia antipiretico cuando la consulta es de seguimiento y se ingresa la fif

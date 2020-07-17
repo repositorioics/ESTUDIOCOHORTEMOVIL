@@ -558,6 +558,31 @@
 
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/txtUaf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/lnyFila3"
+            android:layout_toLeftOf="@+id/chkUAF"
+            android:layout_marginTop="38dp"
+            android:text="@string/label_uaf"
+            android:visibility="invisible"
+            android:textAppearance="@style/LabelSintomasScreensEstilo"
+            />
+
+        <CheckBox
+            android:id="@+id/chkUAF"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/lnyFila3"
+            android:layout_toLeftOf="@+id/imgBtnCerrarHoja"
+            android:layout_marginTop="35dp"
+            android:layout_marginRight="60dp"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            android:visibility="invisible"
+            />
+
         <Button
             android:id="@+id/imgBtnCerrarHoja"
             android:layout_width="160dp"

@@ -562,7 +562,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/lnyFila3"
-            android:layout_toLeftOf="@+id/chkUaf"
+            android:layout_toLeftOf="@+id/chkUAF"
             android:layout_marginTop="38dp"
             android:text="@string/label_uaf"
             android:visibility="invisible"
@@ -570,7 +570,7 @@
             />
 
         <CheckBox
-            android:id="@+id/chkUaf"
+            android:id="@+id/chkUAF"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/lnyFila3"

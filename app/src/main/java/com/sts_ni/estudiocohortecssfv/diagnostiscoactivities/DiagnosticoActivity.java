@@ -1,6 +1,7 @@
 package com.sts_ni.estudiocohortecssfv.diagnostiscoactivities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,6 +21,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sts_ni.estudiocohortecssfv.ConsultaActivity;
 import com.sts_ni.estudiocohortecssfv.CssfvApp;
@@ -305,6 +307,12 @@ public class DiagnosticoActivity extends ActionBarActivity
         return;
     }
 
+    /*Metodo para salir de la pantalla diagnostico e ir a completar
+    * la infomacion para crear la hoja de influenza y la ficha de manera automatica*/
+    public void onClick_btnSalirDiagnostico(View view) {
+        regresarPantallaAnterior();
+    }
+
     /***
      * Metodo para controlar el evento onClick del boton regresar.
      * @param view
@@ -325,7 +333,14 @@ public class DiagnosticoActivity extends ActionBarActivity
                         public void onClick(DialogInterface dialog, int which) {
                             switch (which){
                                 case DialogInterface.BUTTON_POSITIVE:
-                                    guardarDiagnostico(hojaconsulta);
+                                    if (hojaconsulta.getDiagnostico1() == 101 || hojaconsulta.getDiagnostico2() == 101
+                                        || hojaconsulta.getDiagnostico3() == 101 || hojaconsulta.getDiagnostico4() == 101) {
+                                        //guardarDiagnostico(hojaconsulta);
+                                        alertaSCV();
+                                    } else {
+                                        guardarDiagnostico(hojaconsulta);
+                                    }
+                                    //guardarDiagnostico(hojaconsulta);
                                     break;
                                 case DialogInterface.BUTTON_NEGATIVE:
                                     regresarPantallaAnterior();
@@ -340,10 +355,24 @@ public class DiagnosticoActivity extends ActionBarActivity
                             preguntaDialogClickListener);
 
                 }else{
-                    guardarDiagnostico(hojaconsulta);
+                    if (hojaconsulta.getDiagnostico1() == 101 || hojaconsulta.getDiagnostico2() == 101
+                            || hojaconsulta.getDiagnostico3() == 101 || hojaconsulta.getDiagnostico4() == 101) {
+                        //guardarDiagnostico(hojaconsulta);
+                        alertaSCV();
+                    } else {
+                        guardarDiagnostico(hojaconsulta);
+                    }
+                    //guardarDiagnostico(hojaconsulta);
                 }
             }else{
-                guardarDiagnostico(hojaconsulta);
+                if (hojaconsulta.getDiagnostico1() == 101 || hojaconsulta.getDiagnostico2() == 101
+                        || hojaconsulta.getDiagnostico3() == 101 || hojaconsulta.getDiagnostico4() == 101) {
+                    //guardarDiagnostico(hojaconsulta);
+                    alertaSCV();
+                } else {
+                    guardarDiagnostico(hojaconsulta);
+                }
+                //guardarDiagnostico(hojaconsulta);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -395,40 +424,70 @@ public class DiagnosticoActivity extends ActionBarActivity
         Integer diagnosticoId3 =  ((DiagnosticoDTO) ((Spinner)findViewById(R.id.spnDialogo3)).getSelectedItem()).getSecDiagnostico();
         Integer diagnosticoId4 =  ((DiagnosticoDTO) ((Spinner)findViewById(R.id.spnDialogo4)).getSelectedItem()).getSecDiagnostico();
 
-        if (categoria.trim().equals("A")) {
-            if (diagnosticoId1 == 57 || diagnosticoId2 == 57 || diagnosticoId3 == 57 || diagnosticoId4 == 57) {
-                throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
-                        ", Diagnostico: SINDROME FEBRIL AGUDO SIN FOCO APARENTE");
+        if (categoria != null) {
+            if (categoria.trim().equals("A")) {
+                if (diagnosticoId1 == 57 || diagnosticoId2 == 57 || diagnosticoId3 == 57 || diagnosticoId4 == 57) {
+                    throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
+                            ", Diagnostico: SINDROME FEBRIL AGUDO SIN FOCO APARENTE");
+                }
             }
-        }
-        if (categoria.trim().equals("B") || categoria.trim().equals("C")) {
-            if (diagnosticoId1 == 94 || diagnosticoId2 == 94 || diagnosticoId3 == 94 || diagnosticoId4 == 94) {
-                throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
-                        ", Diagnostico: DENGUE SIN SIGNOS DE ALARMA");
-            }
-            if (diagnosticoId1 == 95 || diagnosticoId2 == 95 || diagnosticoId3 == 95 || diagnosticoId4 == 95) {
-                throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
-                        ", Diagnostico: DENGUE CON SIGNOS DE ALARMA");
-            }
-            if (diagnosticoId1 == 96 || diagnosticoId2 == 96 || diagnosticoId3 == 96 || diagnosticoId4 == 96) {
-                throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
-                        ", Diagnostico: DENGUE GRAVE");
-            }
-            if (diagnosticoId1 == 97 || diagnosticoId2 == 97 || diagnosticoId3 == 97 || diagnosticoId4 == 97) {
-                throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
-                        ", Diagnostico: CHOQUE INICIAL");
-            }
-            if (diagnosticoId1 == 98 || diagnosticoId2 == 98 || diagnosticoId3 == 98 || diagnosticoId4 == 98) {
-                throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
-                        ", Diagnostico: CHOQUE HIPOTENSIVO");
-            }
-            if (diagnosticoId1 == 99 || diagnosticoId2 == 99 || diagnosticoId3 == 99 || diagnosticoId4 == 99) {
-                throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
-                        ", Diagnostico: DENGUE CONFIRMADO POR PCR");
+            if (categoria.trim().equals("B") || categoria.trim().equals("C")) {
+                if (diagnosticoId1 == 94 || diagnosticoId2 == 94 || diagnosticoId3 == 94 || diagnosticoId4 == 94) {
+                    throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
+                            ", Diagnostico: DENGUE SIN SIGNOS DE ALARMA");
+                }
+                if (diagnosticoId1 == 95 || diagnosticoId2 == 95 || diagnosticoId3 == 95 || diagnosticoId4 == 95) {
+                    throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
+                            ", Diagnostico: DENGUE CON SIGNOS DE ALARMA");
+                }
+                if (diagnosticoId1 == 96 || diagnosticoId2 == 96 || diagnosticoId3 == 96 || diagnosticoId4 == 96) {
+                    throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
+                            ", Diagnostico: DENGUE GRAVE");
+                }
+                if (diagnosticoId1 == 97 || diagnosticoId2 == 97 || diagnosticoId3 == 97 || diagnosticoId4 == 97) {
+                    throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
+                            ", Diagnostico: CHOQUE INICIAL");
+                }
+                if (diagnosticoId1 == 98 || diagnosticoId2 == 98 || diagnosticoId3 == 98 || diagnosticoId4 == 98) {
+                    throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
+                            ", Diagnostico: CHOQUE HIPOTENSIVO");
+                }
+                if (diagnosticoId1 == 99 || diagnosticoId2 == 99 || diagnosticoId3 == 99 || diagnosticoId4 == 99) {
+                    throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
+                            ", Diagnostico: DENGUE CONFIRMADO POR PCR");
+                }
             }
         }
     }
 
+
+    /**
+     * Metodo para mostrar recordatorio que se creo la hoja de influenza y ficha epidemiologica
+     * Fecha: 08/06/2020 - SC
+     * */
+    private void alertaSCV() {
+        AlertDialog.Builder dialog=new AlertDialog.Builder(this);
+        dialog.setMessage("Usted ha seleccionado el diagnóstico SCV, " +
+                "se creará la Ficha Epidemiológica y la Hoja de Seguimiento de Influenza de forma automatica, " +
+                "pero se deberan cumplir con todos los requistos para la creación ambas");
+        dialog.setTitle(getResources().getString(R.string.title_estudio_sostenible));
+        dialog.setPositiveButton("Continuar",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,
+                                        int which) {
+                        //Toast.makeText(getApplicationContext(),"Yes is clicked",Toast.LENGTH_LONG).show();
+                        guardarDiagnostico(hojaconsulta);
+                    }
+                });
+        dialog.setNegativeButton("Cancelar",new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(),"Se a cancelado el guardado",Toast.LENGTH_LONG).show();
+            }
+        });
+        AlertDialog alertDialog=dialog.create();
+        alertDialog.show();
+    }
 
     /***
      * Metodo que llama el servicio para guardar Diagnostico.

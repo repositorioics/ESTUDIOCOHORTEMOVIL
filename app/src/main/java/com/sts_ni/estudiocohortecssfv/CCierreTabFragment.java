@@ -44,6 +44,7 @@ public class CCierreTabFragment extends Fragment implements CancelacionDialog.Di
 
     private InicioDTO mPacienteSeleccionado;
     private Fragment mCorrienteFragmento;
+    //private final CheckBox chkUAF;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -122,8 +123,11 @@ public class CCierreTabFragment extends Fragment implements CancelacionDialog.Di
             }
 
             if (perteneceEstudioDengue) {
-                getActivity().findViewById(R.id.txtUaf).setVisibility(View.VISIBLE);
-                getActivity().findViewById(R.id.chkUaf).setVisibility(View.VISIBLE);
+                CheckBox chkUaf = (CheckBox) getActivity().findViewById(R.id.chkUAF);
+                if (chkUaf != null) {
+                    getActivity().findViewById(R.id.txtUaf).setVisibility(View.VISIBLE);
+                    getActivity().findViewById(R.id.chkUAF).setVisibility(View.VISIBLE);
+                }
             }
         }
     }
@@ -264,14 +268,30 @@ public class CCierreTabFragment extends Fragment implements CancelacionDialog.Di
         }
 
         /*Inicializando el evento onClick para la UAF Fecha Creacion 16/01/2020 - SC*/
-        rootView.findViewById(R.id.chkUaf).setOnClickListener(new View.OnClickListener() {
+
+        final CheckBox chkUAF = (CheckBox) rootView.findViewById(R.id.chkUAF);
+        if(chkUAF != null) {
+            chkUAF.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    InicioDTO pacienteSeleccionado = (InicioDTO) getActivity().getIntent().getSerializableExtra("pacienteSeleccionado");
+                    boolean chkUafValue = ((CheckBox) getActivity().findViewById(R.id.chkUAF)).isChecked();
+                    llamarProcesoUaf(pacienteSeleccionado.getIdObjeto(), chkUafValue);
+                }
+            });
+        }
+
+
+        /*rootView.findViewById(R.id.chkUAF).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                InicioDTO pacienteSeleccionado = (InicioDTO) getActivity().getIntent().getSerializableExtra("pacienteSeleccionado");
-                boolean chkUafValue = ((CheckBox) getActivity().findViewById(R.id.chkUaf)).isChecked();
-                llamarProcesoUaf(pacienteSeleccionado.getIdObjeto(), chkUafValue);
+                if (v != null) {
+                    InicioDTO pacienteSeleccionado = (InicioDTO) getActivity().getIntent().getSerializableExtra("pacienteSeleccionado");
+                    boolean chkUafValue = ((CheckBox) getActivity().findViewById(R.id.chkUAF)).isChecked();
+                    llamarProcesoUaf(pacienteSeleccionado.getIdObjeto(), chkUafValue);
+                }
             }
-        });
+        });*/
     }
 
     /***

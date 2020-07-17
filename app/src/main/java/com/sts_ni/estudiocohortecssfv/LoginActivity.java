@@ -4,12 +4,19 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.DownloadManager;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.Loader;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -18,8 +25,10 @@ import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,6 +38,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sts_ni.estudiocohortecssfv.dto.ErrorDTO;
 import com.sts_ni.estudiocohortecssfv.dto.InfoSessionWSDTO;
@@ -36,6 +46,12 @@ import com.sts_ni.estudiocohortecssfv.helper.MensajesHelper;
 import com.sts_ni.estudiocohortecssfv.ws.SeguridadWS;
 import com.sts_ni.estudiocohortecssfv.wsclass.DataNodoItemArray;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +65,8 @@ public class LoginActivity extends Activity {
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
-
+    public ProgressDialog PD_CREATE;
+    private Context CONTEXT;
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
@@ -64,7 +81,7 @@ public class LoginActivity extends Activity {
             System.exit(0);
         }
         setContentView(R.layout.activity_login);
-
+        this.CONTEXT = this;
         //Inicializando Seguridad WS
         mSeguridadWS = new SeguridadWS(this);
 
@@ -94,7 +111,6 @@ public class LoginActivity extends Activity {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
-
 
     /**
      * Attempts to sign in or register the account specified by the login form.

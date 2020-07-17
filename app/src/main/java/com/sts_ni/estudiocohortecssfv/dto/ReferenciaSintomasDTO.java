@@ -13,6 +13,7 @@ public class ReferenciaSintomasDTO {
     private Character eti;
     private Character irag;
     private Character neumonia;
+    private Character cV;
 
     public Character getInterconsultaPediatrica() {
         return interconsultaPediatrica;
@@ -76,5 +77,13 @@ public class ReferenciaSintomasDTO {
 
     public void setNeumonia(Character neumonia) {
         this.neumonia = neumonia;
+    }
+
+    public Character getcV() {
+        return cV;
+    }
+
+    public void setcV(Character cV) {
+        this.cV = cV;
     }
 }
