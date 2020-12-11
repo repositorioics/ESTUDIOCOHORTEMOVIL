@@ -604,7 +604,7 @@ public class SeguimientoZikaWS extends EstudioCohorteCssfvWS {
     }
 
 
-    public ErrorDTO ImprimirHojaSeguimientoPdf(int numHojaSeguimiento){
+    public ErrorDTO ImprimirHojaSeguimientoPdf(int numHojaSeguimiento, int consultorio){
 
         ErrorDTO retorno = new ErrorDTO();
 
@@ -618,8 +618,17 @@ public class SeguimientoZikaWS extends EstudioCohorteCssfvWS {
             paramWS.setName("paramNumHojaSeguimiento");
             paramWS.setNamespace("");
             paramWS.setType(Integer.class);
+
+            PropertyInfo paramImpresora = new PropertyInfo();
+            paramImpresora.setValue(consultorio);
+            paramImpresora.setName("paramImpresora");
+            paramImpresora.setNamespace("");
+            paramImpresora.setType(Integer.class);
+
             request.addProperty(paramWS);
+            request.addProperty(paramImpresora);
             sobre.setOutputSoapObject(request);
+
             HttpTransportSE transporte = new HttpTransportSE(URL, this.TIME_OUT);
             transporte.call(ACCIOSOAP_IMPRIMIRHOJASEGUIMIENTOZ_PDF, sobre, this.HEADER_PROPERTY);
 

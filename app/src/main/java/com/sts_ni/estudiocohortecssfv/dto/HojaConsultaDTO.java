@@ -235,6 +235,8 @@ public class HojaConsultaDTO {
 
     private Character cV;
 
+    private Character consultaRespiratorio;
+
     public int getSecHojaConsulta() {
         return secHojaConsulta;
     }
@@ -1955,5 +1957,13 @@ public class HojaConsultaDTO {
 
     public void setcV(Character cV) {
         this.cV = cV;
+    }
+
+    public Character getConsultaRespiratorio() {
+        return consultaRespiratorio;
+    }
+
+    public void setConsultaRespiratorio(Character consultaRespiratorio) {
+        this.consultaRespiratorio = consultaRespiratorio;
     }
 }

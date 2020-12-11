@@ -5,9 +5,11 @@ import android.content.Context;
 import com.sts_ni.estudiocohortecssfv.dto.ErrorDTO;
 import com.sts_ni.estudiocohortecssfv.dto.InfoResultadoWSDTO;
 import com.sts_ni.estudiocohortecssfv.dto.InfoSessionWSDTO;
+import com.sts_ni.estudiocohortecssfv.utils.StringUtils;
 import com.sts_ni.estudiocohortecssfv.wsclass.ArbaloMenuResponse;
 import com.sts_ni.estudiocohortecssfv.wsclass.DataNodoItemArray;
 
+import org.json.JSONObject;
 import org.ksoap2.HeaderProperty;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -28,8 +30,8 @@ import java.util.Properties;
 public class SeguridadWS {
 
   //  private static String URL = "http://54.183.17.90:8080/seguridadWS/SeguridadWS?wsdl";
-  private static String URL = "http://192.168.1.97:8080/seguridadWS/SeguridadWS?wsdl";
-  //private static String URL = "http://192.168.1.20:8080/seguridadWS/SeguridadWS?wsdl";
+    private static String URL = "http://192.168.1.97:8080/seguridadWS/SeguridadWS?wsdl";
+    //private static String URL = "http://192.168.1.26:8080/seguridadWS/SeguridadWS?wsdl";
     private static String CODIGO_SISTEMA;
 
     static {
@@ -213,5 +215,4 @@ public class SeguridadWS {
         nodoItemArray.setRespuestaError(respuestaError);
         return nodoItemArray;
     }
-
 }

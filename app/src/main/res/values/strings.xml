@@ -791,7 +791,7 @@
 
     <string name="label_uaf">UAF:</string>
     <string name="descargar_apk">http://192.168.1.97:8080/estudioCohorte_CSSFV.apk</string>
-    <!--<string name="descargar_apk">http://192.168.1.25:8080/estudioCohorte_CSSFV.apk</string>-->
+    <!--<string name="descargar_apk">http://192.168.1.26:8080/estudioCohorte_CSSFV.apk</string>-->
     <string name="label_covid">CV</string>
 
     <string name="btn_regresar_diagnostico">Regresar</string>
@@ -806,6 +806,18 @@
     <string name="label_ictus">Ictus</string>
     <string name="label_sincope">Sincope</string>
 
+    <string name="label_flu_zika"></string>
 
     <string name="msj_falta_marcar_otro_examen_lab">Debe de marcar Otro Examen</string>
+
+    <string name="msj_categoria_d_con_fif">Categoria D con FIF favor revisar</string>
+
+    <string name="label_consulta_respiratorio">Consultas en Respiratorio</string>
+
+    <string name="label_no_consultas_respiratorio_espera">Espera: </string>
+    <string name="label_no_consultas_respiratorio_consulta">Consulta: </string>
+    <string name="label_no_consultas_respiratorio_laboratorio">Lab: </string>
+    <string name="label_no_consultas_respiratorio_cerrado">Cerrado: </string>
+
+    <string name="es_consulta_respiratoria">Es consulta respiratoria ?:</string>
 </resources>

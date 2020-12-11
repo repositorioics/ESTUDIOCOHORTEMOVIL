@@ -40,6 +40,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sts_ni.estudiocohortecssfv.CssfvApp;
 import com.sts_ni.estudiocohortecssfv.NavigationDrawerFragment;
@@ -94,6 +95,9 @@ public class VigilanciaIntegradaActivity extends ActionBarActivity
     private static ResultadoListWSDTO<MunicipiosDTO> RESPUESTAMUNICIP;
 
     private NavigationDrawerFragment mNavigationDrawerFragment;
+
+    public static int consultorioMedico = 0;
+    public static int consultorioResp = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1019,7 +1023,8 @@ public class VigilanciaIntegradaActivity extends ActionBarActivity
                 @Override
                 public void onClick(View view) {
                     if (existeDetalle) {
-                        ImprimirFichaPdf();
+                        //ImprimirFichaPdf();
+                        showAlertDialogFicha();
                     }/*else{
                         MensajesHelper.mostrarMensajeInfo(getActivity(),
                                 getResources().getString(R.string.msj_sin_detalle_seg_influenza),
@@ -4204,10 +4209,40 @@ public class VigilanciaIntegradaActivity extends ActionBarActivity
             fichaPdf.execute((Void[]) null);
         }
 
+        /*Metodo para hacer la seleccion de la impresora*/
+        private void showAlertDialogFicha() {
+            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(CONTEXT);
+            alertDialog.setTitle("Seleccioné la Impresora");
+            String[] items = {"Consultorio Médico","Consultorio Respiratorio"};
+            int checkedItem = 2;
+            alertDialog.setSingleChoiceItems(items, checkedItem, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which) {
+                        case 0:
+                            Toast.makeText(CONTEXT, "Impresión enviada al Consultorio Médico", Toast.LENGTH_LONG).show();
+                            ImprimirFichaPdf(consultorioMedico);
+                            dialog.cancel();
+                            break;
+                        case 1:
+                            Toast.makeText(CONTEXT, "Impresión enviada al Consultorio Respiratorio", Toast.LENGTH_LONG).show();
+                            ImprimirFichaPdf(consultorioResp);
+                            dialog.cancel();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
+            AlertDialog alert = alertDialog.create();
+            alert.setCanceledOnTouchOutside(true);
+            alert.show();
+        }
+
         /***
          * Metodo para llamar servicio que imprime la ficha.
          */
-        private void ImprimirFichaPdf() {
+        private void ImprimirFichaPdf(final int consultorio) {
             /*Creando una tarea asincrona*/
             AsyncTask<Void, Void, Void> ImprimirFichaPdf = new AsyncTask<Void, Void, Void>() {
                 private ProgressDialog PD;
@@ -4228,7 +4263,7 @@ public class VigilanciaIntegradaActivity extends ActionBarActivity
                 @Override
                 protected Void doInBackground(Void... params) {
                     if (NET_INFO != null && NET_INFO.isConnected()) {
-                        EXPEDIENTE.ImprimirFichaPdf(mVigilanciaIntegradaActivity.mSecVigilanciaIntegrada);
+                        EXPEDIENTE.ImprimirFichaPdf(mVigilanciaIntegradaActivity.mSecVigilanciaIntegrada, consultorio);
                     }
 
                     return null;

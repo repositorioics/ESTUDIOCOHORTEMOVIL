@@ -94,6 +94,9 @@ public class CierreWS extends EstudioCohorteCssfvWS {
                     retorno.getObjecRespuesta().setNumeroPersonalEnfermeria(jsonObject.getString("numeroPersonalEnfermera"));
                     retorno.getObjecRespuesta().setNombreEnfermeria(jsonObject.getString("nombreEnfermera"));
 
+                    retorno.getObjecRespuesta().setHojaInfluenzaActiva(jsonObject.getBoolean("hojaInfluenzaActiva"));
+                    retorno.getObjecRespuesta().setHojaZikaActiva(jsonObject.getBoolean("hojaZikaActiva"));
+
                     retorno.setCodigoError(Long.parseLong("0"));
                     retorno.setMensajeError("");
 

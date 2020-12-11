@@ -27,7 +27,11 @@ public class CabeceraSintomaDTO implements Serializable {
     private String consulta;
     private String temMedc;
     private String eritrocitos;
+    /*Nuevos campos agregados 20/11/2020*/
+    private String serologiaDengue;
+    private String eti;
 
+    private Character consultaRespiratorio;
 
     public String getExpedienteFisico() {
         return expedienteFisico;
@@ -147,5 +151,29 @@ public class CabeceraSintomaDTO implements Serializable {
 
     public void setEritrocitos(String eritrocitos) {
         this.eritrocitos = eritrocitos;
+    }
+
+    public String getSerologiaDengue() {
+        return serologiaDengue;
+    }
+
+    public void setSerologiaDengue(String serologiaDengue) {
+        this.serologiaDengue = serologiaDengue;
+    }
+
+    public String getEti() {
+        return eti;
+    }
+
+    public void setEti(String eti) {
+        this.eti = eti;
+    }
+
+    public Character getConsultaRespiratorio() {
+        return consultaRespiratorio;
+    }
+
+    public void setConsultaRespiratorio(Character consultaRespiratorio) {
+        this.consultaRespiratorio = consultaRespiratorio;
     }
 }

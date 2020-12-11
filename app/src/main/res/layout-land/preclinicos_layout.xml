@@ -348,12 +348,31 @@
             android:onClick="onClick_imgBusquedaMedico"
             />
 
+        <TextView
+            android:id="@+id/txtvConsultaRespiratoria"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="37dp"
+            android:layout_below="@id/txtvMedicoOpcional"
+            android:text="@string/es_consulta_respiratoria"
+            />
+        <CheckBox
+            android:id="@+id/chkConsultaRespiratoria"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="31dp"
+            android:layout_toRightOf="@+id/txtvConsultaRespiratoria"
+            android:layout_below="@+id/txtvMedicoOpcional"
+            style="@style/customCheckboxStyle"
+            android:layout_marginLeft="7dp"
+            />
+
         <include
             android:id="@+id/incBotonesPreclinicos"
             android:layout_width="510dp"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_below="@id/txtvMedicoOpcional"
+            android:layout_below="@id/txtvConsultaRespiratoria"
             android:layout_marginTop="40dp"
             layout="@layout/preclinicos_layout_parte1"
             />

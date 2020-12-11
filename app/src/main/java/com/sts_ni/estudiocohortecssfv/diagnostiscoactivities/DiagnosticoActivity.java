@@ -44,8 +44,7 @@ import java.util.ArrayList;
 /**
  * Controlador de la UI Diagnostico.
  */
-public class DiagnosticoActivity extends ActionBarActivity
-{
+public class DiagnosticoActivity extends ActionBarActivity {
 
     private ListView LSTV_LISTA_DIAGNOSTICO;
 
@@ -89,6 +88,7 @@ public class DiagnosticoActivity extends ActionBarActivity
 
         llamadoListaDiagnosticoServicio();
         cargarDatosDiagnostico();
+        verificarAlertasDiagnosticos();
     }
 
     /***
@@ -99,14 +99,14 @@ public class DiagnosticoActivity extends ActionBarActivity
         HojaConsultaDTO hojaConsulta = new HojaConsultaDTO();
 
         hojaConsulta.setSecHojaConsulta(((InicioDTO) this.getIntent().getSerializableExtra("pacienteSeleccionado")).getIdObjeto());
-        Integer diagnosticoId =  ((DiagnosticoDTO) ((Spinner)findViewById(R.id.spnDialogo1)).getSelectedItem()).getSecDiagnostico();
-        hojaConsulta.setDiagnostico1( Short.parseShort( diagnosticoId.toString()));
-         diagnosticoId =  ((DiagnosticoDTO) ((Spinner)findViewById(R.id.spnDialogo2)).getSelectedItem()).getSecDiagnostico();
-        hojaConsulta.setDiagnostico2(Short.parseShort(diagnosticoId.toString()));
-        diagnosticoId =  ((DiagnosticoDTO) ((Spinner)findViewById(R.id.spnDialogo3)).getSelectedItem()).getSecDiagnostico();
-        hojaConsulta.setDiagnostico3(Short.parseShort(diagnosticoId.toString()));
-        diagnosticoId =  ((DiagnosticoDTO) ((Spinner)findViewById(R.id.spnDialogo4)).getSelectedItem()).getSecDiagnostico();
-        hojaConsulta.setDiagnostico4(Short.parseShort(diagnosticoId.toString()));
+        Integer diagnostico1 =  ((DiagnosticoDTO) ((Spinner)findViewById(R.id.spnDialogo1)).getSelectedItem()).getSecDiagnostico();
+        hojaConsulta.setDiagnostico1( Short.parseShort( diagnostico1.toString()));
+        Integer diagnostico2 =  ((DiagnosticoDTO) ((Spinner)findViewById(R.id.spnDialogo2)).getSelectedItem()).getSecDiagnostico();
+        hojaConsulta.setDiagnostico2(Short.parseShort(diagnostico2.toString()));
+        Integer diagnostico3 =  ((DiagnosticoDTO) ((Spinner)findViewById(R.id.spnDialogo3)).getSelectedItem()).getSecDiagnostico();
+        hojaConsulta.setDiagnostico3(Short.parseShort(diagnostico3.toString()));
+        Integer diagnostico4 =  ((DiagnosticoDTO) ((Spinner)findViewById(R.id.spnDialogo4)).getSelectedItem()).getSecDiagnostico();
+        hojaConsulta.setDiagnostico4(Short.parseShort(diagnostico4.toString()));
         hojaConsulta.setOtroDiagnostico(( (EditText) findViewById(R.id.edtxtOtrosDiagnostico)).getText().toString());
         return hojaConsulta;
     }
@@ -410,11 +410,47 @@ public class DiagnosticoActivity extends ActionBarActivity
         }
     }
 
+    /*Hacer visibles las alertas
+    * Fecha Creacion: 20/11/2020 */
+    public  void verificarAlertasDiagnosticos() {
+        CabeceraSintomaDTO CABECERA = (CabeceraSintomaDTO) this.getIntent().getSerializableExtra("cabeceraSintoma");
+        String categoria = CABECERA.getCategoria();
+        String serologiaDengue = CABECERA.getSerologiaDengue();
+        String eti = CABECERA.getEti();
+        /*Obteniendo los valores que tiene los text view que muestran los diagnosticos*/
+        String valueDiag1 = "";
+        valueDiag1 = ((TextView) findViewById(R.id.txvDiag1)).getText().toString();
+        /*String valueDiag2 = ((TextView) findViewById(R.id.txvDiag2)).getText().toString();*/
+        TextView txtvDiag1 = ((TextView) findViewById(R.id.txvDiag1));
+        TextView txtvDiag2 = ((TextView) findViewById(R.id.txvDiag2));
+        txtvDiag1.setText("");
+        txtvDiag2.setText("");
+        if (categoria != null && serologiaDengue != null) {
+            if (categoria.trim().equals("C") && serologiaDengue.trim().equals("0")) {
+                //Seleccionar diagnostico de búsqueda activa.
+                if (StringUtils.isNullOrEmpty(valueDiag1)) {
+                    txtvDiag1.setText("Marco categoria " + categoria + " + " + "Serologia Dengue" + " --> " + "Seleccionar diagnóstico búsqueda activa");
+                }
+            }
+        }
+        if (eti != null) {
+            valueDiag1 = ((TextView) findViewById(R.id.txvDiag1)).getText().toString();
+            if (eti.trim().equals("0")) {
+                if (StringUtils.isNullOrEmpty(valueDiag1)) {
+                    txtvDiag1.setText("Marco Eti " + "--> " + "Seleccionar diagnóstico Eti");
+                } else {
+                    txtvDiag2.setText("Marco Eti " + "--> " + "Seleccionar diagnóstico Eti");
+                }
+            }
+        }
+    }
+
     /*
     * Metodo para validar la seleccion de los diagnosticos dependiendo de la categoria seleccionada
     * Fecha Creacion: 13/12/2019 - SC
     **/
     public void validrDiagnosticosSeleccionados() throws Exception {
+
 
         CabeceraSintomaDTO CABECERA = (CabeceraSintomaDTO) this.getIntent().getSerializableExtra("cabeceraSintoma");
         String categoria = CABECERA.getCategoria();

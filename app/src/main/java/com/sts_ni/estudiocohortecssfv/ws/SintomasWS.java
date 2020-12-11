@@ -165,6 +165,21 @@ public class SintomasWS extends EstudioCohorteCssfvWS {
                     } else {
                         retorno.getObjecRespuesta().setEritrocitos(((JSONObject)resultadoJson.get(0)).getString("eritrocitos"));
                     }
+                    /*Nuevo Campo serologiaDengue agregado 23/11/2020 */
+                    if(StringUtils.isNullOrEmpty(((JSONObject)resultadoJson.get(0)).getString("serologiaDengue")) ||
+                            ((JSONObject)resultadoJson.get(0)).getString("serologiaDengue").compareTo("null") == 0) {
+                        retorno.getObjecRespuesta().setSerologiaDengue(((JSONObject)resultadoJson.get(0)).getString("serologiaDengue"));
+                    } else {
+                        retorno.getObjecRespuesta().setSerologiaDengue(((JSONObject)resultadoJson.get(0)).getString("serologiaDengue"));
+                    }
+
+                    /*Nuevo Campo eti agregado 23/11/2020 */
+                    if(StringUtils.isNullOrEmpty(((JSONObject)resultadoJson.get(0)).getString("eti")) ||
+                            ((JSONObject)resultadoJson.get(0)).getString("eti").compareTo("null") == 0) {
+                        retorno.getObjecRespuesta().setEti(((JSONObject)resultadoJson.get(0)).getString("eti"));
+                    } else {
+                        retorno.getObjecRespuesta().setEti(((JSONObject)resultadoJson.get(0)).getString("eti"));
+                    }
                     retorno.setCodigoError(Long.parseLong("0"));
                     retorno.setMensajeError("");
 
@@ -2510,5 +2525,46 @@ public class SintomasWS extends EstudioCohorteCssfvWS {
         }
 
         return retorno;
+    }
+
+    /*Metodo que retorna las alertas de criterios Eti*/
+    public String validacionMatrizEti(HojaConsultaDTO hojaConsulta) {
+        try {
+            SoapObject request = new SoapObject(NAMESPACE, METODO_ALERTA_CRITERIOS_ETI);
+            SoapSerializationEnvelope sobre = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            sobre.dotNet = false;
+
+            JSONObject objenvio = new JSONObject();
+            objenvio.put("secHojaConsulta", hojaConsulta.getSecHojaConsulta());
+
+            //Seteando parametros
+
+            PropertyInfo paramEviar = new PropertyInfo();
+            paramEviar.setValue(objenvio.toString());
+            paramEviar.setName("paramHojaConsulta");
+            paramEviar.setNamespace("");
+            paramEviar.setType(String.class);
+
+            request.addProperty(paramEviar);
+
+            sobre.setOutputSoapObject(request);
+
+            HttpTransportSE transporte = new HttpTransportSE(URL, this.TIME_OUT);
+            transporte.call(ACCIOSOAP_METODO_ALERTA_CRITERIOS_ETI, sobre, HEADER_PROPERTY);
+
+            String resultado = sobre.getResponse().toString();
+
+            if (resultado != null && !resultado.isEmpty()) {
+                return resultado;
+            }
+
+        }catch (ConnectException ce){
+            ce.printStackTrace();
+        }catch (SocketTimeoutException et) {
+            et.printStackTrace();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

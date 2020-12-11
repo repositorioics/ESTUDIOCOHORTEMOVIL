@@ -558,6 +558,17 @@
 
         </LinearLayout>
 
+        <TextViewTextView
+            android:id="@+id/txtvTieneHojaFlu_Zika"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/lnyFila3"
+            android:layout_marginLeft="5dp"
+            android:text="@string/label_flu_zika"
+            android:visibility="invisible"
+            android:textColor="@android:color/holo_red_dark"
+            android:textSize="17sp" />
+
         <TextView
             android:id="@+id/txtUaf"
             android:layout_width="wrap_content"

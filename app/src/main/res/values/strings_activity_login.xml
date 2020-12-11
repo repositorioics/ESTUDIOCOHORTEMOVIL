@@ -58,8 +58,23 @@
 
     <!--<string name="version">Versión 1.2.2</string>&lt;!&ndash;Validacion para fecha ultimo dia fiebre&ndash;&gt;
     <string name="date_version">Junio 15, 2020</string>-->
-    <string name="version">Versión 1.2.3</string><!--Nuevos sintomas en la hoja de influenza-->
-    <string name="date_version">Julio 13, 2020</string>
+    <!--<string name="version">Versión 1.2.3</string>&lt;!&ndash;Nuevos sintomas en la hoja de influenza&ndash;&gt;
+    <string name="date_version">Julio 13, 2020</string>-->
+
+    <!--<string name="version">Versión 1.2.4</string>&lt;!&ndash;Validacion fecha ultima dosis antipiretico no puede ser mayor a la fecha consulta&ndash;&gt;
+    <string name="date_version">Agosto 06, 2020</string>-->
+
+
+    <!--<string name="version">Versión 1.2.5</string>&lt;!&ndash;Validacion mensaje hoja de influenza y zika abierta en grilla cierre &ndash;&gt;
+    <string name="date_version">Sep 30, 2020</string>-->
+
+    <!--<string name="version">Versión 1.2.6</string>&lt;!&ndash;Mejora en la descarga del apk y en los diagnosticos &ndash;&gt;
+    <string name="date_version">Nov 03, 2020</string>-->
+
+    <string name="version">Versión 1.2.7</string><!--Cambios solicitados por el Dr. Ojeda -->
+    <string name="date_version">Dic 09, 2020</string>
+
+    <string name="version_a_comparar">1.2.7</string><!--Se utiliza para realizar la comparacion de la version instalada-->
 
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>

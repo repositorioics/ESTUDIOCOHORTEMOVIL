@@ -1,5 +1,6 @@
 package com.sts_ni.estudiocohortecssfv.expedientesactivities;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,6 +26,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sts_ni.estudiocohortecssfv.CssfvApp;
 import com.sts_ni.estudiocohortecssfv.NavigationDrawerFragment;
@@ -44,6 +46,9 @@ public class FichaEpiSindromesFebrilesActivity extends ActionBarActivity
     private static Context CONTEXT;
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private static FichaEpiSindromesFebrilesActivity mFichaEpiSindromesFebrilesActivity;
+
+    public static int consultorioMedico = 0;
+    public static int consultorioResp = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -211,7 +216,8 @@ public class FichaEpiSindromesFebrilesActivity extends ActionBarActivity
                         return;
                     } else {
                         String numHojaConsulta = (((EditText) getActivity().findViewById(R.id.edtxtNumHojaConsulta)).getText().toString());
-                        ImprimirFichaPdf(Integer.parseInt(numHojaConsulta));
+                        //ImprimirFichaPdf(Integer.parseInt(numHojaConsulta));
+                        showAlertDialogFichaDengue(Integer.parseInt(numHojaConsulta));
                     }
                     /*else{
                         MensajesHelper.mostrarMensajeInfo(getActivity(),
@@ -282,10 +288,40 @@ public class FichaEpiSindromesFebrilesActivity extends ActionBarActivity
             fichaPdf.execute((Void[]) null);
         }
 
+        /*Metodo para hacer la seleccion de la impresora*/
+        private void showAlertDialogFichaDengue(final int numHojaConsulta) {
+            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(CONTEXT);
+            alertDialog.setTitle("Seleccioné la Impresora");
+            String[] items = {"Consultorio Médico","Consultorio Respiratorio"};
+            int checkedItem = 2;
+            alertDialog.setSingleChoiceItems(items, checkedItem, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which) {
+                        case 0:
+                            Toast.makeText(CONTEXT, "Impresión enviada al Consultorio Médico", Toast.LENGTH_LONG).show();
+                            ImprimirFichaPdf(numHojaConsulta, consultorioMedico);
+                            dialog.cancel();
+                            break;
+                        case 1:
+                            Toast.makeText(CONTEXT, "Impresión enviada al Consultorio Respiratorio", Toast.LENGTH_LONG).show();
+                            ImprimirFichaPdf(numHojaConsulta, consultorioResp);
+                            dialog.cancel();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
+            AlertDialog alert = alertDialog.create();
+            alert.setCanceledOnTouchOutside(true);
+            alert.show();
+        }
+
         /***
          * Metodo para llamar servicio que imprime la ficha.
          */
-        private void ImprimirFichaPdf(final int numHojaConsulta) {
+        private void ImprimirFichaPdf(final int numHojaConsulta, final int consultorio) {
             /*Creando una tarea asincrona*/
             AsyncTask<Void, Void, Void> ImprimirFichaPdf = new AsyncTask<Void, Void, Void>() {
                 private ProgressDialog PD;
@@ -306,7 +342,7 @@ public class FichaEpiSindromesFebrilesActivity extends ActionBarActivity
                 @Override
                 protected Void doInBackground(Void... params) {
                     if (NET_INFO != null && NET_INFO.isConnected()) {
-                        EXPEDIENTE.ImprimirFichaEpiPdf(numHojaConsulta);
+                        EXPEDIENTE.ImprimirFichaEpiPdf(numHojaConsulta, consultorio);
                     }
 
                     return null;

@@ -24,6 +24,7 @@ import com.sts_ni.estudiocohortecssfv.dto.ReferenciaSintomasDTO;
 import com.sts_ni.estudiocohortecssfv.dto.ResultadoObjectWSDTO;
 import com.sts_ni.estudiocohortecssfv.helper.MensajesHelper;
 import com.sts_ni.estudiocohortecssfv.utils.AndroidUtils;
+import com.sts_ni.estudiocohortecssfv.utils.StringUtils;
 import com.sts_ni.estudiocohortecssfv.ws.SintomasWS;
 
 /**
@@ -37,6 +38,8 @@ public class ReferenciaSintomasActivity extends ActionBarActivity {
     private String mUsuarioLogiado;
     private TextView viewTxtvNENSintoma;
     private TextView viewTxtvSENSintoma;
+
+    public AsyncTask<Void, Void, Void> mMensajesAlertas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +73,7 @@ public class ReferenciaSintomasActivity extends ActionBarActivity {
                 SintomaMarcado(view, true);
             }
         });
+        obtenerMensajesAlertaCriteriosEti();
 
     }
 
@@ -496,5 +500,64 @@ public class ReferenciaSintomasActivity extends ActionBarActivity {
             }
         };
         lecturaTask.execute((Void[])null);
+    }
+
+    /***
+     * Metodo que realiza el llamado del servicio de alertas para verificar
+     * si reunen criterios Eti
+     * Fecha creacion 24/11/2020 - SC
+     */
+    private void obtenerMensajesAlertaCriteriosEti() {
+        if (mMensajesAlertas == null ||
+                mMensajesAlertas.getStatus() == AsyncTask.Status.FINISHED) {
+            mMensajesAlertas = new AsyncTask<Void, Void, Void>() {
+
+                private ProgressDialog PD;
+                private ConnectivityManager CM = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                private NetworkInfo NET_INFO = CM.getActiveNetworkInfo();
+                private SintomasWS SINTOMASWS = new SintomasWS(getResources());
+                private String MENSAJE_MATRIZ = null;
+
+                @Override
+                protected void onPreExecute() {
+                    PD = new ProgressDialog(CONTEXT);
+                    PD.setTitle(getResources().getString(R.string.title_obteniendo));
+                    PD.setMessage(getResources().getString(R.string.msj_espere_por_favor));
+                    PD.setCancelable(false);
+                    PD.setIndeterminate(true);
+                    PD.show();
+                }
+
+                @Override
+                protected Void doInBackground(Void... params) {
+                    if (NET_INFO != null && NET_INFO.isConnected()) {
+                        HojaConsultaDTO hojaConsulta = new HojaConsultaDTO();
+                        hojaConsulta.setSecHojaConsulta(((InicioDTO) getIntent().getSerializableExtra("pacienteSeleccionado")).getIdObjeto());
+                        MENSAJE_MATRIZ = SINTOMASWS.validacionMatrizEti(hojaConsulta);
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Void result) {
+                    PD.dismiss();
+                    try {
+                        if (!StringUtils.isNullOrEmpty(MENSAJE_MATRIZ)
+                                && !MENSAJE_MATRIZ.startsWith("any")) {
+                            MensajesHelper.mostrarMensajeInfo(CONTEXT, MENSAJE_MATRIZ,
+                                    getResources().getString(R.string.title_estudio_sostenible), null);
+                        }
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        MensajesHelper.mostrarMensajeError(CONTEXT,
+                                new StringBuffer().append(getResources().getString(
+                                        R.string.msj_error_no_controlado)).append(e.getMessage()).toString(),
+                                getResources().getString(R.string.title_estudio_sostenible), null);
+                    }
+                }
+            };
+            mMensajesAlertas.execute((Void[]) null);
+        }
     }
 }

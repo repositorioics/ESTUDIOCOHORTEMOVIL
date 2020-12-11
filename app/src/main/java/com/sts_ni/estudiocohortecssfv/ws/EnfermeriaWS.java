@@ -170,6 +170,8 @@ public class EnfermeriaWS extends EstudioCohorteCssfvWS {
 
             objenvio.put("horasv", hojaConsulta.getHorasv());
 
+            objenvio.put("consultaRespiratoria", hojaConsulta.getConsultaRespiratorio());
+
             //Seteando parametros
 
             PropertyInfo paramEviar = new PropertyInfo();
@@ -242,6 +244,7 @@ public class EnfermeriaWS extends EstudioCohorteCssfvWS {
             objenvio.put("expedienteFisico", hojaConsulta.getExpedienteFisico());
             objenvio.put("motivo", motivo);
             objenvio.put("horasv", hojaConsulta.getHorasv());
+            objenvio.put("consultaRespiratoria", hojaConsulta.getConsultaRespiratorio());
 
             //Seteando parametros
 

@@ -50,6 +50,7 @@ import com.sts_ni.estudiocohortecssfv.ws.ControlCambiosWS;
 import com.sts_ni.estudiocohortecssfv.ws.EnfermeriaWS;
 import com.sts_ni.estudiocohortecssfv.ws.SintomasWS;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -397,7 +398,7 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 Calendar calendar = Calendar.getInstance();
                 calendar.set(year, monthOfYear, dayOfMonth);
-                if(DateUtils.esMayorFechaHoy(calendar)){
+                if(DateUtils.esMayorFechaHoy(calendar)) {
                     ((EditText)getActivity().findViewById(R.id.dpFif)).setError(getString(R.string.msj_fecha_mayor_hoy));
                 } else {
                     if(((EditText) getActivity().findViewById(R.id.dpFif)).getError() != null) {
@@ -405,6 +406,18 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
                         ((EditText) getActivity().findViewById(R.id.dpFif)).setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.calendar, 0);
                     }
                     ((EditText) getActivity().findViewById(R.id.dpFif)).setText(new SimpleDateFormat("dd/MM/yyyy").format(calendar.getTime()));
+                }
+                /*Nueva validacion mensaje cuando la categora es D y se marca la fif
+                * fecha creacion 23/11/2020 - SC*/
+                CabeceraSintomaDTO CABECERA = (CabeceraSintomaDTO) getIntent().getSerializableExtra("cabeceraSintoma");
+                String fif = String.valueOf(((EditText) getActivity().findViewById(R.id.dpFif)).getText());
+                String categoria = CABECERA.getCategoria();
+                if (!StringUtils.isNullOrEmpty(fif)) {
+                    if (!StringUtils.isNullOrEmpty(categoria)) {
+                        if (categoria.trim().equals("D")) {
+                            ((EditText)getActivity().findViewById(R.id.dpFif)).setError(getString(R.string.msj_categoria_d_con_fif));
+                        }
+                    }
                 }
             }
         };
@@ -437,6 +450,7 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 Calendar calendar = Calendar.getInstance();
                 calendar.set(year, monthOfYear, dayOfMonth);
+                ((EditText) findViewById(R.id.edtxtHoraGeneralesSint)).setText("");
                 if(DateUtils.esMayorFechaHoy(calendar)){
                     ((EditText)getActivity().findViewById(R.id.dpUltmDosGeneralesSint)).setError(getString(R.string.msj_fecha_mayor_hoy));
                 } else {
@@ -456,22 +470,26 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
      * @param view
      */
     public void showTimePickerDialogHora(View view) {
-        DialogFragment newFragment = new TimePickerFragment(){
-            @Override
-            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                Calendar calendar = Calendar.getInstance();
-                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                calendar.set(Calendar.MINUTE, minute);
+        if (!StringUtils.isNullOrEmpty(((EditText) findViewById(R.id.dpUltmDosGeneralesSint)).getText().toString())) {
+            DialogFragment newFragment = new TimePickerFragment(){
+                @Override
+                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                    calendar.set(Calendar.MINUTE, minute);
 
-                mAmPm = (calendar.get(Calendar.AM_PM) == Calendar.AM) ? true :
-                        (calendar.get(Calendar.AM_PM) == Calendar.PM) ? false : null;
-                if(((EditText) getActivity().findViewById(R.id.edtxtHoraGeneralesSint)).getError() != null) {
-                    ((EditText) getActivity().findViewById(R.id.edtxtHoraGeneralesSint)).setError(null);
-                    ((EditText) getActivity().findViewById(R.id.edtxtHoraGeneralesSint)).setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.timer, 0);
-                }
+                    mAmPm = (calendar.get(Calendar.AM_PM) == Calendar.AM) ? true :
+                            (calendar.get(Calendar.AM_PM) == Calendar.PM) ? false : null;
+                    if(((EditText) getActivity().findViewById(R.id.edtxtHoraGeneralesSint)).getError() != null) {
+                        ((EditText) getActivity().findViewById(R.id.edtxtHoraGeneralesSint)).setError(null);
+                        ((EditText) getActivity().findViewById(R.id.edtxtHoraGeneralesSint)).setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.timer, 0);
+                    }
 
-                ((EditText) getActivity().findViewById(R.id.edtxtHoraGeneralesSint)).setText(new SimpleDateFormat("KK:mm a").format(calendar.getTime()));
-                //String a = ((EditText) findViewById(R.id.edtxtHoraGeneralesSint)).getText().toString();
+                    ((EditText) getActivity().findViewById(R.id.edtxtHoraGeneralesSint)).setText(new SimpleDateFormat("KK:mm a").format(calendar.getTime()));
+                    //String a = ((EditText) findViewById(R.id.edtxtHoraGeneralesSint)).getText().toString();
+                    if (validarFechaUltDosisAntipiretico()) {
+                        comparacionDeHoras();
+                    }
 
                 /*if(DateUtils.esMayorHoraActual(hourOfDay, minute)) {
                     ((EditText)getActivity().findViewById(R.id.edtxtHoraGeneralesSint)).setError(getString(R.string.msj_hora_mayor_actual));
@@ -485,9 +503,12 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
                     }
                     ((EditText) getActivity().findViewById(R.id.edtxtHoraGeneralesSint)).setText(new SimpleDateFormat("KK:mm a").format(calendar.getTime()));
                 }*/
-            }
-        };
-        newFragment.show(getSupportFragmentManager(), getString(R.string.title_date_picker));
+                }
+            };
+            newFragment.show(getSupportFragmentManager(), getString(R.string.title_date_picker));
+        } else {
+            ((EditText) findViewById(R.id.edtxtHoraGeneralesSint)).setText("");
+        }
     }
 
     /***
@@ -502,6 +523,7 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
         try {
             validarCampoRequerido(controlCambios);
             validarUltDosisAntipiretico();
+            //validarFechaUltDosisAntipiretico();
             //alertDialog();
             if( controlCambios.size() > 0){
                 genControlCambios = new GeneralesControlCambiosDTO();
@@ -657,6 +679,77 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
             }
         }
     }
+
+    /*Validacion para verificar que la fecha de la ultima dosis antipiretico no sea mayor a la
+    * fecha de la consulta 03/08/2020 - SC*/
+    public boolean validarFechaUltDosisAntipiretico() {
+        boolean fechasIguales = false;
+        /*Verificamos que exista la fecha de ultima dosis antipiretico*/
+        if (!StringUtils.isNullOrEmpty(((EditText) findViewById(R.id.dpUltmDosGeneralesSint)).getText().toString())) {
+            int fConsulta = 0;
+            int fUltDosisAntipiretico = 0;
+
+            CabeceraSintomaDTO CABECERA = (CabeceraSintomaDTO) this.getIntent().getSerializableExtra("cabeceraSintoma");
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+            Date fechaConsulta = CABECERA.getFechaConsulta().getTime();
+            String resultFechaConsulta = sdf.format(fechaConsulta);
+
+            /*Obteniendo la fecha de la ultima dosis antipiretico*/
+            EditText fechaUltDosisAntipiretico = (EditText) findViewById(R.id.dpUltmDosGeneralesSint);
+            String stringFechaUltDosisAntipiretico = fechaUltDosisAntipiretico.getText().toString();
+
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+            Date date = null;
+            try {
+                date = format.parse(stringFechaUltDosisAntipiretico);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            String resultFechaUltDosisAntipiretico = sdf.format(date);
+
+            fConsulta = Integer.parseInt(resultFechaConsulta);
+            fUltDosisAntipiretico = Integer.parseInt(resultFechaUltDosisAntipiretico);
+
+            /*Verificar que la fecha de ultima dosis antipiretico no sea mayor a la fecha de consulta*/
+            if (fUltDosisAntipiretico == fConsulta) {
+                //throw new Exception("La fecha última dosis antipirético no puede ser mayor a la fecha de consulta");
+                fechasIguales = true;
+            }
+        }
+        return fechasIguales;
+    }
+
+
+    private void comparacionDeHoras() {
+        CabeceraSintomaDTO CABECERA = (CabeceraSintomaDTO) this.getIntent().getSerializableExtra("cabeceraSintoma");
+        Date fechaConsulta = CABECERA.getFechaConsulta().getTime();
+
+        /*Obteniendo la hora de la consulta*/
+        SimpleDateFormat sdf2 = new SimpleDateFormat("hh:mm a");
+        String horaConsulta = sdf2.format(fechaConsulta);
+
+        /*Obteniendo la hora de la ultima dosis antipiretico*/
+        EditText edtxtHoraGeneralesSint = (EditText) findViewById(R.id.edtxtHoraGeneralesSint);
+        String horaUltDosisAntipiretico = edtxtHoraGeneralesSint.getText().toString();
+
+        AlertDialog.Builder dialog=new AlertDialog.Builder(this);
+        dialog.setMessage("Hora Consulta: "+""+horaConsulta+" "+"Hora Ultima Dosis Antipirético: "+""+horaUltDosisAntipiretico +" "+
+                "Favor verificar que la Hora Ultima Dosis Antipiretico no sea mayor que la Hora Consulta");
+        dialog.setTitle(getResources().getString(R.string.title_estudio_sostenible));
+        dialog.setPositiveButton("Continuar",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,
+                                        int which) {
+                    }
+                });
+        AlertDialog alertDialog=dialog.create();
+        alertDialog.show();
+    }
+
+
+
+
 
     public void validarCampoRequerido(ArrayList<ControlCambiosDTO> controlCambios) throws Exception {
         //String[] pa = ((EditText) findViewById(R.id.edtxtPAGeneralesSint)).getText().toString().split("/");

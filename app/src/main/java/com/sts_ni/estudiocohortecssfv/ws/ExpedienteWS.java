@@ -130,7 +130,7 @@ public class ExpedienteWS extends EstudioCohorteCssfvWS {
     }
 
     /*Metodo para reimprimir la hoja de consulta*/
-    public ErrorDTO ejecutarProcesoReimpresion(Integer secHojaConsulta){
+    public ErrorDTO ejecutarProcesoReimpresion(Integer secHojaConsulta, int consultorio){
 
         ErrorDTO retorno = new ErrorDTO();
 
@@ -150,7 +150,14 @@ public class ExpedienteWS extends EstudioCohorteCssfvWS {
             paramEviar.setNamespace("");
             paramEviar.setType(Integer.class);
 
+            PropertyInfo paramImpresora = new PropertyInfo();
+            paramImpresora.setValue(consultorio);
+            paramImpresora.setName("paramImpresora");
+            paramImpresora.setNamespace("");
+            paramImpresora.setType(Integer.class);
+
             request.addProperty(paramEviar);
+            request.addProperty(paramImpresora);
 
             sobre.setOutputSoapObject(request);
 
@@ -385,7 +392,7 @@ public class ExpedienteWS extends EstudioCohorteCssfvWS {
         return retorno;
     }
 
-    public void ImprimirFichaPdf(int secVigilanciaIntegrada){
+    public void ImprimirFichaPdf(int secVigilanciaIntegrada, int consultorio){
 
         try {
             SoapObject request = new SoapObject(NAMESPACE, METODO_IMPRIMIR_FICHA_PDF);
@@ -397,8 +404,17 @@ public class ExpedienteWS extends EstudioCohorteCssfvWS {
             paramWS.setName("secVigilanciaIntegrada");
             paramWS.setNamespace("");
             paramWS.setType(Integer.class);
+
+            PropertyInfo paramImpresora = new PropertyInfo();
+            paramImpresora.setValue(consultorio);
+            paramImpresora.setName("paramImpresora");
+            paramImpresora.setNamespace("");
+            paramImpresora.setType(Integer.class);
+
             request.addProperty(paramWS);
+            request.addProperty(paramImpresora);
             sobre.setOutputSoapObject(request);
+
             HttpTransportSE transporte = new HttpTransportSE(URL, this.TIME_OUT);
             transporte.call(ACCIOSOAP_METODO_IMPRIMIR_FICHA_PDF, sobre, this.HEADER_PROPERTY);
 
@@ -460,7 +476,7 @@ public class ExpedienteWS extends EstudioCohorteCssfvWS {
         return retorno;
     }
 
-    public void ImprimirFichaEpiPdf(int numHojaConsulta){
+    public void ImprimirFichaEpiPdf(int numHojaConsulta, int consultorio){
 
         try {
             SoapObject request = new SoapObject(NAMESPACE, METODO_IMPRIMIR_FICHA_EPI_PDF);
@@ -472,8 +488,17 @@ public class ExpedienteWS extends EstudioCohorteCssfvWS {
             paramWS.setName("numHojaConsulta");
             paramWS.setNamespace("");
             paramWS.setType(Integer.class);
+
+            PropertyInfo paramImpresora = new PropertyInfo();
+            paramImpresora.setValue(consultorio);
+            paramImpresora.setName("paramImpresora");
+            paramImpresora.setNamespace("");
+            paramImpresora.setType(Integer.class);
+
             request.addProperty(paramWS);
+            request.addProperty(paramImpresora);
             sobre.setOutputSoapObject(request);
+
             HttpTransportSE transporte = new HttpTransportSE(URL, this.TIME_OUT);
             transporte.call(ACCIOSOAP_METODO_IMPRIMIR_FICHA_EPI_PDF, sobre, this.HEADER_PROPERTY);
 

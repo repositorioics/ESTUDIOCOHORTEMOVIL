@@ -4,6 +4,7 @@ import android.content.res.Resources;
 import android.util.Base64;
 
 import com.sts_ni.estudiocohortecssfv.R;
+import com.sts_ni.estudiocohortecssfv.dto.ConsultaRespiratorioDTO;
 import com.sts_ni.estudiocohortecssfv.dto.ErrorDTO;
 import com.sts_ni.estudiocohortecssfv.dto.HojaConsultaDTO;
 import com.sts_ni.estudiocohortecssfv.dto.InicioDTO;
@@ -638,6 +639,99 @@ public class ConsultaWS extends EstudioCohorteCssfvWS {
 
         return retorno;
     }
+
+    public String getUltimaversionApk() {
+        try {
+            SoapObject request = new SoapObject(NAMESPACE, METODO_OBTENER_ULTIMA_VERSION_APK);
+            SoapSerializationEnvelope sobre = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            sobre.dotNet = false;
+            sobre.setOutputSoapObject(request);
+
+            HttpTransportSE transporte = new HttpTransportSE(URL, this.TIME_OUT);
+            transporte.call(ACCIONSOAP_OBTENER_ULTIMA_VERSION_APK, sobre, this.HEADER_PROPERTY);
+            String resultado = sobre.getResponse().toString();
+
+            if (resultado != null && !resultado.isEmpty()) {
+                return resultado;
+            }
+
+        } catch (Exception e) {
+
+        }
+        return null;
+    }
+
+    /**/
+    public ResultadoListWSDTO<ConsultaRespiratorioDTO> getListaConsultasRespitatorio(){
+
+        ResultadoListWSDTO<ConsultaRespiratorioDTO> retorno = new ResultadoListWSDTO<ConsultaRespiratorioDTO>();
+
+        try {
+            SoapObject request = new SoapObject(NAMESPACE, METODO_GET_LISTA_CONSULTA_RESPIRATORIO);
+            SoapSerializationEnvelope sobre = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+            sobre.dotNet = false;
+            sobre.setOutputSoapObject(request);
+
+
+            HttpTransportSE transporte = new HttpTransportSE(URL, this.TIME_OUT);
+            transporte.call(ACCIOSOAP_GET_LISTA_CONSULTA_RESPIRATORIO, sobre, this.HEADER_PROPERTY);
+            String resultado = sobre.getResponse().toString();
+
+            if(!StringUtils.isNullOrEmpty(resultado)){
+                JSONObject jObject = new JSONObject(resultado);
+                JSONObject mensaje = (JSONObject) jObject.get("mensaje");
+                if(mensaje.getInt("codigo") == 0){
+                    JSONArray inicioArrayJson = (JSONArray) jObject.get("resultado");
+
+                    ArrayList<ConsultaRespiratorioDTO> lstInicio = new ArrayList<ConsultaRespiratorioDTO>();
+
+                    for (int i = 0; i < inicioArrayJson.length(); i++){
+                        JSONObject inicioJson  = inicioArrayJson.getJSONObject(i);
+                        ConsultaRespiratorioDTO inicio = new ConsultaRespiratorioDTO();
+                        inicio.setSecHojaConsulta(inicioJson.getString("secHojaConsulta"));
+                        inicio.setCodigoExpedinte(inicioJson.getString("codExpediente"));
+                        inicio.setNumHojaConsulta(inicioJson.getString("numHojaConsulta"));
+                        inicio.setEstado(inicioJson.getString("estado"));
+                        if(inicioJson.get("usuarioMedico").toString() != "null" && inicioJson.get("medicoCambioTurno").toString() == "null")
+                            inicio.setUsuarioMedico(inicioJson.getString("usuarioMedico"));
+                        if(inicioJson.get("medicoCambioTurno").toString() != "null")
+                            inicio.setUsuarioMedico(inicioJson.getString("medicoCambioTurno"));
+
+                        lstInicio.add(inicio);
+
+                    }
+
+                    retorno.setLstResultado(lstInicio);
+                    retorno.setCodigoError(Long.parseLong("0"));
+                    retorno.setMensajeError("");
+
+                }else {
+                    retorno.setCodigoError((long)mensaje.getInt("codigo"));
+                    retorno.setMensajeError(mensaje.getString("texto"));
+                }
+
+            }else {
+                retorno.setCodigoError(Long.parseLong("1"));
+                retorno.setMensajeError(RES.getString(R.string.msj_servicio_no_envia_respuesta));
+            }
+
+        }catch (ConnectException ce){
+            ce.printStackTrace();
+            retorno.setCodigoError(Long.parseLong("2"));
+            retorno.setMensajeError(RES.getString(R.string.msj_servicio_no_dispon));
+        }catch (SocketTimeoutException et){
+            et.printStackTrace();
+            retorno.setCodigoError(Long.parseLong("2"));
+            retorno.setMensajeError(RES.getString(R.string.msj_servicio_no_dispon));
+        } catch (Exception e) {
+            e.printStackTrace();
+            retorno.setCodigoError(Long.parseLong("999"));
+            retorno.setMensajeError(RES.getString(R.string.msj_error_no_controlado));
+        }
+
+        return retorno;
+    }
+
 }
 
 

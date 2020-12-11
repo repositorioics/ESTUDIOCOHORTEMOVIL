@@ -42,6 +42,9 @@ public class GrillaCierreDTO implements Serializable {
     private String numeroPersonalEnfermeria;
     private String nombreEnfermeria;
 
+    private boolean hojaInfluenzaActiva;
+    private boolean hojaZikaActiva;
+
     public String getCargoUsuarioLog() {
         return cargoUsuarioLog;
     }
@@ -88,5 +91,21 @@ public class GrillaCierreDTO implements Serializable {
 
     public void setNombreEnfermeria(String nombreEnfermeria) {
         this.nombreEnfermeria = nombreEnfermeria;
+    }
+
+    public boolean isHojaInfluenzaActiva() {
+        return hojaInfluenzaActiva;
+    }
+
+    public void setHojaInfluenzaActiva(boolean hojaInfluenzaActiva) {
+        this.hojaInfluenzaActiva = hojaInfluenzaActiva;
+    }
+
+    public boolean isHojaZikaActiva() {
+        return hojaZikaActiva;
+    }
+
+    public void setHojaZikaActiva(boolean hojaZikaActiva) {
+        this.hojaZikaActiva = hojaZikaActiva;
     }
 }

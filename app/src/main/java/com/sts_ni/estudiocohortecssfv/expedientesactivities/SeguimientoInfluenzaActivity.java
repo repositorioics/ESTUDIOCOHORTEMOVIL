@@ -1,6 +1,7 @@
 package com.sts_ni.estudiocohortecssfv.expedientesactivities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -124,6 +125,9 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
     public static boolean isEmptyFIF = false;
     public static String currentUser = null;
     //public static int posicionMedico = 0;
+
+    public static int consultorioMedico = 0;
+    public static int consultorioResp = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -678,7 +682,8 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 @Override
                 public void onClick(View view) {
                     if (existeDetalle) {
-                        ImprimirHojaSeguimientoaPdf();
+                        //ImprimirHojaSeguimientoaPdf();
+                        showAlertDialogInfluenza();
                     } else {
                         MensajesHelper.mostrarMensajeInfo(getActivity(),
                                 getResources().getString(R.string.msj_sin_detalle_seg_influenza),
@@ -3965,10 +3970,41 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
             }
         }
 
+        /*Metodo para hacer la seleccion de la impresora*/
+        private void showAlertDialogInfluenza() {
+            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(CONTEXT);
+            alertDialog.setTitle("Seleccioné la Impresora");
+            String[] items = {"Consultorio Médico","Consultorio Respiratorio"};
+            int checkedItem = 2;
+            alertDialog.setSingleChoiceItems(items, checkedItem, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which) {
+                        case 0:
+                            Toast.makeText(CONTEXT, "Impresión enviada al Consultorio Médico", Toast.LENGTH_LONG).show();
+                            ImprimirHojaSeguimientoaPdf(consultorioMedico);
+                            dialog.cancel();
+                            break;
+                        case 1:
+                            Toast.makeText(CONTEXT, "Impresión enviada al Consultorio Respiratorio", Toast.LENGTH_LONG).show();
+                            ImprimirHojaSeguimientoaPdf(consultorioResp);
+                            dialog.cancel();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
+            AlertDialog alert = alertDialog.create();
+            alert.setCanceledOnTouchOutside(true);
+            alert.show();
+        }
+
+
         /***
          * Metodo para llamar servicio que imprime el seguimiento influenza.
          */
-        private void ImprimirHojaSeguimientoaPdf() {
+        private void ImprimirHojaSeguimientoaPdf(final int consultorio) {
             /*Creando una tarea asincrona*/
             AsyncTask<Void, Void, Void> ImprimirHojaSeguimientoaPdf = new AsyncTask<Void, Void, Void>() {
                 private ProgressDialog PD;
@@ -3990,7 +4026,7 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                 @Override
                 protected Void doInBackground(Void... params) {
                     if (NET_INFO != null && NET_INFO.isConnected()) {
-                        RESPUESTA = SEGUIMIENTO.ImprimirHojaSeguimientoPdf(mSeguimientoInfluenzaActivity.mNumSeg);
+                        RESPUESTA = SEGUIMIENTO.ImprimirHojaSeguimientoPdf(mSeguimientoInfluenzaActivity.mNumSeg, consultorio);
                     }
 
                     return null;

@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -45,6 +46,7 @@ import com.sts_ni.estudiocohortecssfv.tools.BuscarDialogMedico;
 import com.sts_ni.estudiocohortecssfv.tools.CancelacionDialog;
 import com.sts_ni.estudiocohortecssfv.tools.DecimalDigitsInputFilter;
 import com.sts_ni.estudiocohortecssfv.tools.LstViewGenericaInicio;
+import com.sts_ni.estudiocohortecssfv.utils.AndroidUtils;
 import com.sts_ni.estudiocohortecssfv.utils.StringUtils;
 import com.sts_ni.estudiocohortecssfv.utils.UserTask;
 import com.sts_ni.estudiocohortecssfv.ws.ConsultaWS;
@@ -480,6 +482,8 @@ public class PreClinicosActivity extends ActionBarActivity
             hojaConsulta.setUsuarioMedico(idMedico);
         }
 
+        hojaConsulta.setConsultaRespiratorio(AndroidUtils.resultadoGenericoChk(this.findViewById(R.id.chkConsultaRespiratoria)));
+
         /*Creando una tarea asincrona*/
         AsyncTask<Object, Void, Void> datosPreclinicos = new AsyncTask<Object, Void, Void>() {
             private ProgressDialog PD;
@@ -564,6 +568,8 @@ public class PreClinicosActivity extends ActionBarActivity
         hojaConsulta.setUsuarioEnfermeria(((CssfvApp)this.getApplication()).getInfoSessionWSDTO().getUserId());
         hojaConsulta.setExpedienteFisico(((EditText)this.findViewById(R.id.edtxtExpediente)).getText().toString());
         hojaConsulta.setHorasv(((EditText)this.findViewById(R.id.edtxtHora)).getText().toString());
+
+        hojaConsulta.setConsultaRespiratorio(AndroidUtils.resultadoGenericoChk(this.findViewById(R.id.chkConsultaRespiratoria)));
 
         /*Creando una tarea asincrona*/
         AsyncTask<Object, Void, Void> datosPreclinicos = new AsyncTask<Object, Void, Void>() {
@@ -704,6 +710,15 @@ public class PreClinicosActivity extends ActionBarActivity
         ((EditText)findViewById(R.id.edtxtTemp)).setText(datosPreclinicos.getTemperaturac().toString());
         ((EditText)findViewById(R.id.edtxtExpediente)).setText(datosPreclinicos.getExpedienteFisico());
 
+        if (!StringUtils.isNullOrEmpty(datosPreclinicos.getConsultaRespiratorio().toString())) {
+            Character consultaRespiratoriaValue = datosPreclinicos.getConsultaRespiratorio();
+            if (consultaRespiratoriaValue.compareTo('0') == 0) {
+                ((CheckBox) findViewById(R.id.chkConsultaRespiratoria)).setChecked(true);
+            } else {
+                ((CheckBox) findViewById(R.id.chkConsultaRespiratoria)).setChecked(false);
+            }
+        }
+
         if(datosPreclinicos.getUsuarioMedico() != null) {
             if(adapter != null) {
                 MedicosDTO medicoEncontrado = new MedicosDTO();
@@ -718,6 +733,7 @@ public class PreClinicosActivity extends ActionBarActivity
             }
         }
 
+
         findViewById(R.id.btnEnviar).setEnabled(false);
         findViewById(R.id.btnCancel).setEnabled(false);
         findViewById(R.id.btnNoAtiendeLlamado).setEnabled(false);
@@ -728,6 +744,7 @@ public class PreClinicosActivity extends ActionBarActivity
         findViewById(R.id.edtxtNumOrdenLlegada).setEnabled(false);
         findViewById(R.id.spnMedico).setEnabled(false);
         findViewById(R.id.imgBusquedaMedico).setEnabled(false);
+        findViewById(R.id.chkConsultaRespiratoria).setEnabled(false);
     }
 
     /***
@@ -861,9 +878,9 @@ public class PreClinicosActivity extends ActionBarActivity
             ((EditText) rootView.findViewById(R.id.edtxtTalla)).setFilters(new InputFilter[]{new DecimalDigitsInputFilter(4,2)});
             ((EditText) rootView.findViewById(R.id.edtxtTemp)).setFilters(new InputFilter[]{new DecimalDigitsInputFilter(3,2)});
 
+            inicializarControles(rootView);
+
             return rootView;
-
-
         }
 
         @Override
@@ -987,9 +1004,23 @@ public class PreClinicosActivity extends ActionBarActivity
                 }
                 edtxtEdad.setText(age + " años");
             }*/
-
         }
 
+        public void inicializarControles(View rootView) {
+            // chkUrbano
+            View.OnClickListener onClickConsultaRespiratoria = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onChkConsultaRespiratoria(view);
+                }
+            };
+            rootView.findViewById(R.id.chkConsultaRespiratoria).setOnClickListener(onClickConsultaRespiratoria);
+        }
+
+        public void onChkConsultaRespiratoria(View view) {
+            boolean chkConsultaRespiratoria = ((CheckBox) getActivity().findViewById(R.id.chkConsultaRespiratoria)).isChecked();
+            ((CheckBox) getActivity().findViewById(R.id.chkConsultaRespiratoria)).setChecked(chkConsultaRespiratoria);
+        }
     }
 
     /***
@@ -1032,6 +1063,4 @@ public class PreClinicosActivity extends ActionBarActivity
     public void onDialogCancelClick(DialogFragment dialog) {
         buscaMedico = false;
     }
-
-
 }

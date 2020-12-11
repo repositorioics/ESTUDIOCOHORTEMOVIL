@@ -148,6 +148,22 @@ public class ExamenesWS extends EstudioCohorteCssfvWS{
                         retorno.getObjecRespuesta().setEritrocitos(((JSONObject)resultadoJson.get(0)).getString("eritrocitos"));
                     }
 
+                    /*Nuevo Campo serologiaDengue agregado 23/11/2020 */
+                    if(StringUtils.isNullOrEmpty(((JSONObject)resultadoJson.get(0)).getString("serologiaDengue")) ||
+                            ((JSONObject)resultadoJson.get(0)).getString("serologiaDengue").compareTo("null") == 0) {
+                        retorno.getObjecRespuesta().setSerologiaDengue(((JSONObject)resultadoJson.get(0)).getString("serologiaDengue"));
+                    } else {
+                        retorno.getObjecRespuesta().setSerologiaDengue(((JSONObject)resultadoJson.get(0)).getString("serologiaDengue"));
+                    }
+
+                    /*Nuevo Campo eti agregado 23/11/2020 */
+                    if(StringUtils.isNullOrEmpty(((JSONObject)resultadoJson.get(0)).getString("eti")) ||
+                            ((JSONObject)resultadoJson.get(0)).getString("eti").compareTo("null") == 0) {
+                        retorno.getObjecRespuesta().setEti(((JSONObject)resultadoJson.get(0)).getString("eti"));
+                    } else {
+                        retorno.getObjecRespuesta().setEti(((JSONObject)resultadoJson.get(0)).getString("eti"));
+                    }
+
                     retorno.setCodigoError(Long.parseLong("0"));
                     retorno.setMensajeError("");
 

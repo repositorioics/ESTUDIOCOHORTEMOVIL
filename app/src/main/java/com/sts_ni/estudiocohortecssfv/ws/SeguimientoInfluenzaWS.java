@@ -679,7 +679,7 @@ public class SeguimientoInfluenzaWS extends EstudioCohorteCssfvWS {
     }
 
 
-    public ErrorDTO ImprimirHojaSeguimientoPdf(int numHojaSeguimiento){
+    public ErrorDTO ImprimirHojaSeguimientoPdf(int numHojaSeguimiento, int consultorio){
 
         ErrorDTO retorno = new ErrorDTO();
         try {
@@ -693,8 +693,14 @@ public class SeguimientoInfluenzaWS extends EstudioCohorteCssfvWS {
             paramWS.setNamespace("");
             paramWS.setType(Integer.class);
 
-            request.addProperty(paramWS);
+            PropertyInfo paramImpresora = new PropertyInfo();
+            paramImpresora.setValue(consultorio);
+            paramImpresora.setName("paramImpresora");
+            paramImpresora.setNamespace("");
+            paramImpresora.setType(Integer.class);
 
+            request.addProperty(paramWS);
+            request.addProperty(paramImpresora);
             sobre.setOutputSoapObject(request);
 
             HttpTransportSE transporte = new HttpTransportSE(URL, this.TIME_OUT);

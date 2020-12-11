@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+    <TextView
+        android:id="@+id/consultaEstados"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="5dp"
+        android:textColor="#1F5271"
+        android:textStyle="bold"
+        android:text="Cantidad de consultas respiratorias por estados"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+
+    <TextView
+        android:id="@+id/txtvConsultaRespiratoriaEspera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="5dp"
+        android:layout_below="@+id/consultaEstados"
+        android:text="@string/label_no_consultas_respiratorio_espera"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+
+    <EditText
+        android:id="@+id/edtxtConsultasEnEspera"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/txtvConsultaRespiratoriaEspera"
+        android:layout_below="@+id/consultaEstados"
+        android:layout_marginLeft="5dp"
+        android:textSize="15sp"
+        android:enabled="false"
+        android:maxLength="1"
+
+        android:inputType="number"
+        android:digits="12345"
+        android:layout_marginTop="4dp"
+        android:textColor="@android:color/black"
+        />
+
+    <TextView
+        android:id="@+id/txtvConsultaRespiratoriaConsulta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@+id/edtxtConsultasEnEspera"
+        android:layout_below="@+id/consultaEstados"
+        android:text="@string/label_no_consultas_respiratorio_consulta"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+
+    <EditText
+        android:id="@+id/edtxtEnConsulta"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/txtvConsultaRespiratoriaConsulta"
+        android:layout_below="@+id/consultaEstados"
+        android:layout_marginLeft="5dp"
+        android:enabled="false"
+        android:maxLength="1"
+        android:textSize="15sp"
+        android:inputType="number"
+        android:digits="12345"
+        android:layout_marginTop="4dp"
+        android:textColor="@android:color/black"
+        />
+
+    <TextView
+        android:id="@+id/txtvConsultaRespiratoriaLab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@+id/edtxtEnConsulta"
+        android:layout_below="@+id/consultaEstados"
+        android:text="@string/label_no_consultas_respiratorio_laboratorio"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+
+    <EditText
+        android:id="@+id/edtxtConsultasEnLab"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/txtvConsultaRespiratoriaLab"
+        android:layout_below="@+id/consultaEstados"
+        android:layout_marginLeft="5dp"
+        android:enabled="false"
+        android:maxLength="1"
+        android:textSize="15sp"
+        android:inputType="number"
+        android:digits="12345"
+        android:layout_marginTop="4dp"
+        android:textColor="@android:color/black"
+        />
+
+    <TextView
+        android:id="@+id/txtvConsultaRespiratoriaCerrado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="15dp"
+        android:layout_toRightOf="@+id/edtxtConsultasEnLab"
+        android:layout_below="@+id/consultaEstados"
+        android:text="@string/label_no_consultas_respiratorio_cerrado"
+        android:textAppearance="@style/TextViewEstiloSeguimiento" />
+
+    <EditText
+        android:id="@+id/edtxtConsultasCerrada"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/txtvConsultaRespiratoriaCerrado"
+        android:layout_below="@+id/consultaEstados"
+        android:layout_marginLeft="5dp"
+        android:enabled="false"
+        android:maxLength="1"
+        android:textSize="15sp"
+        android:inputType="number"
+        android:digits="12345"
+        android:layout_marginTop="4dp"
+        android:textColor="@android:color/black"
+        />
+    <!--<EditText
+        android:id="@+id/edtxtCantidadConsulta"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/txtvCantidadConsulta"
+        android:layout_marginLeft="10dp"
+        android:enabled="false"
+        android:maxLength="1"
+        android:inputType="number"
+        android:digits="12345"
+        android:layout_marginTop="4dp"
+        android:textColor="@android:color/black"
+        />-->
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:layout_below="@+id/txtvConsultaRespiratoriaEspera"
+        android:background="@android:color/white"
+        tools:context=".ListaConsultaRespiratorioActivity$PlaceholderFragment">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent">
+            <TableLayout
+                android:id="@+id/tabla_consulta_respiratorio"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:stretchColumns="*"
+                android:layout_marginTop="15dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp">
+            </TableLayout>
+        </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>

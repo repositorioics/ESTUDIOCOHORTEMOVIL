@@ -1,9 +1,11 @@
 package com.sts_ni.estudiocohortecssfv.expedientesactivities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -66,11 +68,16 @@ public class ExpedienteActivity extends ActionBarActivity
     public  AsyncTask<Void, Void, Void> mReimpresionHojConsultaTask;
     private DialogFragment mFragmentoAcciones;
 
+    private static Context CONTEXT;
+    public static int consultorioMedico = 0;
+    public static int consultorioResp = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expediente_busqueda);
 
+        this.CONTEXT = this;
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -93,6 +100,7 @@ public class ExpedienteActivity extends ActionBarActivity
         }
 
         this.ACTIVITY = this;
+
     }
 
     @Override
@@ -172,12 +180,40 @@ public class ExpedienteActivity extends ActionBarActivity
         DlogBuscar.show(getSupportFragmentManager(), "Seleccionar");
     }
 
-
+    /*Metodo para hacer la seleccion de la impresora*/
+    private void showAlertDialogReimpresionHC() {
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(CONTEXT);
+        alertDialog.setTitle("Seleccioné la Impresora");
+        String[] items = {"Consultorio Médico","Consultorio Respiratorio"};
+        int checkedItem = 2;
+        alertDialog.setSingleChoiceItems(items, checkedItem, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case 0:
+                        Toast.makeText(CONTEXT, "Impresión enviada al Consultorio Médico", Toast.LENGTH_LONG).show();
+                        llamarProcesoReimpresionHojaConsulta(consultorioMedico);
+                        dialog.cancel();
+                        break;
+                    case 1:
+                        Toast.makeText(CONTEXT, "Impresión enviada al Consultorio Respiratorio", Toast.LENGTH_LONG).show();
+                        llamarProcesoReimpresionHojaConsulta(consultorioResp);
+                        dialog.cancel();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+        AlertDialog alert = alertDialog.create();
+        alert.setCanceledOnTouchOutside(true);
+        alert.show();
+    }
 
     /***
      * Metodo para realizar la reimpresion de la hoja de consulta.
      */
-    private void llamarProcesoReimpresionHojaConsulta(){
+    private void llamarProcesoReimpresionHojaConsulta(final int consultorio) {
         if (mReimpresionHojConsultaTask == null ||
                 mReimpresionHojConsultaTask.getStatus() == AsyncTask.Status.FINISHED) {
             mReimpresionHojConsultaTask = new AsyncTask<Void, Void, Void>() {
@@ -209,7 +245,7 @@ public class ExpedienteActivity extends ActionBarActivity
                     try {
                         if (NET_INFO != null && NET_INFO.isConnected()) {
 
-                            RESPUESTA = EXPEDIENTEWS.ejecutarProcesoReimpresion(SEC_HOJA_CONSULTA);
+                            RESPUESTA = EXPEDIENTEWS.ejecutarProcesoReimpresion(SEC_HOJA_CONSULTA, consultorio);
                         } else {
                             RESPUESTA.setCodigoError(Long.parseLong("3"));
                             RESPUESTA.setMensajeError(getResources().getString(R.string.msj_no_tiene_conexion));
@@ -325,7 +361,9 @@ public class ExpedienteActivity extends ActionBarActivity
 
     @Override
     public void onClickImpresion() {
-        llamarProcesoReimpresionHojaConsulta();
+        //llamarProcesoReimpresionHojaConsulta();
+        showAlertDialogReimpresionHC();
+
     }
 
     @Override

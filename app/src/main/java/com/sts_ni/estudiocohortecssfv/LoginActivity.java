@@ -12,11 +12,13 @@ import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -27,6 +29,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.ContactsContract;
+import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -40,10 +43,20 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sts_ni.estudiocohortecssfv.dto.CabeceraSintomaDTO;
 import com.sts_ni.estudiocohortecssfv.dto.ErrorDTO;
+import com.sts_ni.estudiocohortecssfv.dto.HojaConsultaDTO;
 import com.sts_ni.estudiocohortecssfv.dto.InfoSessionWSDTO;
+import com.sts_ni.estudiocohortecssfv.dto.InicioDTO;
+import com.sts_ni.estudiocohortecssfv.dto.ResultadoObjectWSDTO;
+import com.sts_ni.estudiocohortecssfv.helper.ApkInstaller;
 import com.sts_ni.estudiocohortecssfv.helper.MensajesHelper;
+import com.sts_ni.estudiocohortecssfv.utils.StringUtils;
+import com.sts_ni.estudiocohortecssfv.utils.UserTask;
+import com.sts_ni.estudiocohortecssfv.ws.ConsultaWS;
+import com.sts_ni.estudiocohortecssfv.ws.ControlCambiosWS;
 import com.sts_ni.estudiocohortecssfv.ws.SeguridadWS;
+import com.sts_ni.estudiocohortecssfv.ws.SintomasWS;
 import com.sts_ni.estudiocohortecssfv.wsclass.DataNodoItemArray;
 
 import java.io.File;
@@ -52,8 +65,12 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -74,6 +91,7 @@ public class LoginActivity extends Activity {
     private View mLoginFormView;
     public SeguridadWS mSeguridadWS = null;
 
+    private verificarUltimaVersionApkHc verificarUltimaVersionApkHcTask = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,6 +100,7 @@ public class LoginActivity extends Activity {
         }
         setContentView(R.layout.activity_login);
         this.CONTEXT = this;
+
         //Inicializando Seguridad WS
         mSeguridadWS = new SeguridadWS(this);
 
@@ -110,6 +129,32 @@ public class LoginActivity extends Activity {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        //verificando si es la ultima version de la aplicacion
+        //verificarUltimaVersionApkHojaConsulta();
+        obtenerUltimaVersion();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        cancelarUltimaVersionAPKTask();
+    }
+
+    public void obtenerUltimaVersion() {
+        verificarUltimaVersionApkHcTask = new verificarUltimaVersionApkHc();
+        verificarUltimaVersionApkHcTask.execute((Void) null);
+    }
+
+    /***
+     * Cancela tarea verificarUltimaVersionApkHc al destruir el activity.
+     */
+    private void cancelarUltimaVersionAPKTask() {
+        if (verificarUltimaVersionApkHcTask != null && verificarUltimaVersionApkHcTask.getStatus() == verificarUltimaVersionApkHc.Status.RUNNING) {
+            verificarUltimaVersionApkHcTask.cancel(true);
+            verificarUltimaVersionApkHcTask = null;
+        }
     }
 
     /**
@@ -316,6 +361,134 @@ public class LoginActivity extends Activity {
             mAuthTask = null;
             showProgress(false);
         }
+    }
+
+    /* Metodo para verificar la ultima version del APK de la hoja de consulta
+     * Fecha creacion = 21/10/2020 - SC
+     * */
+    /*private void verificarUltimaVersionApkHojaConsulta() {
+        AsyncTask<Void, Void, Void> getUltimaVersionApkHC = new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog PD;
+            private ConnectivityManager CM = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            private NetworkInfo NET_INFO = CM.getActiveNetworkInfo();
+            private ConsultaWS CONSULTAWS = new ConsultaWS(getResources());
+            private String RESULT = null;
+
+
+            @Override
+            protected void onPreExecute() {
+                PD = new ProgressDialog(CONTEXT);
+                PD.setTitle(getResources().getString(R.string.tittle_actualizando));
+                PD.setMessage(getResources().getString(R.string.msj_espere_por_favor));
+                PD.setCancelable(false);
+                PD.setIndeterminate(true);
+                PD.show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                if (NET_INFO != null && NET_INFO.isConnected()){
+                    RESULT = CONSULTAWS.getUltimaversionApk();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result){
+                PD.dismiss();
+                if (!StringUtils.isNullOrEmpty(RESULT)) {
+                    boolean resultado = compararVersionesAPK(RESULT);
+                    if (!resultado) {
+                        alertaDiferentesVersionesAPK();
+                    }
+                }
+            }
+        };
+        getUltimaVersionApkHC.execute((Void[])null);
+    }*/
+
+    public class verificarUltimaVersionApkHc extends AsyncTask<Void, Void, Boolean> {
+
+        private ProgressDialog PD;
+        private ConnectivityManager CM = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        private NetworkInfo NET_INFO = CM.getActiveNetworkInfo();
+        private ConsultaWS CONSULTAWS = new ConsultaWS(getResources());
+        private String RESULT = null;
+
+        @Override
+        protected void onPreExecute() {
+            PD = new ProgressDialog(CONTEXT);
+            PD.setTitle(getResources().getString(R.string.tittle_actualizando));
+            PD.setMessage(getResources().getString(R.string.msj_espere_por_favor));
+            PD.setCancelable(false);
+            PD.setIndeterminate(true);
+            PD.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            if (NET_INFO != null && NET_INFO.isConnected()){
+                RESULT = CONSULTAWS.getUltimaversionApk();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            PD.dismiss();
+            if (!StringUtils.isNullOrEmpty(RESULT)) {
+                boolean resultado = compararVersionesAPK(RESULT);
+                if (!resultado) {
+                    alertaDiferentesVersionesAPK();
+                }
+            }
+        }
+    }
+
+    public boolean compararVersionesAPK(String valor) {
+        boolean mismaVersion = false;
+        try {
+            //String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            String versionName = getResources().getString(R.string.version_a_comparar);
+            if (versionName.trim().equals(valor.trim())) {
+                mismaVersion = true;
+            } else {
+                mismaVersion = false;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return mismaVersion;
+    }
+
+    private void alertaDiferentesVersionesAPK() {
+        AlertDialog.Builder dialog=new AlertDialog.Builder(this);
+        dialog.setMessage("Existe una nueva versión de la hoja de consulta favor actualizar");
+        dialog.setTitle(getResources().getString(R.string.title_estudio_sostenible));
+        dialog.setPositiveButton("Actualizar",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,
+                                        int which) {
+                        //Llamando a la clase que realiza la instalacion del apk
+                        //ApkInstaller.installApplication(CONTEXT);
+                        descargarYActualizar();
+                    }
+                });
+        /*dialog.setNegativeButton("Cancelar",new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(),"Se a cancelado la actualización",Toast.LENGTH_LONG).show();
+            }
+        });*/
+        AlertDialog alertDialog=dialog.create();
+        alertDialog.show();
+    }
+
+    private void descargarYActualizar() {
+        Intent intent = new Intent(CONTEXT, DescargarApkActivity.class);
+        startActivity(intent);
+        finish();
     }
 }
 

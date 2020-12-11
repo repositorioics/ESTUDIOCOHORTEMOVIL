@@ -15,8 +15,7 @@ public class EstudioCohorteCssfvWS {
     //public static final String URL = "http://192.168.43.220:8080/estudioCohorteCSSFVMovilWS/EstudioCohorteCSSFVMovilWSService?wsdl";
     //public static String URL = "http://54.183.17.90:8080/estudioCohorteCSSFVMovilWS/EstudioCohorteCSSFVMovilWSService?wsdl";
     public static String URL = "http://192.168.1.97:8080/estudioCohorteCSSFVMovilWS/EstudioCohorteCSSFVMovilWSService?wsdl";
-   //public static String URL = "http://192.168.1.20:8080/estudioCohorteCSSFVMovilWS/EstudioCohorteCSSFVMovilWSService?wsdl";
-
+    // public static String URL = "http://192.168.1.26:8080/estudioCohorteCSSFVMovilWS/EstudioCohorteCSSFVMovilWSService?wsdl";
 
     static {
         try {
@@ -340,7 +339,16 @@ public class EstudioCohorteCssfvWS {
     public static final String METODO_OBTENER_FIS_FIF = "getFisAndFifByCodExp";
     public static final String ACCIOSOAP_METODO_OBTENER_FIS_FIF = NAMESPACE + METODO_OBTENER_FIS_FIF;
 
-  public static final String METODO_CAMBIAR_VALOR_VARIABLE_UAF = "updateUafValue";
-  public static final String ACCIOSOAP_METODO_CAMBIAR_VALOR_VARIABLE_UAF = NAMESPACE + METODO_CAMBIAR_VALOR_VARIABLE_UAF;
+    public static final String METODO_CAMBIAR_VALOR_VARIABLE_UAF = "updateUafValue";
+    public static final String ACCIOSOAP_METODO_CAMBIAR_VALOR_VARIABLE_UAF = NAMESPACE + METODO_CAMBIAR_VALOR_VARIABLE_UAF;
+
+    public static final String METODO_OBTENER_ULTIMA_VERSION_APK = "obtenerUltimaVersionApk";
+    public static final String ACCIONSOAP_OBTENER_ULTIMA_VERSION_APK = NAMESPACE + METODO_OBTENER_ULTIMA_VERSION_APK;
+
+    public static final String METODO_ALERTA_CRITERIOS_ETI = "alertaCriteriosEti";
+    public static final String ACCIOSOAP_METODO_ALERTA_CRITERIOS_ETI = NAMESPACE + METODO_ALERTA_CRITERIOS_ETI;
+
+    public static final String METODO_GET_LISTA_CONSULTA_RESPIRATORIO = "getListaConsultasRespitatorio";
+    public static final String ACCIOSOAP_GET_LISTA_CONSULTA_RESPIRATORIO = NAMESPACE + METODO_GET_LISTA_CONSULTA_RESPIRATORIO;
 
 }

@@ -10,11 +10,13 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.sts_ni.estudiocohortecssfv.dto.PerifericoResultadoDTO;
+import com.sts_ni.estudiocohortecssfv.helper.ApkInstaller;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -109,11 +111,8 @@ public class DescargarApkActivity extends Activity {
                 fos.close();
                 is.close();
 
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(uri, "application/vnd.android.package-archive");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // without this flag android returned a intent error!
-                context.startActivity(intent);
-
+                //Llamando a la funcion que instala el APK
+                ApkInstaller.installApplication(CONTEXT);
 
             } catch (FileNotFoundException fnfe) {
                 status = 1;
@@ -125,14 +124,13 @@ public class DescargarApkActivity extends Activity {
                 Log.e("UpdateAPP", "Exception " + e);
             }
             return null;
-
         }
 
         public void onPostExecute(Void unused) {
             //progressDialog.dismiss();
             PD_CREATE.dismiss();
             if(status == 1)
-                Toast.makeText(context,"Apk Not Available",Toast.LENGTH_LONG).show();
+                Toast.makeText(CONTEXT,"Apk no disponible",Toast.LENGTH_LONG).show();
         }
     }
 }

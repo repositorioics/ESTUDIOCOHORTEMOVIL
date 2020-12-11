@@ -371,6 +371,25 @@ public class CCierreTabFragment extends Fragment implements CancelacionDialog.Di
                         ((TextView) rootView.findViewById(R.id.txtvNumeroMedTurno)).setText(RESPUESTA_GRILLA.getObjecRespuesta().getNumeroPersonalEnfermeria());
                         ((TextView) rootView.findViewById(R.id.txtvNombreMedTurno)).setText(RESPUESTA_GRILLA.getObjecRespuesta().getNombreEnfermeria());
                     }
+
+                    /*Nueva validacion*/
+                    if (RESPUESTA_GRILLA.getObjecRespuesta().isHojaInfluenzaActiva() && RESPUESTA_GRILLA.getObjecRespuesta().isHojaZikaActiva()) {
+                        TextView textView = (TextView) rootView.findViewById(R.id.txtvTieneHojaFlu_Zika);
+                        textView.setTextSize(15);
+                        textView.setText("Hoja de Influenza y de Zika abierta, favor revisar");
+                        rootView.findViewById(R.id.txtvTieneHojaFlu_Zika).setVisibility(View.VISIBLE);
+                    } else if (RESPUESTA_GRILLA.getObjecRespuesta().isHojaInfluenzaActiva() && !RESPUESTA_GRILLA.getObjecRespuesta().isHojaZikaActiva()) {
+                        TextView textView = (TextView) rootView.findViewById(R.id.txtvTieneHojaFlu_Zika);
+                        textView.setTextSize(15);
+                        textView.setText("Hoja de Influenza abierta, favor revisar");
+                        rootView.findViewById(R.id.txtvTieneHojaFlu_Zika).setVisibility(View.VISIBLE);
+                    } else if (!RESPUESTA_GRILLA.getObjecRespuesta().isHojaInfluenzaActiva() && RESPUESTA_GRILLA.getObjecRespuesta().isHojaZikaActiva()) {
+                        TextView textView = (TextView) rootView.findViewById(R.id.txtvTieneHojaFlu_Zika);
+                        textView.setTextSize(15);
+                        textView.setText("Hoja de Zika abierta, favor revisar");
+                        rootView.findViewById(R.id.txtvTieneHojaFlu_Zika).setVisibility(View.VISIBLE);
+                    }
+                    /*Fin*/
                 } else if (RESPUESTA_GRILLA.getCodigoError().intValue() != 999) {
                     MensajesHelper.mostrarMensajeInfo(getActivity(),
                             RESPUESTA_GRILLA.getMensajeError(), getResources().getString(
