@@ -1,9 +1,11 @@
 package com.sts_ni.estudiocohortecssfv.ws;
 
 import android.content.res.Resources;
+import android.net.Uri;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.sts_ni.estudiocohortecssfv.R;
 import com.sts_ni.estudiocohortecssfv.dto.CabeceraSintomaDTO;
 import com.sts_ni.estudiocohortecssfv.dto.CabezaSintomasDTO;
@@ -29,6 +31,11 @@ import com.sts_ni.estudiocohortecssfv.dto.SeccionesSintomasDTO;
 import com.sts_ni.estudiocohortecssfv.dto.VacunasSintomasDTO;
 import com.sts_ni.estudiocohortecssfv.utils.StringUtils;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.ksoap2.HeaderProperty;

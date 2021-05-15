@@ -1,21 +1,25 @@
 package com.sts_ni.estudiocohortecssfv.sintomasactivities;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sts_ni.estudiocohortecssfv.ConsultaActivity;
 import com.sts_ni.estudiocohortecssfv.CssfvApp;
@@ -32,8 +36,21 @@ import com.sts_ni.estudiocohortecssfv.utils.DateUtils;
 import com.sts_ni.estudiocohortecssfv.utils.StringUtils;
 import com.sts_ni.estudiocohortecssfv.ws.SintomasWS;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.Console;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Map;
 
 /**
  * Controlador de la UI Respiratorio.
@@ -89,7 +106,6 @@ public class RespiratorioSintomasActivity extends ActionBarActivity {
                 SintomaMarcado(view, true);
             }
         });
-
     }
 
     @Override
@@ -101,6 +117,7 @@ public class RespiratorioSintomasActivity extends ActionBarActivity {
     protected void onStart () {
         super.onStart();
         obtenerValorGuardadoServicio();
+        verificarFrecuenciaResp();
     }
 
     public void onChkboxClickedTOSEN(View view) {
@@ -350,7 +367,7 @@ public class RespiratorioSintomasActivity extends ActionBarActivity {
             throw new Exception(getString(R.string.msj_completar_informacion));
         }*/
     }
-    
+
     public HojaConsultaDTO cargarHojaConsulta() {
         HojaConsultaDTO hojaConsulta = new HojaConsultaDTO();
 
@@ -657,5 +674,136 @@ public class RespiratorioSintomasActivity extends ActionBarActivity {
             }
         };
         lecturaTask.execute((Void[])null);
+    }
+
+    /* Funcion para obtener y comparar la frencuencia respiratoria
+    * utilizando la Normativa_147 GUIA PARA EL MANEJO CLINICO DEL DENGUE 2018 */
+    private void obtenerFrecuenciaRespiratoria() {
+        AsyncTask<Void, Void, Void> frecuenciaRepiratoria = new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog PD;
+            private ConnectivityManager CM = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            private NetworkInfo NET_INFO = CM.getActiveNetworkInfo();
+            private String RESULT = null;
+
+            @Override
+            protected void onPreExecute() {
+                PD = new ProgressDialog(CONTEXT);
+                PD.setTitle(getResources().getString(R.string.title_obteniendo));
+                PD.setMessage(getResources().getString(R.string.msj_espere_por_favor));
+                PD.setCancelable(false);
+                PD.setIndeterminate(true);
+                PD.show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                if (NET_INFO != null && NET_INFO.isConnected()) {
+                    try {
+                        HttpClient client = new DefaultHttpClient();
+
+                        client.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 60000); //milisegundos
+
+                        String SERVER = getResources().getString(R.string.ip_server);
+                        String PATH = getResources().getString(R.string.obtener_fciaCard_fciaResp);
+                        String url = SERVER + PATH; //Api url
+                        Uri.Builder builder = Uri.parse(url).buildUpon();
+
+                        String sexo = mPacienteSeleccionado.getSexo();
+                        SimpleDateFormat format1 = new SimpleDateFormat("yyyyMMdd");
+                        String fechaNac = format1.format(mPacienteSeleccionado.getFechaNac().getTime());
+
+                        /*Pasando los parametros*/
+                        builder.appendQueryParameter("sexo", sexo);
+                        builder.appendQueryParameter("fecha_nac", fechaNac);
+
+                        url = builder.build().toString();
+                        HttpGet request = new HttpGet(url);
+                        HttpResponse response = null;
+
+                        response = client.execute(request);
+
+                        RESULT = EntityUtils.toString(response.getEntity());
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                PD.dismiss();
+                if (RESULT != null && !RESULT.isEmpty()) {
+                    try {
+                        JSONObject myObject = new JSONObject(RESULT);
+                        if (myObject.length() > 1) {
+                            String frec_respiratoria_max = myObject.getString("frec_respiratoria_max");
+                            String fciaResp = mPacienteSeleccionado.getFciaResp();
+                            if (!StringUtils.isNullOrEmpty(fciaResp)) {
+                                if (Integer.parseInt(fciaResp) > Integer.parseInt(frec_respiratoria_max)) {
+                                    alertaFrecuenciaRespiratoria(fciaResp, frec_respiratoria_max);
+                                }
+                            }
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        frecuenciaRepiratoria.execute((Void[])null);
+    }
+
+    /*Funcion para comparar la frencuencia respiratoria
+    * para las edades de 2 a 11 meses, de 1 a 4 años, de 5 años se utiliza la norma Aiepi 2018
+    * para los mayores a 5 años se utiliza la Normativa_147 GUIA PARA EL MANEJO CLINICO DEL DENGUE 2018*/
+    private void verificarFrecuenciaResp() {
+        String fciaResp = mPacienteSeleccionado.getFciaResp();
+        if (!StringUtils.isNullOrEmpty(fciaResp)) {
+            String edad = DateUtils.obtenerEdad(mPacienteSeleccionado.getFechaNac());
+            String[] parts = edad.split(" ");
+            String part1 = parts[0];
+            String part2 = parts[1];
+            if (part2.trim().equals("meses")) {
+                if (Integer.parseInt(part1) >= 2 && Integer.parseInt(part1) <= 11) {
+                    if (Integer.parseInt(fciaResp) >= 50) {
+                        alertaFrecuenciaRespiratoria(fciaResp, "49");
+                    }
+                }
+            }
+            if (part2.trim().equals("años")) {
+                if (Integer.parseInt(part1) >= 1 && Integer.parseInt(part1) < 5) {
+                    if (Integer.parseInt(fciaResp) >= 40) {
+                        alertaFrecuenciaRespiratoria(fciaResp, "39");
+                    }
+                }
+                if (Integer.parseInt(part1) == 5) {
+                    if (Integer.parseInt(fciaResp) >= 25) {
+                        alertaFrecuenciaRespiratoria(fciaResp, "24");
+                    }
+                }
+                /*Si la edad es mayor 5 se consumira el otro proceso*/
+                if (Integer.parseInt(part1) > 5) {
+                    obtenerFrecuenciaRespiratoria();
+                }
+            }
+        }
+    }
+
+    /*Mensaje de alerta para indicar si el paciente presenta respiracion rapida*/
+    private void alertaFrecuenciaRespiratoria(String fResp, String fRespMax) {
+        AlertDialog.Builder dialog=new AlertDialog.Builder(this);
+        dialog.setMessage("Frecuencia respiratoria ingresada: " + fResp +
+                ", Frecuencia respiratoria máxima: " + fRespMax + ", Paciente presenta Respiración Rápida");
+        dialog.setTitle(getResources().getString(R.string.title_estudio_sostenible));
+        dialog.setNegativeButton("Continuar",new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //Toast.makeText(getApplicationContext(),"",Toast.LENGTH_LONG).show();
+            }
+        });
+        AlertDialog alertDialog=dialog.create();
+        alertDialog.show();
     }
 }

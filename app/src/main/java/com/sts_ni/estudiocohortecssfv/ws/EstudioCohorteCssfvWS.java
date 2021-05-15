@@ -14,7 +14,7 @@ import java.util.Properties;
 public class EstudioCohorteCssfvWS {
     //public static final String URL = "http://192.168.43.220:8080/estudioCohorteCSSFVMovilWS/EstudioCohorteCSSFVMovilWSService?wsdl";
     //public static String URL = "http://54.183.17.90:8080/estudioCohorteCSSFVMovilWS/EstudioCohorteCSSFVMovilWSService?wsdl";
-    public static String URL = "http://192.168.1.97:8080/estudioCohorteCSSFVMovilWS/EstudioCohorteCSSFVMovilWSService?wsdl";
+    public static String URL = "http://192.168.1.94:8081/estudioCohorteCSSFVMovilWS/EstudioCohorteCSSFVMovilWSService?wsdl";
     // public static String URL = "http://192.168.1.26:8080/estudioCohorteCSSFVMovilWS/EstudioCohorteCSSFVMovilWSService?wsdl";
 
     static {

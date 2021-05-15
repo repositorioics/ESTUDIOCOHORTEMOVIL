@@ -34,6 +34,8 @@ public class InicioDTO implements Serializable {
     private String fif;
     private String consulta;
     private String temMedc;
+    private String fciaResp;
+    private String consultaRespiratoria;
 
     public int getIdObjeto() {
         return idObjeto;
@@ -200,5 +202,21 @@ public class InicioDTO implements Serializable {
 
     public void setTemMedc(String temMedc) {
         this.temMedc = temMedc;
+    }
+
+    public String getFciaResp() {
+        return fciaResp;
+    }
+
+    public void setFciaResp(String fciaResp) {
+        this.fciaResp = fciaResp;
+    }
+
+    public String getConsultaRespiratoria() {
+        return consultaRespiratoria;
+    }
+
+    public void setConsultaRespiratoria(String consultaRespiratoria) {
+        this.consultaRespiratoria = consultaRespiratoria;
     }
 }

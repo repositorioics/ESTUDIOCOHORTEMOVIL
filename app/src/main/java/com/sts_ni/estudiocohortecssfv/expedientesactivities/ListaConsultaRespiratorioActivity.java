@@ -98,8 +98,8 @@ public class ListaConsultaRespiratorioActivity extends ActionBarActivity
         if (!mNavigationDrawerFragment.isDrawerOpen()) {
             MenuItem itemLupa = menu.findItem(R.id.action_search);
             itemLupa.setVisible(false);
-            MenuItem itemRecargar = menu.findItem(R.id.action_reload);
-            itemRecargar.setVisible(false);
+            //MenuItem itemRecargar = menu.findItem(R.id.action_reload);
+            //itemRecargar.setVisible(false);
             return true;
         }
         return super.onPrepareOptionsMenu(menu);
@@ -115,6 +115,12 @@ public class ListaConsultaRespiratorioActivity extends ActionBarActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+        if (id == R.id.action_reload) {
+            Intent myIntent = new Intent(CONTEXT, ListaConsultaRespiratorioActivity.class);
+            finish();
+            CONTEXT.startActivity(myIntent);
+            //recreate();
         }
 
         return super.onOptionsItemSelected(item);

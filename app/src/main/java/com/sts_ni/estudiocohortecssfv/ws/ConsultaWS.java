@@ -86,14 +86,23 @@ public class ConsultaWS extends EstudioCohorteCssfvWS {
                         calFechaNac.setTime(new SimpleDateFormat("yyyyMMdd").parse(fechaNac));
                         inicio.setFechaNac(calFechaNac);
 
+                        inicio.setSexo(inicioJson.getString("sexo"));
 
                         if(inicioJson.get("usuarioMedico").toString()!="null")
                             inicio.setUsuarioMedico(inicioJson.getInt("usuarioMedico"));
 
                         if(inicioJson.get("medicoCambioTurno").toString()!="null")
                             inicio.setMedicoCambioTurno(inicioJson.getInt("medicoCambioTurno"));
+
                         if(inicioJson.get("nombreMedico").toString() !="null" )
                             inicio.setNombreMedico(inicioJson.get("nombreMedico").toString());
+
+                        if(inicioJson.get("fcia_resp").toString()!="null")
+                            inicio.setFciaResp(inicioJson.getString("fcia_resp"));
+
+                        if(inicioJson.get("consulta_respiratorio").toString()!="null")
+                            inicio.setConsultaRespiratoria(inicioJson.getString("consulta_respiratorio"));
+
                         lstInicio.add(inicio);
 
                     }
