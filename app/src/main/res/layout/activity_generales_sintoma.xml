@@ -13,12 +13,11 @@
             android:id="@+id/btnGeneralesGSintomas"
             android:layout_width="match_parent"
             android:layout_height="65dp"
-            android:layout_marginTop="7dp"
-            android:text="@string/boton_general_sintomas"
             android:layout_alignParentTop="true"
+            android:layout_marginTop="7dp"
             android:drawableRight="@drawable/reducir"
             android:onClick="onClick_btnGenerales"
-        />
+            android:text="@string/boton_general_sintomas" />
 
         <TextView
             android:id="@+id/txtvPASint"
@@ -490,18 +489,18 @@
 
         <EditText
             android:id="@+id/dpFis"
+            style="@style/EditTextEstilo"
             android:layout_width="160dp"
             android:layout_height="40dp"
-            android:inputType="date"
-            android:editable="false"
-            android:layout_toRightOf="@+id/txtvFisGeneralesSint"
             android:layout_below="@+id/edtxtTempMedGeneralesSint"
-            android:layout_marginTop="33dp"
             android:layout_marginLeft="8dp"
-            android:ems="10"
-            android:textCursorDrawable="@null"
+            android:layout_marginTop="33dp"
+            android:layout_toRightOf="@+id/txtvFisGeneralesSint"
             android:drawableRight="@drawable/calendar"
-            style="@style/EditTextEstilo" />
+            android:editable="false"
+            android:ems="10"
+            android:inputType="date"
+            android:textCursorDrawable="@null" />
 
         <TextView
             android:id="@+id/txtvFifGeneralesSint"
@@ -543,18 +542,18 @@
 
         <EditText
             android:id="@+id/dpUltmFiebGeneralesSint"
+            style="@style/EditTextEstilo"
             android:layout_width="160dp"
             android:layout_height="40dp"
-            android:inputType="date"
-            android:editable="false"
-            android:layout_toRightOf="@+id/txtvUltmFebGeneralesSint"
             android:layout_below="@+id/dpFis"
-            android:layout_marginTop="10dp"
             android:layout_marginLeft="8dp"
-            android:ems="10"
-            android:textCursorDrawable="@null"
+            android:layout_marginTop="10dp"
+            android:layout_toRightOf="@+id/txtvUltmFebGeneralesSint"
             android:drawableRight="@drawable/calendar"
-            style="@style/EditTextEstilo" />
+            android:editable="false"
+            android:ems="10"
+            android:inputType="date"
+            android:textCursorDrawable="@null" />
 
         <!--<EditText
             android:id="@+id/dpUltmFiebGeneralesSint"
@@ -586,12 +585,11 @@
             android:id="@+id/chkbAMUltFGeneralesSint"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/txtvAMUltFGeneralesSint"
             android:layout_below="@+id/txtvFisGeneralesSint"
-            android:layout_marginTop="35dp"
             android:layout_marginLeft="8dp"
-            android:onClick="onChkboxClickedAMPMFb"
-            />
+            android:layout_marginTop="35dp"
+            android:layout_toRightOf="@+id/txtvAMUltFGeneralesSint"
+            android:onClick="onChkboxClickedAMPMFb" />
 
         <TextView
             android:id="@+id/txtvPMUltFGeneralesSint"

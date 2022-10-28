@@ -6,6 +6,15 @@ import java.io.Serializable;
  * Created by prgleandro on 2015/03/26.
  */
 public class ExpedienteDTO implements Serializable {
+
+    private String nomMedico;
+    private String estado;
+    private int numHojaConsulta;
+    private String fechaConsulta;
+    private String horaConsulta;
+    private int secHojaConsulta;
+    private String hojaImpresa;
+
     public String getNomMedico() {
         return nomMedico;
     }
@@ -46,18 +55,19 @@ public class ExpedienteDTO implements Serializable {
         this.horaConsulta = horaConsulta;
     }
 
-    private String nomMedico;
-    private String estado;
-    private int numHojaConsulta;
-    private String fechaConsulta;
-    private String horaConsulta;
-    private int secHojaConsulta;
-
     public int getSecHojaConsulta() {
         return secHojaConsulta;
     }
 
     public void setSecHojaConsulta(int secHojaConsulta) {
         this.secHojaConsulta = secHojaConsulta;
+    }
+
+    public String getHojaImpresa() {
+        return hojaImpresa;
+    }
+
+    public void setHojaImpresa(String hojaImpresa) {
+        this.hojaImpresa = hojaImpresa;
     }
 }

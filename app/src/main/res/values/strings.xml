@@ -496,6 +496,9 @@
     <string name="msj_hora_vacia">Tiene ingresado Ultima Dosis Antipirético debe ingresar la hora.</string>
     <string name="msj_cierre_campos_requeridos">Se debe de completar los campos requeridos para poder realizar el cierre de hoja.</string>
 
+    <string name="msj_ult_fiebre_am_pm">Debe seleccionar AM ó PM</string>
+    <string name="msj_telf">El telefono esta fuera de rango</string>
+
     <string name="msj_debe_ingresar_hemoconcentracion">Debe ingresar la informacion en el campo Hemoconcentración</string>
     <string name="msj_fecha_menor_fecha_nacimiento">Fecha no debe ser menor a la fecha de nacimiento del paciente</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>

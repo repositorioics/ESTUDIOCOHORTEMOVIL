@@ -461,13 +461,14 @@ public class DiagnosticoActivity extends ActionBarActivity {
         Integer diagnosticoId4 =  ((DiagnosticoDTO) ((Spinner)findViewById(R.id.spnDialogo4)).getSelectedItem()).getSecDiagnostico();
 
         if (categoria != null) {
-            if (categoria.trim().equals("A")) {
+            /*if (categoria.trim().equals("A")) {
                 if (diagnosticoId1 == 57 || diagnosticoId2 == 57 || diagnosticoId3 == 57 || diagnosticoId4 == 57) {
                     throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
                             ", Diagnostico: SINDROME FEBRIL AGUDO SIN FOCO APARENTE");
                 }
-            }
-            if (categoria.trim().equals("B") || categoria.trim().equals("C")) {
+            }*/
+            //if (categoria.trim().equals("B") || categoria.trim().equals("C")) {
+            if (categoria.trim().equals("C")) {
                 if (diagnosticoId1 == 94 || diagnosticoId2 == 94 || diagnosticoId3 == 94 || diagnosticoId4 == 94) {
                     throw new Exception("No coincide categoria con diagnostico, Categoria: " + categoria.trim() +
                             ", Diagnostico: DENGUE SIN SIGNOS DE ALARMA");

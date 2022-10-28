@@ -120,13 +120,13 @@
             android:background="@drawable/bg_border_titulo_grid"/>
 
        </LinearLayout>
+
         <ListView
 
+            android:id="@+id/lstvHojaConsultaExp"
             android:layout_width="match_parent"
             android:layout_height="500dp"
-            android:id="@+id/lstvHojaConsultaExp"
-            android:layout_below="@+id/lnyCabezeraExpediente"
-            />
+            android:layout_below="@+id/lnyCabezeraExpediente" />
 
 
     </RelativeLayout>

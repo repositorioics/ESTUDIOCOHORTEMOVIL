@@ -41,6 +41,7 @@ import com.sts_ni.estudiocohortecssfv.NavigationDrawerFragment;
 import com.sts_ni.estudiocohortecssfv.R;
 import com.sts_ni.estudiocohortecssfv.dto.ErrorDTO;
 import com.sts_ni.estudiocohortecssfv.dto.HojaZikaDTO;
+import com.sts_ni.estudiocohortecssfv.dto.InfoSessionWSDTO;
 import com.sts_ni.estudiocohortecssfv.dto.MedicosDTO;
 import com.sts_ni.estudiocohortecssfv.dto.ResultadoListWSDTO;
 import com.sts_ni.estudiocohortecssfv.dto.SeguimientoZikaDTO;
@@ -355,6 +356,21 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         if(dias >= 21){ /* dias >= 5 / Ahora son 21 dias */
                             presentaAviso = true;
                             mensajeAviso = String.format(getResources().getString(R.string.msj_aviso_fecha_cierre_seguimiento), dias);
+                        } else {
+                            InfoSessionWSDTO usuario = ((CssfvApp) getApplication()).getInfoSessionWSDTO();
+                            if (usuario != null) {
+                                /*
+                                DRA. Gaytan = 7
+                                DR. Plazahola = 4
+                                DR. Sanchez = 20
+                                DR. Ojega = 21
+                                Doña Zoila = 16
+                                * */
+                                if (usuario.getUserId() != 7 && usuario.getUserId() != 4 && usuario.getUserId() != 20
+                                        && usuario.getUserId() != 21 && usuario.getUserId() != 16) {
+                                    this.findViewById(R.id.btnCerrarSeguimiento).setEnabled(false);
+                                }
+                            }
                         }
 
                     }catch (ParseException e) {

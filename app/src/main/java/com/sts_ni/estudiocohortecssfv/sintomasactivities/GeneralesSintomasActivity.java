@@ -329,23 +329,29 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
     public void onChkboxClickedAMPMFb(View view) {
         // Is the view now checked?
         boolean checked = ((CheckBox) view).isChecked();
-
-        // Check which checkbox was clicked
-        switch(view.getId()) {
-            case R.id.chkbAMUltFGeneralesSint:
-                if (checked){
-                    ((CheckBox) findViewById(R.id.chkbPMUltFGeneralesSint)).setChecked(false);
-                }
-                else
-                    ((CheckBox) view).setChecked(true);
-                break;
-            case R.id.chkbPMUltFGeneralesSint:
-                if (checked){
-                    ((CheckBox) findViewById(R.id.chkbAMUltFGeneralesSint)).setChecked(false);
-                }
-                else
-                    ((CheckBox) view).setChecked(true);
-                break;
+        EditText dpUltmFiebGeneralesSint = (EditText) findViewById(R.id.dpUltmFiebGeneralesSint);
+        String valor = dpUltmFiebGeneralesSint.getText().toString();
+        if (valor.trim().equals("")) {
+            ((CheckBox) findViewById(R.id.chkbPMUltFGeneralesSint)).setChecked(false);
+            ((CheckBox) findViewById(R.id.chkbAMUltFGeneralesSint)).setChecked(false);
+        } else {
+            // Check which checkbox was clicked
+            switch(view.getId()) {
+                case R.id.chkbAMUltFGeneralesSint:
+                    if (checked){
+                        ((CheckBox) findViewById(R.id.chkbPMUltFGeneralesSint)).setChecked(false);
+                    }
+                    else
+                        ((CheckBox) view).setChecked(true);
+                    break;
+                case R.id.chkbPMUltFGeneralesSint:
+                    if (checked){
+                        ((CheckBox) findViewById(R.id.chkbAMUltFGeneralesSint)).setChecked(false);
+                    }
+                    else
+                        ((CheckBox) view).setChecked(true);
+                    break;
+            }
         }
     }
 
@@ -522,7 +528,7 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
 
         try {
             validarCampoRequerido(controlCambios);
-            validarUltDosisAntipiretico();
+            //validarUltDosisAntipiretico();
             //validarFechaUltDosisAntipiretico();
             //alertDialog();
             if( controlCambios.size() > 0){
@@ -668,7 +674,10 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
 
     /*Validacion para ultimo dia antipiretico cuando la consulta es de seguimiento y se ingresa la fif
     * Fecha Creacion: 16/12/2019 - SC*/
-    public void validarUltDosisAntipiretico() throws Exception {
+
+    /* Fecha 23/09/2021 se quito esta validacion por orden del Dr. Ojeda**/
+
+    /*public void validarUltDosisAntipiretico() throws Exception {
         boolean esConsultaSeguimiento = ((CheckBox) findViewById(R.id.chkbConsultaSeguimGeneralesSint)).isChecked();
         if (esConsultaSeguimiento && !StringUtils.isNullOrEmpty(((EditText) findViewById(R.id.dpFif)).getText().toString())) {
             if (StringUtils.isNullOrEmpty(((EditText) findViewById(R.id.dpUltmDosGeneralesSint)).getText().toString())) {
@@ -678,7 +687,7 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
                 throw new Exception(getString(R.string.msj_hora_vacia));
             }
         }
-    }
+    }*/
 
     /*Validacion para verificar que la fecha de la ultima dosis antipiretico no sea mayor a la
     * fecha de la consulta 03/08/2020 - SC*/
@@ -790,6 +799,13 @@ public class GeneralesSintomasActivity extends ActionBarActivity {
         else if(!StringUtils.isNullOrEmpty(((EditText) findViewById(R.id.dpUltmDosGeneralesSint)).getText().toString())) {
             if (StringUtils.isNullOrEmpty(((EditText) findViewById(R.id.edtxtHoraGeneralesSint)).getText().toString())) {
                 throw new Exception(getString(R.string.msj_hora_vacia));
+            }
+        } else if(!((CheckBox) findViewById(R.id.chkbAMUltFGeneralesSint)).isChecked() &&
+                !((CheckBox) findViewById(R.id.chkbPMUltFGeneralesSint)).isChecked()) {
+            EditText dpUltmFiebGeneralesSint = (EditText) findViewById(R.id.dpUltmFiebGeneralesSint);
+            String valorUltmFieb = dpUltmFiebGeneralesSint.getText().toString();
+            if (!valorUltmFieb.trim().equals("")) {
+                throw new Exception(getString(R.string.msj_ult_fiebre_am_pm));
             }
         }
         int cont = 0;

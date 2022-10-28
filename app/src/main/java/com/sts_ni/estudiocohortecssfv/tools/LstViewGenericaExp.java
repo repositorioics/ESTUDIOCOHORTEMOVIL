@@ -3,6 +3,7 @@ package com.sts_ni.estudiocohortecssfv.tools;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,6 +89,16 @@ public class LstViewGenericaExp extends ArrayAdapter<ExpedienteDTO> implements V
         holder.txtvHora.setText(((ExpedienteDTO) this.VALUES.get(position)).getHoraConsulta());
         holder.txtvNomMedico.setText(((ExpedienteDTO) this.VALUES.get(position)).getNomMedico());
         holder.txtvEstado.setText(((ExpedienteDTO) this.VALUES.get(position)).getEstado());
+        /*String hojaImpresa = this.VALUES.get(position).getHojaImpresa();
+        if (hojaImpresa != "") {
+            if (hojaImpresa.trim().equals("N")) {
+                holder.txtvNumHojaConsulta.setTextColor(Color.parseColor("#B82601"));
+                holder.txtvFecha.setTextColor(Color.parseColor("#B82601"));
+                holder.txtvHora.setTextColor(Color.parseColor("#B82601"));
+                holder.txtvNomMedico.setTextColor(Color.parseColor("#B82601"));
+                holder.txtvEstado.setTextColor(Color.parseColor("#B82601"));
+            }
+        }*/
 
 
         /******** Set Item Click Listner for LayoutInflater for each row *******/

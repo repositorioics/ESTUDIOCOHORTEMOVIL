@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="ip_server">http://192.168.1.98:8080/estudios-0.1/api/v1/</string> <!--Producción-->
+    <string name="ip_server">http://localhost:8081/estudios-0.1/api/v1/</string> <!--Producción-->
     <!--<string name="ip_server">http://192.168.1.20:8081/estudios-0.1/api/v1/</string> Local-->
 
     <string name="obtener_fciaCard_fciaResp">rangos-presion-frecuencias</string>

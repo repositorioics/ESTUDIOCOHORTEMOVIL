@@ -33,12 +33,12 @@
         android:id="@+id/imgBtnPdf"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@null"
-        android:src="@drawable/pdf64"
-        android:layout_marginBottom="14dp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="5dp"
-        android:layout_toRightOf="@+id/imgBtnImprimir" />
+        android:layout_marginBottom="14dp"
+        android:layout_toRightOf="@+id/imgBtnImprimir"
+        android:background="@null"
+        android:src="@drawable/pdf64" />
 
 
     <TextView

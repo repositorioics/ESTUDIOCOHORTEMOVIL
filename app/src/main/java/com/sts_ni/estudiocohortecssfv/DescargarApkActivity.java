@@ -19,15 +19,31 @@ import com.sts_ni.estudiocohortecssfv.dto.PerifericoResultadoDTO;
 import com.sts_ni.estudiocohortecssfv.helper.ApkInstaller;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Properties;
 
 public class DescargarApkActivity extends Activity {
     public ProgressDialog PD_CREATE;
     private Context CONTEXT;
+    public static String URL_DOWNLOAD_APK;
+
+    static {
+        try {
+            Properties props = new Properties();
+            InputStream inputStream = new FileInputStream("/sdcard/cssfvApk/configApk/configApk.properties");
+            props.load(inputStream);
+            URL_DOWNLOAD_APK = props.getProperty("DOWNLOAD_APK");
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +62,8 @@ public class DescargarApkActivity extends Activity {
             //progress.setCancelable(false);
             //progress.setMessage("Downloading...");
             downloadAndInstall.setContext(getApplicationContext());
-            downloadAndInstall.execute(getResources().getString(R.string.descargar_apk));
+            downloadAndInstall.execute(URL_DOWNLOAD_APK);
+            //downloadAndInstall.execute(getResources().getString(R.string.descargar_apk));
         }
 
     }

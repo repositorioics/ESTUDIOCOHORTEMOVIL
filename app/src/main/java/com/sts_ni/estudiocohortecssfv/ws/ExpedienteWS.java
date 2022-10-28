@@ -94,6 +94,7 @@ public class ExpedienteWS extends EstudioCohorteCssfvWS {
                         exp.setFechaConsulta(inicioJson.getString("fechaCierre"));
                         exp.setHoraConsulta(inicioJson.getString("horaCierre"));
                         exp.setSecHojaConsulta(inicioJson.getInt("secHojaConsulta"));
+                        exp.setHojaImpresa(inicioJson.getString("hojaImpresa"));
                         lstHojaConsulta.add(exp);
 
                     }

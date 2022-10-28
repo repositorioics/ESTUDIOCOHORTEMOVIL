@@ -209,6 +209,73 @@ public class ExpedienteActivity extends ActionBarActivity
         alert.setCanceledOnTouchOutside(true);
         alert.show();
     }
+    /***
+     *
+     */
+    void cargarExpedienteDespuesImpresion() {
+
+        final ListView[] LSTV_LISTA_Expediente = new ListView[1];
+        ArrayList<ExpedienteDTO> arrDatosExp = new ArrayList<ExpedienteDTO>();
+
+        final int codigo;
+
+        EditText edtxBuscarExpediente= (EditText)ACTIVITY.findViewById(R.id.edtxBuscarExpediente);
+        codigo = Integer.parseInt(edtxBuscarExpediente.getText().toString());
+
+        /*Creando una tarea asincrona*/
+        AsyncTask<Void, Void, Void> listaInicioServicio = new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog PD;
+            private ConnectivityManager CM = (ConnectivityManager) ACTIVITY.getSystemService(Context.CONNECTIVITY_SERVICE);
+            private NetworkInfo NET_INFO = CM.getActiveNetworkInfo();
+            private ResultadoListWSDTO<ExpedienteDTO> RESPUESTA = new ResultadoListWSDTO<ExpedienteDTO>();
+            private ExpedienteWS EXPWS = new ExpedienteWS(getResources());
+
+            @Override
+            protected void onPreExecute() {
+                PD = new ProgressDialog(ACTIVITY);
+                PD.setTitle(getResources().getString(R.string.title_obteniendo));
+                PD.setMessage(getResources().getString(R.string.msj_espere_por_favor));
+                PD.setCancelable(false);
+                PD.setIndeterminate(true);
+                PD.show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                if (NET_INFO != null && NET_INFO.isConnected()){
+                    RESPUESTA = EXPWS.getListaHojaConsulta(codigo);
+
+                }else{
+                    RESPUESTA.setCodigoError(Long.parseLong("3"));
+                    RESPUESTA.setMensajeError(getResources().getString(R.string.msj_no_tiene_conexion));
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result){
+                PD.dismiss();
+                if (RESPUESTA.getCodigoError().intValue() == 0){
+
+                    LSTV_LISTA_Expediente[0] = (ListView)ACTIVITY.findViewById(R.id.lstvHojaConsultaExp);
+                    ((ExpedienteActivity) ACTIVITY).LST_ADAPTER_EXP = new LstViewGenericaExp(ACTIVITY, ACTIVITY, RESPUESTA.getLstResultado(), getResources());
+                    LSTV_LISTA_Expediente[0].setAdapter(((ExpedienteActivity) ACTIVITY).LST_ADAPTER_EXP);
+
+                }else if (RESPUESTA.getCodigoError().intValue() != 999){
+                    MensajesHelper.mostrarMensajeInfo(ACTIVITY,
+                            RESPUESTA.getMensajeError(), getResources().getString(
+                                    R.string.app_name), null);
+
+                }else{
+                    MensajesHelper.mostrarMensajeError(ACTIVITY,
+                            RESPUESTA.getMensajeError(), getResources().getString(
+                                    R.string.app_name), null);
+                }
+            }
+        };
+        listaInicioServicio.execute((Void[])null);
+    }
+    /*--------------------------*/
 
     /***
      * Metodo para realizar la reimpresion de la hoja de consulta.
@@ -269,11 +336,13 @@ public class ExpedienteActivity extends ActionBarActivity
                                     getResources().getString(R.string.msj_se_ejecuto_la_impresion),
                                     getResources().getString(
                                             R.string.title_estudio_sostenible), null);
+                            cargarExpedienteDespuesImpresion();
                         } else if (RESPUESTA.getCodigoError().intValue() == 1) {
                             MensajesHelper.mostrarMensajeOk(ACTIVITY,
                                     getResources().getString(R.string.msj_se_ejecuto_la_impresion),
                                     getResources().getString(
                                             R.string.title_estudio_sostenible), null);
+                            cargarExpedienteDespuesImpresion();
 
                         } else {
                             MensajesHelper.mostrarMensajeError(ACTIVITY,
@@ -439,7 +508,6 @@ public class ExpedienteActivity extends ActionBarActivity
                 }
             });
 
-
             ((EditText)getActivity().findViewById(R.id.edtxBuscarExpediente)).setText(((ExpedienteActivity)getActivity()).CODIGO_EXPEDIENTE);
 
             if (((ExpedienteActivity)getActivity()).ARRAY_DATOS_EXPEDIENTE != null &&
@@ -448,9 +516,6 @@ public class ExpedienteActivity extends ActionBarActivity
                 ((ExpedienteActivity) getActivity()).LST_ADAPTER_EXP = new LstViewGenericaExp(getActivity(), getActivity(), ((ExpedienteActivity) getActivity()).ARRAY_DATOS_EXPEDIENTE, getResources());
                 LSTV_LISTA_Expediente.setAdapter(((ExpedienteActivity) getActivity()).LST_ADAPTER_EXP);
             }
-
-
-
         }
 
 
@@ -461,7 +526,7 @@ public class ExpedienteActivity extends ActionBarActivity
 
         void cargarExpediente() {
 
-  /*Creando una tarea asincrona*/
+            /*Creando una tarea asincrona*/
             AsyncTask<Void, Void, Void> listaInicioServicio = new AsyncTask<Void, Void, Void>() {
                 private ProgressDialog PD;
                 private ConnectivityManager CM = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);

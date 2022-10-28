@@ -418,7 +418,7 @@ public class InicioEnfermeriaActivity extends ActionBarActivity implements Busca
      * Metodo para asignar el usuario enfermeria a la hoja deconsulta.
      *
      */
-    private void asignarUsuarioEnfermeria(){
+    private void asignarUsuarioEnfermeria() {
         if (mAsignarUusarioEnfermeriaTask == null ||
                 mAsignarUusarioEnfermeriaTask.getStatus() == AsyncTask.Status.FINISHED) {
             mAsignarUusarioEnfermeriaTask = new AsyncTask<HojaConsultaDTO, Void, ErrorDTO>() {

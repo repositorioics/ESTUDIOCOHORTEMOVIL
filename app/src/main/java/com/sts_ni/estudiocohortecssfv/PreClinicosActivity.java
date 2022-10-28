@@ -944,7 +944,8 @@ public class PreClinicosActivity extends ActionBarActivity
                 cCtrC.setNumHojaConsulta(Integer.parseInt(pacienteSeleccionado.getNumHojaConsulta()));
             }
 
-            Calendar today = Calendar.getInstance();
+            /**Funcion que se usa actualmente*/
+            /*Calendar today = Calendar.getInstance();
             int age = today.get(Calendar.YEAR) - fechaNac.get(Calendar.YEAR);
             int month = (age)*12 + today.get(Calendar.MONTH) - fechaNac.get(Calendar.MONTH);
 
@@ -981,7 +982,7 @@ public class PreClinicosActivity extends ActionBarActivity
                 }
                 edtxtEdad.setText(age + " años");
                 //return new StringBuffer().append(age).append(" años").toString();
-            }
+            }*/
 
            /* Calendar today = Calendar.getInstance();
             int age = today.get(Calendar.YEAR) - fechaNac.get(Calendar.YEAR);
@@ -1004,6 +1005,48 @@ public class PreClinicosActivity extends ActionBarActivity
                 }
                 edtxtEdad.setText(age + " años");
             }*/
+            Calendar today = Calendar.getInstance();
+            int age = today.get(Calendar.YEAR) - fechaNac.get(Calendar.YEAR);
+            int month = (age)*12 + today.get(Calendar.MONTH) - fechaNac.get(Calendar.MONTH);
+
+            if(today.get(Calendar.DAY_OF_MONTH) < fechaNac.get(Calendar.DAY_OF_MONTH)){
+                month = month - 1;
+            }
+
+            if(month == 0) {
+                Long tDias = (today.getTimeInMillis() - fechaNac.getTimeInMillis())  / (1000 * 60 * 60 * 24);
+                edtxtEdad.setText(tDias + " dias");
+
+            }
+            else if(age == 0) {
+                age = today.get(Calendar.MONTH) - fechaNac.get(Calendar.MONTH);
+                if(age == 0) {
+                    age = today.get(Calendar.DAY_OF_MONTH) - fechaNac.get(Calendar.DAY_OF_MONTH);
+                    edtxtEdad.setText(age + " dias");
+                }else {
+                    int diaFechaActual = today.get(Calendar.DAY_OF_MONTH);
+                    int diaFechaNac = fechaNac.get(Calendar.DAY_OF_MONTH);
+                    if (diaFechaActual < diaFechaNac) {
+                        age = age - 1;
+                        edtxtEdad.setText(age + " meses");
+                    } else {
+                        //age = age;
+                        edtxtEdad.setText(age + " meses");
+                    }
+
+                }
+            } else if (month > 0 && month < 12) {
+                edtxtEdad.setText(month + " meses");
+
+            }else {
+                if (today.get(Calendar.MONTH) < fechaNac.get(Calendar.MONTH)) {
+                    age--;
+                } else if (today.get(Calendar.MONTH) == fechaNac.get(Calendar.MONTH)
+                        && today.get(Calendar.DAY_OF_MONTH) < fechaNac.get(Calendar.DAY_OF_MONTH)) {
+                    age--;
+                }
+                edtxtEdad.setText(age + " años");
+            }
         }
 
         public void inicializarControles(View rootView) {

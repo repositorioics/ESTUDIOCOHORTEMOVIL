@@ -395,10 +395,10 @@
             android:id="@+id/btnGeneralesSintomas"
             android:layout_width="match_parent"
             android:layout_height="75dp"
-            android:layout_marginTop="48dp"
-            android:text="@string/boton_general_sintomas"
             android:layout_alignTop="@+id/txtvTallaCmSintoma"
-            android:drawableRight="@drawable/expandir"/>
+            android:layout_marginTop="48dp"
+            android:drawableRight="@drawable/expandir"
+            android:text="@string/boton_general_sintomas" />
 
         <Button
             android:id="@+id/btnEstadoGeneralSintomas"

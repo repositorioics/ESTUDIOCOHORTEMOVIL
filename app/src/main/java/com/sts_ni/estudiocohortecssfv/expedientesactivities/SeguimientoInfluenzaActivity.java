@@ -350,8 +350,22 @@ public class SeguimientoInfluenzaActivity extends ActionBarActivity
                         if (dias >= 30) { /* dias >= 5 / Antes eran 14 dias / Ahora son 30 */
                             presentaAviso = true;
                             mensajeAviso = String.format(getResources().getString(R.string.msj_aviso_fecha_cierre_seguimiento), dias);
+                        } else {
+                            InfoSessionWSDTO usuario = ((CssfvApp) getApplication()).getInfoSessionWSDTO();
+                            if (usuario != null) {
+                                /*
+                                DRA. Gaytan = 7
+                                DR. Plazahola = 4
+                                DR. Sanchez = 20
+                                DR. Ojega = 21
+                                Doña Zoila = 16
+                                * */
+                                if (usuario.getUserId() != 7 && usuario.getUserId() != 4 && usuario.getUserId() != 20
+                                    && usuario.getUserId() != 21 && usuario.getUserId() != 16) {
+                                    this.findViewById(R.id.btnCerrarSeguimiento).setEnabled(false);
+                                }
+                            }
                         }
-
                     } catch (ParseException e) {
                         e.printStackTrace();
                         MensajesHelper.mostrarMensajeError(CONTEXT,

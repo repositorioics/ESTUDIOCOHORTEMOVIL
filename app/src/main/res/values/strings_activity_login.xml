@@ -74,10 +74,19 @@
     <!--<string name="version">Versión 1.2.7</string>
     <string name="date_version">Dic 09, 2020</string>-->
 
-    <string name="version">Versión 1.2.8</string><!--Frecuencia Respiratoria -->
-    <string name="date_version">Enero 12, 2021</string>
+    <!--<string name="version">Versión 1.2.8</string>&lt;!&ndash;Frecuencia Respiratoria &ndash;&gt;
+    <string name="date_version">Enero 12, 2021</string>-->
 
-    <string name="version_a_comparar">1.2.8</string><!--Se utiliza para realizar la comparacion de la version instalada-->
+    <!--<string name="version">Versión 1.2.9</string>&lt;!&ndash;Correccion error de edad en enfermeria, mejora para la descarga del Apk &ndash;&gt;
+    <string name="date_version">Agosto 23, 2021</string>-->
+
+    <!--<string name="version">Versión 1.3.1</string>Se quito la validacion para la utlima dosis antipiretico
+    <string name="date_version">Septiembre 23, 2021</string>-->
+
+    <string name="version">Versión 1.3.4</string>
+    <string name="date_version">Octubre 28, 2022</string>
+
+    <string name="version_a_comparar">1.3.3</string><!--Se utiliza para realizar la comparacion de la version instalada-->
 
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
