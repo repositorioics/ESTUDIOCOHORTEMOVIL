@@ -46,8 +46,9 @@ public class CerrarHojaSeguimientoZikaTask extends UserTask<Object, Void, ErrorD
         if (netInfo != null && netInfo.isConnected()) {
             HojaZikaDTO hojaZika = (HojaZikaDTO) params[0];
             String user = (String) params[1];
+            String consultorio = (String) params[2];
             SeguimientoZikaWS zikaWS = new SeguimientoZikaWS(this.seguimientoZikaActivity.getResources());
-            resultado = zikaWS.guardarHojaSeguimiento(hojaZika, hojaZika.getLstSeguimientoZika(), user);
+            resultado = zikaWS.guardarHojaSeguimiento(hojaZika, hojaZika.getLstSeguimientoZika(), user, consultorio);
         } else {
             resultado.setCodigoError(Long.parseLong("3"));
             resultado.setMensajeError(this.seguimientoZikaActivity.getResources().getString(R.string.msj_no_tiene_conexion));

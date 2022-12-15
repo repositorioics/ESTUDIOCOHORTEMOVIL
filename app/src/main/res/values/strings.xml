@@ -448,7 +448,7 @@
     <string name="msj_validacion_sin_datos">Se deben enviar datos</string>
     <string name="msj_servicio_no_envia_respuesta">El servicio no envía respuesta</string>
     <string name="msj_paciente_no_atiende_llamado">Está seguro que Paciente no Atiende Llamado?</string>
-    <string name="msj_cierre_seguimiento_influenza">Está seguro que desea realizar el cierre?</string>
+    <string name="msj_cierre_seguimiento_influenza"><font color='#C10517'>Último día ingresado %1s,</font> Está seguro que desea realizar el cierre?</string>
     <string name="msj_esta_seguro_de_cancelar">Está seguro de Cancelar la Hoja de Consulta?</string>
     <string name="msj_cambio_hoja_consulta">Se han modificado datos en hoja cerrada, desea confirmar el cambio?</string>
     <string name="msj_esta_seguro_agregar_hoja">Desea agregar Hoja de Consulta para Observación?</string>

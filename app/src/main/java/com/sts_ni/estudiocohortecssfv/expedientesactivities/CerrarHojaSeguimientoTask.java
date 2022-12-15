@@ -46,8 +46,9 @@ public class CerrarHojaSeguimientoTask extends UserTask<Object, Void, ErrorDTO> 
         if (netInfo != null && netInfo.isConnected()) {
             HojaInfluenzaDTO hojaInfluenza = (HojaInfluenzaDTO) params[0];
             String user = (String) params[1];
+            String consultorio = (String) params[2];
             SeguimientoInfluenzaWS influenzaWS = new SeguimientoInfluenzaWS(this.seguimientoInfluenzaActivity.getResources());
-            resultado = influenzaWS.guardarHojaSeguimiento(hojaInfluenza, hojaInfluenza.getLstSeguimientoInfluenza(), user);
+            resultado = influenzaWS.guardarHojaSeguimiento(hojaInfluenza, hojaInfluenza.getLstSeguimientoInfluenza(), user, consultorio);
         } else {
             resultado.setCodigoError(Long.parseLong("3"));
             resultado.setMensajeError(this.seguimientoInfluenzaActivity.getResources().getString(R.string.msj_no_tiene_conexion));

@@ -57,6 +57,7 @@ import com.sts_ni.estudiocohortecssfv.ws.SeguimientoZikaWS;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -126,6 +127,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
     public static int consultorioMedico = 0;
     public static int consultorioResp = 1;
+    public static int CONTROL_DIA = 0;
+    public static String consultorio = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -288,7 +291,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
      * @param hojaZika, Hoja Zika
      */
     public void cargarDatosZikaUI(HojaZikaDTO hojaZika) {
-
+        CONTROL_DIA = 0;
         this.mCodExp = hojaZika.getCodExpediente();
         this.mNumSeg = hojaZika.getNumHojaSeguimiento();
         this.findViewById(R.id.ibtCrearHoja).setEnabled(false);
@@ -338,10 +341,10 @@ public class SeguimientoZikaActivity extends ActionBarActivity
             //bandera para presentar el aviso de la fecha de seguimiento
             boolean presentaAviso = false;
             String mensajeAviso = "";
-
             for(SeguimientoZikaDTO seg : hojaZika.getLstSeguimientoZika()) {
                 //cargnado los datos de seguimientos
                 listaSegZika.add(seg);
+                CONTROL_DIA = seg.getControlDia();
 
                 if(hojaZika.getCerrado() == 'N' && seg.getControlDia() == 1 && !StringUtils.isNullOrEmpty(seg.getFechaSeguimiento())){
                     try {
@@ -356,23 +359,23 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                         if(dias >= 21){ /* dias >= 5 / Ahora son 21 dias */
                             presentaAviso = true;
                             mensajeAviso = String.format(getResources().getString(R.string.msj_aviso_fecha_cierre_seguimiento), dias);
-                        } else {
+                        }
+                        /*if(dias < 14) {
                             InfoSessionWSDTO usuario = ((CssfvApp) getApplication()).getInfoSessionWSDTO();
                             if (usuario != null) {
-                                /*
+
                                 DRA. Gaytan = 7
                                 DR. Plazahola = 4
                                 DR. Sanchez = 20
                                 DR. Ojega = 21
                                 Doña Zoila = 16
-                                * */
+
                                 if (usuario.getUserId() != 7 && usuario.getUserId() != 4 && usuario.getUserId() != 20
                                         && usuario.getUserId() != 21 && usuario.getUserId() != 16) {
                                     this.findViewById(R.id.btnCerrarSeguimiento).setEnabled(false);
                                 }
                             }
-                        }
-
+                        }* */
                     }catch (ParseException e) {
                         e.printStackTrace();
                         MensajesHelper.mostrarMensajeError(CONTEXT,
@@ -731,8 +734,15 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                 @Override
                 public void onClick(View view) {
 
+                    showDialogCierreHoja(CONTEXT, getResources().getString(
+                            R.string.msj_cierre_seguimiento_influenza, CONTROL_DIA) + " Seleccione donde desea enviar el seguimiento", new String[] { "Aceptar", "Cancelar" },
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            });
                     //pregunta si quiere realizar cierre
-                    DialogInterface.OnClickListener realizarCierreDialogClickListener = new DialogInterface.OnClickListener() {
+                    /*DialogInterface.OnClickListener realizarCierreDialogClickListener = new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             switch (which){
@@ -748,8 +758,8 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     };
                     MensajesHelper.mostrarMensajeYesNo(CONTEXT,
                             getResources().getString(
-                                    R.string.msj_cierre_seguimiento_influenza), getResources().getString(
-                                    R.string.title_estudio_sostenible), realizarCierreDialogClickListener);
+                                    R.string.msj_cierre_seguimiento_influenza, CONTROL_DIA), getResources().getString(
+                                    R.string.title_estudio_sostenible), realizarCierreDialogClickListener);*/
                 }
             });
 
@@ -765,6 +775,65 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     getActivity().finish();
                 }
             });
+        }
+
+        public void showDialogCierreHoja(Context context, String title, String[] btnText,
+                                         DialogInterface.OnClickListener listener) {
+
+            final CharSequence[] items = { "Consultorio Médico", "Consultorio Respiratorio" };
+            int checkedItem = 2;
+            consultorio = "";
+            if (listener == null)
+                listener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface paramDialogInterface,
+                                        int paramInt) {
+                        paramDialogInterface.dismiss();
+                    }
+                };
+            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle(title);
+
+            builder.setSingleChoiceItems(items, checkedItem,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int item) {
+                            if (String.valueOf(item).trim().equals("0")) {
+                                consultorio = "Medico";
+                            }
+                            if (String.valueOf(item).trim().equals("1")) {
+                                consultorio = "Resp";
+                            }
+                        }
+                    })
+                    .setPositiveButton(btnText[0],
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    //set what would happen when positive button is clicked
+                                    if (!StringUtils.isNullOrEmpty(consultorio)) {
+                                        if (consultorio.trim().equals("Medico")) {
+                                            cerrarHojaZika();
+                                            Toast.makeText(CONTEXT, "Impresión enviada al consultorio" + consultorio, Toast.LENGTH_LONG).show();
+                                        } else {
+                                            cerrarHojaZika();
+                                            Toast.makeText(CONTEXT, "Impresión enviada a " + consultorio, Toast.LENGTH_LONG).show();
+                                        }
+                                    } else {
+                                        builder.show();
+                                        Toast.makeText(CONTEXT, "Debe seleccionar donde enviara el seguimiento", Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            })
+                    .setNegativeButton(btnText[1],
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    //set what should happen when negative button is clicked
+                                    dialogInterface.cancel();
+                                }
+                            });
+            builder.setCancelable(false);
+            builder.show();
         }
 
 
@@ -1218,7 +1287,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
 
                     hojaZika.setLstSeguimientoZika(lstSeg);
                     mSeguimientoZikaActivity.mCerrarHojaSeguimientoTask = (CerrarHojaSeguimientoZikaTask) new
-                            CerrarHojaSeguimientoZikaTask(mSeguimientoZikaActivity).execute(hojaZika, user);
+                            CerrarHojaSeguimientoZikaTask(mSeguimientoZikaActivity).execute(hojaZika, user, consultorio);
 
                 }
             }else{
@@ -16275,6 +16344,7 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                             }
                             ((EditText) getActivity().findViewById(viewId)).setText(new SimpleDateFormat("dd/MM/yyyy").format(calendar.getTime()));
                             cargarFechaSeguimiento(new SimpleDateFormat("dd/MM/yyyy").format(calendar.getTime()));
+                            validarFechasConsecutivas(calendar);
                         }
                     }
                 };
@@ -17507,6 +17577,291 @@ public class SeguimientoZikaActivity extends ActionBarActivity
                     e.printStackTrace();
                 }
                 return false;
+            }
+
+            /***
+             Metodo para validar que la fecha de seguimiento ingresada valla de forma consecutiva
+             * @param fecha, Fecha Ingresada
+             * @return mensaje si las fechas son diferentes.
+             */
+            private boolean validarFechasConsecutivas(Calendar fecha) {
+                try {
+                    SeguimientoZikaDTO seguimiento = null;
+                    switch (mPage) {
+                        case 2:
+                            seguimiento = (obtenerSeguimientoPorDia(1) != null) ? obtenerSeguimientoPorDia(1) :
+                                    obtenerNuevoSeguimientoPorDia(1);
+
+                            if (seguimiento != null && !StringUtils.isNullOrEmpty(seguimiento.getFechaSeguimiento())) {
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                Calendar fechaAnterior = Calendar.getInstance();
+                                fechaAnterior.setTime(sdf.parse(seguimiento.getFechaSeguimiento()));
+                                fechaAnterior.add(Calendar.DAY_OF_MONTH, 1);
+                                Date today = fecha.getTime();
+                                Date fechaSugerida = fechaAnterior.getTime();
+
+                                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                                if(!dateFormat.format(fechaSugerida).equals(dateFormat.format(today))) {
+                                    alertaFechas("2", fechaSugerida, today);
+                                }
+                            }
+                            break;
+                        case 3:
+                            seguimiento = (obtenerSeguimientoPorDia(2) != null) ? obtenerSeguimientoPorDia(2) :
+                                    obtenerNuevoSeguimientoPorDia(2);
+
+                            if (seguimiento != null && !StringUtils.isNullOrEmpty(seguimiento.getFechaSeguimiento())) {
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                Calendar fechaAnterior = Calendar.getInstance();
+                                fechaAnterior.setTime(sdf.parse(seguimiento.getFechaSeguimiento()));
+                                fechaAnterior.add(Calendar.DAY_OF_MONTH, 1);
+                                Date today = fecha.getTime();
+                                Date fechaSugerida = fechaAnterior.getTime();
+
+                                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                                if(!dateFormat.format(fechaSugerida).equals(dateFormat.format(today))) {
+                                    alertaFechas("3", fechaSugerida, today);
+                                }
+                            }
+                            break;
+                        case 4:
+                            seguimiento = (obtenerSeguimientoPorDia(3) != null) ? obtenerSeguimientoPorDia(3) :
+                                    obtenerNuevoSeguimientoPorDia(3);
+
+                            if (seguimiento != null && !StringUtils.isNullOrEmpty(seguimiento.getFechaSeguimiento())) {
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                Calendar fechaAnterior = Calendar.getInstance();
+                                fechaAnterior.setTime(sdf.parse(seguimiento.getFechaSeguimiento()));
+                                fechaAnterior.add(Calendar.DAY_OF_MONTH, 1);
+                                Date today = fecha.getTime();
+                                Date fechaSugerida = fechaAnterior.getTime();
+
+                                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                                if(!dateFormat.format(fechaSugerida).equals(dateFormat.format(today))) {
+                                    alertaFechas("4", fechaSugerida, today);
+                                }
+                            }
+                            break;
+                        case 5:
+                            seguimiento = (obtenerSeguimientoPorDia(4) != null) ? obtenerSeguimientoPorDia(4) :
+                                    obtenerNuevoSeguimientoPorDia(4);
+
+                            if (seguimiento != null && !StringUtils.isNullOrEmpty(seguimiento.getFechaSeguimiento())) {
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                Calendar fechaAnterior = Calendar.getInstance();
+                                fechaAnterior.setTime(sdf.parse(seguimiento.getFechaSeguimiento()));
+                                fechaAnterior.add(Calendar.DAY_OF_MONTH, 1);
+                                Date today = fecha.getTime();
+                                Date fechaSugerida = fechaAnterior.getTime();
+
+                                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                                if(!dateFormat.format(fechaSugerida).equals(dateFormat.format(today))) {
+                                    alertaFechas("5", fechaSugerida, today);
+                                }
+                            }
+                            break;
+                        case 6:
+                            seguimiento = (obtenerSeguimientoPorDia(5) != null) ? obtenerSeguimientoPorDia(5) :
+                                    obtenerNuevoSeguimientoPorDia(5);
+
+                            if (seguimiento != null && !StringUtils.isNullOrEmpty(seguimiento.getFechaSeguimiento())) {
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                Calendar fechaAnterior = Calendar.getInstance();
+                                fechaAnterior.setTime(sdf.parse(seguimiento.getFechaSeguimiento()));
+                                fechaAnterior.add(Calendar.DAY_OF_MONTH, 1);
+                                Date today = fecha.getTime();
+                                Date fechaSugerida = fechaAnterior.getTime();
+
+                                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                                if(!dateFormat.format(fechaSugerida).equals(dateFormat.format(today))) {
+                                    alertaFechas("6", fechaSugerida, today);
+                                }
+                            }
+                            break;
+                        case 7:
+                            seguimiento = (obtenerSeguimientoPorDia(6) != null) ? obtenerSeguimientoPorDia(6) :
+                                    obtenerNuevoSeguimientoPorDia(6);
+
+                            if (seguimiento != null && !StringUtils.isNullOrEmpty(seguimiento.getFechaSeguimiento())) {
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                Calendar fechaAnterior = Calendar.getInstance();
+                                fechaAnterior.setTime(sdf.parse(seguimiento.getFechaSeguimiento()));
+                                fechaAnterior.add(Calendar.DAY_OF_MONTH, 1);
+                                Date today = fecha.getTime();
+                                Date fechaSugerida = fechaAnterior.getTime();
+
+                                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                                if(!dateFormat.format(fechaSugerida).equals(dateFormat.format(today))) {
+                                    alertaFechas("7", fechaSugerida, today);
+                                }
+                            }
+                            break;
+
+                        case 8:
+                            seguimiento = (obtenerSeguimientoPorDia(7) != null) ? obtenerSeguimientoPorDia(7) :
+                                    obtenerNuevoSeguimientoPorDia(7);
+
+                            if (seguimiento != null && !StringUtils.isNullOrEmpty(seguimiento.getFechaSeguimiento())) {
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                Calendar fechaAnterior = Calendar.getInstance();
+                                fechaAnterior.setTime(sdf.parse(seguimiento.getFechaSeguimiento()));
+                                fechaAnterior.add(Calendar.DAY_OF_MONTH, 1);
+                                Date today = fecha.getTime();
+                                Date fechaSugerida = fechaAnterior.getTime();
+
+                                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                                if(!dateFormat.format(fechaSugerida).equals(dateFormat.format(today))) {
+                                    alertaFechas("8", fechaSugerida, today);
+                                }
+                            }
+                            break;
+
+                        case 9:
+                            seguimiento = (obtenerSeguimientoPorDia(8) != null) ? obtenerSeguimientoPorDia(8) :
+                                    obtenerNuevoSeguimientoPorDia(8);
+
+                            if (seguimiento != null && !StringUtils.isNullOrEmpty(seguimiento.getFechaSeguimiento())) {
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                Calendar fechaAnterior = Calendar.getInstance();
+                                fechaAnterior.setTime(sdf.parse(seguimiento.getFechaSeguimiento()));
+                                fechaAnterior.add(Calendar.DAY_OF_MONTH, 1);
+                                Date today = fecha.getTime();
+                                Date fechaSugerida = fechaAnterior.getTime();
+
+                                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                                if(!dateFormat.format(fechaSugerida).equals(dateFormat.format(today))) {
+                                    alertaFechas("9", fechaSugerida, today);
+                                }
+                            }
+                            break;
+
+                        case 10:
+                            seguimiento = (obtenerSeguimientoPorDia(9) != null) ? obtenerSeguimientoPorDia(9) :
+                                    obtenerNuevoSeguimientoPorDia(9);
+
+                            if (seguimiento != null && !StringUtils.isNullOrEmpty(seguimiento.getFechaSeguimiento())) {
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                Calendar fechaAnterior = Calendar.getInstance();
+                                fechaAnterior.setTime(sdf.parse(seguimiento.getFechaSeguimiento()));
+                                fechaAnterior.add(Calendar.DAY_OF_MONTH, 1);
+                                Date today = fecha.getTime();
+                                Date fechaSugerida = fechaAnterior.getTime();
+
+                                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                                if(!dateFormat.format(fechaSugerida).equals(dateFormat.format(today))) {
+                                    alertaFechas("10", fechaSugerida, today);
+                                }
+                            }
+                            break;
+
+                        case 11:
+                            seguimiento = (obtenerSeguimientoPorDia(10) != null) ? obtenerSeguimientoPorDia(10) :
+                                    obtenerNuevoSeguimientoPorDia(10);
+
+                            if (seguimiento != null && !StringUtils.isNullOrEmpty(seguimiento.getFechaSeguimiento())) {
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                Calendar fechaAnterior = Calendar.getInstance();
+                                fechaAnterior.setTime(sdf.parse(seguimiento.getFechaSeguimiento()));
+                                fechaAnterior.add(Calendar.DAY_OF_MONTH, 1);
+                                Date today = fecha.getTime();
+                                Date fechaSugerida = fechaAnterior.getTime();
+
+                                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                                if(!dateFormat.format(fechaSugerida).equals(dateFormat.format(today))) {
+                                    alertaFechas("11", fechaSugerida, today);
+                                }
+                            }
+                            break;
+
+                        case 12:
+                            seguimiento = (obtenerSeguimientoPorDia(11) != null) ? obtenerSeguimientoPorDia(11) :
+                                    obtenerNuevoSeguimientoPorDia(11);
+
+                            if (seguimiento != null && !StringUtils.isNullOrEmpty(seguimiento.getFechaSeguimiento())) {
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                Calendar fechaAnterior = Calendar.getInstance();
+                                fechaAnterior.setTime(sdf.parse(seguimiento.getFechaSeguimiento()));
+                                fechaAnterior.add(Calendar.DAY_OF_MONTH, 1);
+                                Date today = fecha.getTime();
+                                Date fechaSugerida = fechaAnterior.getTime();
+
+                                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                                if(!dateFormat.format(fechaSugerida).equals(dateFormat.format(today))) {
+                                    alertaFechas("12", fechaSugerida, today);
+                                }
+                            }
+                            break;
+
+                        case 13:
+                            seguimiento = (obtenerSeguimientoPorDia(12) != null) ? obtenerSeguimientoPorDia(12) :
+                                    obtenerNuevoSeguimientoPorDia(12);
+
+                            if (seguimiento != null && !StringUtils.isNullOrEmpty(seguimiento.getFechaSeguimiento())) {
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                Calendar fechaAnterior = Calendar.getInstance();
+                                fechaAnterior.setTime(sdf.parse(seguimiento.getFechaSeguimiento()));
+                                fechaAnterior.add(Calendar.DAY_OF_MONTH, 1);
+                                Date today = fecha.getTime();
+                                Date fechaSugerida = fechaAnterior.getTime();
+
+                                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                                if(!dateFormat.format(fechaSugerida).equals(dateFormat.format(today))) {
+                                    alertaFechas("13", fechaSugerida, today);
+                                }
+                            }
+                            break;
+
+                        case 14:
+                            seguimiento = (obtenerSeguimientoPorDia(13) != null) ? obtenerSeguimientoPorDia(13) :
+                                    obtenerNuevoSeguimientoPorDia(13);
+
+                            if (seguimiento != null && !StringUtils.isNullOrEmpty(seguimiento.getFechaSeguimiento())) {
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                Calendar fechaAnterior = Calendar.getInstance();
+                                fechaAnterior.setTime(sdf.parse(seguimiento.getFechaSeguimiento()));
+                                fechaAnterior.add(Calendar.DAY_OF_MONTH, 1);
+                                Date today = fecha.getTime();
+                                Date fechaSugerida = fechaAnterior.getTime();
+
+                                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                                if(!dateFormat.format(fechaSugerida).equals(dateFormat.format(today))) {
+                                    alertaFechas("14", fechaSugerida, today);
+                                }
+                            }
+                            break;
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                return false;
+            }
+
+            public void alertaFechas(String dia, Date fechaSugerida, Date fecha) {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                String fecha1 = sdf.format(fechaSugerida);
+                String fecha2 = sdf.format(fecha);
+
+                String message = "La fecha ingresada " + fecha2 + " no coincide con la fecha sugerida " + fecha1 + " para el día " + dia;
+
+                AlertDialog alertDialog = new AlertDialog.Builder(CONTEXT)
+                        .setIcon(android.R.drawable.ic_dialog_info)
+                        .setTitle(getActivity().getResources().getString(R.string.app_name))
+                        .setMessage(message)
+                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //set what would happen when positive button is clicked
+                            }
+                        })
+                        /*.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //set what should happen when negative button is clicked
+
+
+                            }
+                        })*/
+                        .show();
             }
 
             public void setMedico(int usuarioMedico){
