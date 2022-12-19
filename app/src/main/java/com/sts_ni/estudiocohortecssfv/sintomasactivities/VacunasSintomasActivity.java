@@ -300,14 +300,14 @@ public class VacunasSintomasActivity extends ActionBarActivity {
                 findViewById(R.id.chkbLTMNENSintoma), findViewById(R.id.chkbLTMDENSintoma)));
 
         hojaConsulta.setVacunasCompletas(AndroidUtils.resultadoGenericoChkbSND(findViewById(R.id.chkbVCCSENSintoma),
-                findViewById(R.id.chkbVCCNENSintoma), findViewById(R.id.chkbVCCNENSintoma)));
+                findViewById(R.id.chkbVCCNENSintoma), findViewById(R.id.chkbVCCDENSintoma)));
 
         hojaConsulta.setVacunaInfluenza(AndroidUtils.resultadoGenericoChkbSND(findViewById(R.id.chkbVCISENSintoma),
                 findViewById(R.id.chkbVCINENSintoma), findViewById(R.id.chkbVCIDENSintoma)));
 
         if( StringUtils.isNullOrEmpty(((EditText) findViewById(R.id.dpFCV)).getText().toString()) ){
             hojaConsulta.setFechaVacuna(null);
-        }else {
+        } else {
             hojaConsulta.setFechaVacuna(((EditText) findViewById(R.id.dpFCV)).getText().toString());
         }
 
